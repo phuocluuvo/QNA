@@ -1,0 +1,43 @@
+version: '3'
+services:
+  redis:
+      image: redis:latest
+      networks:
+        - sail
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: pass
+      MYSQL_DATABASE: QNA_database
+    ports:
+      - "3306:3306"
+    networks:
+      - sail
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend:/usr/src/app
+    working_dir: /usr/src/app
+    command: npm run start:dev
+    depends_on:
+      - redis
+      - mysql
+    environment:
+      NODE_ENV: production
+      REDIS_HOST: redis
+      MYSQL_HOST: mysql
+      MYSQL_USER: your-username
+      MYSQL_PASSWORD: your-password
+      MYSQL_DATABASE: your-database-name
+    ports:
+      - "3001:3000"
+    networks:
+      - sail
+    restart: unless-stopped
+
+networks:
+  sail:
