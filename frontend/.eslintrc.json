@@ -1,0 +1,9 @@
+{
+  "extends": "next/core-web-vitals",
+  "plugins": ["prettier"],
+  "rules": {
+    "prettier/prettier": 0,
+    "react-native/no-inline-styles": 0,
+    "no-shadow": "off"
+  }
+}
