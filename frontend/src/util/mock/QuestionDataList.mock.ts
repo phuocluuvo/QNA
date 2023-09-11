@@ -41,8 +41,7 @@ const questionDataList: PostListType = {
     totalPageNumber: 1,
   },
 };
-
-const random = Math.floor(Math.random() * 20);
+const random = Math.floor(Math.random() * 20) + 10;
 for (let i = 1; i <= random; i++) {
   const question = generateRandomQuestionDataList(i);
   questionDataList.postList.push(question);
