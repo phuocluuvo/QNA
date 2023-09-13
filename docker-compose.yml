@@ -1,9 +1,9 @@
-version: '3'
+version: "3"
 services:
   redis:
-      image: redis:latest
-      networks:
-        - sail
+    image: redis:latest
+    networks:
+      - sail
 
   mysql:
     image: mysql:5.7
@@ -46,10 +46,15 @@ services:
     volumes:
       - ./frontend:/usr/src/app
       - /usr/src/app/node_modules
+
     working_dir: /usr/src/app
     command: yarn run dev
     depends_on:
       - backend
+    environment:
+      - WDS_SOCKET_HOST=127.0.0.1
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
     ports:
       - "3000:3000"
     networks:

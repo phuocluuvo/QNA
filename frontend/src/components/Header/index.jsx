@@ -1,7 +1,7 @@
+"use client";
 import {
   Box,
   Button,
-  Container,
   HStack,
   IconButton,
   Spacer,
@@ -18,6 +18,7 @@ import { LanguageHelper } from "@/util/Language/Language.util";
 import { Pages } from "@/assets/constant/Pages";
 import ChangeLanguageButton from "./ChangeLanguageButton";
 import { Dimensions } from "@/assets/constant/Dimensions";
+import Link from "next/link";
 
 function Header() {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -68,7 +69,7 @@ function Header() {
             height={Dimensions.HEADER_HEIGHT}
           >
             <SearchBar getTranslate={getTranslate} />
-            <Button variant="main_button" color={"white"}>
+            <Button as={Link} variant="main_button" color={"white"} href={'question/create'}>
               {getTranslate("CREATE")}
             </Button>
           </HStack>

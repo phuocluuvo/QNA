@@ -15,6 +15,12 @@ export default function Home() {
     // Returns null on first render, so the client and server match
     return null;
   }
+  const pageNumClick = (page, limit) => {
+    router.push({
+      pathname: router.pathname,
+      query: { limit: limit, page: page },
+    });
+  };
   return (
     <Fragment>
       <Head>
@@ -61,13 +67,29 @@ export default function Home() {
     </Fragment>
   );
 }
-export const getStaticProps = async (props) => {
+// export const getStaticProps = async (props) => {
+//   return {
+//     props: {
+//       // ...(await loadTranslations(ni18nConfig, props.locale, [
+//       //   "server-namespace",
+//       // ])),
+//       ...clientNamespaces(["home-page"]),
+//     },
+//   };
+// };
+
+export async function getServerSideProps({ params, query, ...props }) {
+  // const postList = await getPosts(query.limit, query.page);
+  const postList = undefined;
   return {
     props: {
-      // ...(await loadTranslations(ni18nConfig, props.locale, [
-      //   "server-namespace",
-      // ])),
+      postList: postList ? postList : [],
+      pagination: {
+        current_page: 1,
+        limit: 10,
+        total_page_number: 1,
+      },
       ...clientNamespaces(["home-page"]),
     },
   };
-};
+}

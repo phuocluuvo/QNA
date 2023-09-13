@@ -23,6 +23,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/pages/about/index.jsx", "src/pages/[lang]/[country]/_app.jsx", "src/pages/index.jsx", "src/components/Header/ChangeLanguageButton/index.jsx", "src/pages/404.js", "src/pages/users/login/index.jsx", "src/pages/question/[id]/index.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/pages/about/index.jsx", "src/pages/[lang]/[country]/_app.jsx", "src/pages/index.jsx", "src/components/Header/ChangeLanguageButton/index.jsx", "src/pages/404.js", "src/pages/users/login/index.jsx", "src/pages/question/[id]/index.jsx", "src/pages/question/create/index.jsx"],
   "exclude": ["node_modules"]
 }
