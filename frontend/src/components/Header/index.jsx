@@ -19,6 +19,7 @@ import { Pages } from "@/assets/constant/Pages";
 import ChangeLanguageButton from "./ChangeLanguageButton";
 import { Dimensions } from "@/assets/constant/Dimensions";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 function Header() {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -26,6 +27,7 @@ function Header() {
     Pages.HOME
   );
   const [isMobile] = useMediaQuery("(max-width: 768px)");
+  const routes = useRouter();
   return (
     <>
       <VStack
@@ -69,7 +71,15 @@ function Header() {
             height={Dimensions.HEADER_HEIGHT}
           >
             <SearchBar getTranslate={getTranslate} />
-            <Button as={Link} variant="main_button" color={"white"} href={'question/create'}>
+            <Button
+              as={Link}
+              variant="main_button"
+              display={
+                routes.pathname === "/question/create" ? "none" : "flex"
+              }
+              color={"white"}
+              href={"/question/create"}
+            >
               {getTranslate("CREATE")}
             </Button>
           </HStack>

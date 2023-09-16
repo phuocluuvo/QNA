@@ -15,7 +15,8 @@ function SearchBar(props) {
       borderColor={
         isFocused ? "gray.500" : colorMode === "light" ? "gray.100" : "gray.700"
       }
-      w={isFocused ? { base: "80%", md: "50%" } : "200px"}
+      maxW={isFocused ? { base: "80%", md: "50%" } : "200px"}
+      flex={isFocused ? 1 : "unset"}
       transition="all 0.5s"
       background={colorMode === "light" ? "gray.100" : "gray.700"}
       rounded={"10px"}

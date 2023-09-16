@@ -33,6 +33,7 @@
     "react": "^17.0.0 || ^18.0.0",
     "react-dom": "^17.0.0 || ^18.0.0",
     "react-i18next": "^13.2.0",
+    "react-quill": "^2.0.0",
     "react-redux": "^8.1.2",
     "redux-logger": "^3.0.6",
     "typescript": "5.1.6"
