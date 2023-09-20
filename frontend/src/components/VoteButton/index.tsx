@@ -6,6 +6,7 @@ type VoteButtonProps = {
   type: "up" | "down";
   isDarkMode?: boolean;
   onClick?: () => void;
+  size?: string | number;
 };
 function VoteButton(props: VoteButtonProps) {
   return (
@@ -19,13 +20,13 @@ function VoteButton(props: VoteButtonProps) {
           <ChevronUpIcon
             color={Colors(props.isDarkMode).UP_VOTE_GREEN}
             transition={"all 0.5s"}
-            fontSize={30}
+            fontSize={props.size ? props.size : 30}
             _hover={{ color: Colors(props.isDarkMode).UP_VOTE_GREEN_HOVER }}
           />
         ) : (
           <ChevronDownIcon
             color={Colors(props.isDarkMode).DOWN_VOTE_RED}
-            fontSize={30}
+            fontSize={props.size ? props.size : 30}
             transition={"all 0.5s"}
             _hover={{ color: Colors(props.isDarkMode).DOWN_VOTE_RED_HOVER }}
           />

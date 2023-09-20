@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Colors } from "@/assets/constant/Colors";
 import {
   Avatar,
@@ -16,6 +16,7 @@ import helper from "@/util/helper";
 import { PostType } from "@/util/type/Post.type";
 import { useRouter } from "next/router";
 import { ChatIcon, ViewIcon } from "@chakra-ui/icons";
+import Author from "../Author";
 function QuestionItem({
   question,
   isDarkMode,
@@ -64,8 +65,8 @@ function QuestionItem({
           <Image
             src={question.images[0].url}
             alt="Picture of the author"
-            width={150}
-            height={300}
+            width={{ base: 75, md: 150 }}
+            height={{ base: "full", md: 300 }}
             rounded={"md"}
             style={{
               maxHeight: "150px",
@@ -110,20 +111,54 @@ function QuestionItem({
           ))}
         </HStack>
         <HStack w={"full"}>
-          <Avatar size="sm" src={question.user.avatar} />
           <VStack spacing={0} alignItems={"flex-start"}>
-            <Heading fontSize={"sm"}>{question.user.name}</Heading>
-            <Text fontSize={"xs"}>
-              {helper.formatDate(question.createdDate, true)}
-            </Text>
+            <Author
+              user={question.user}
+              nameStyle={{
+                fontWeight: "bold",
+                fontSize: "sm",
+                noOfLines: { base: 1, md: 2 },
+                _hover: {
+                  textDecoration: "underline",
+                },
+              }}
+              bottomText={helper.formatDate(question.createdDate, true)}
+              bottomTextStyle={{
+                color: "gray.500",
+                fontSize: "xs",
+                noOfLines: { base: 1, md: 2 },
+              }}
+            />
           </VStack>
           <Spacer />
-          <HStack>
-            <Text>
-              {helper.numberFormat(question.answerNumber ? question.answerNumber : 0)} <ChatIcon />
+          <HStack flex={1} alignItems="flex-end" justifyContent={"end"}>
+            <Text
+              display={{ base: "flex", md: "inline" }}
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                flexDirection: "column",
+                marginRight: "10px",
+              }}
+            >
+              {helper.numberFormat(
+                question.answerNumber ? question.answerNumber : 0
+              )}{" "}
+              <ChatIcon />
             </Text>
-            <Text>
-              {helper.numberFormat(question.viewsNumber ? question.viewsNumber : 0)} <ViewIcon />
+            <Text
+              display={{ base: "flex", md: "inline" }}
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                flexDirection: "column",
+                marginRight: "10px",
+              }}
+            >
+              {helper.numberFormat(
+                question.viewsNumber ? question.viewsNumber : 0
+              )}{" "}
+              <ViewIcon />
             </Text>
           </HStack>
         </HStack>

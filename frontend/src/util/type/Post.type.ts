@@ -1,3 +1,4 @@
+import { AnswerListType } from "./Answer.type";
 import { PartialBy } from "./CustomType";
 import { TagType } from "./Tag.type";
 import { UserType } from "./User.type";
@@ -15,6 +16,7 @@ interface Post {
   status: number;
   user: UserType;
   tags?: Array<TagType>;
+  answerList?: AnswerListType;
 }
 
 interface PostList {
