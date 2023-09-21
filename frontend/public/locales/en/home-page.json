@@ -23,5 +23,6 @@
   "ERROR_PASSWORD_LOWERCASE": "Password must contain at least one lowercase letter",
   "ERROR_PASSWORD_NUMBER": "Password must contain at least one number",
   "ERROR_PASSWORD_SPECIAL": "Password must contain at least one special character",
-  "ASKED_AT": "Asked at {0}"
+  "ASKED_AT": "Asked at {0}",
+  "ANSWERED_AT": "Answered at {0}"
 }

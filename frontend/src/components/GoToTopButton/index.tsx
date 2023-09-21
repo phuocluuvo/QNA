@@ -37,6 +37,7 @@ function GoToTopButton() {
       rounded={"full"}
       icon={<ChevronUpIcon />}
       onClick={handleClick}
+      zIndex={9999}
     />
   );
 }

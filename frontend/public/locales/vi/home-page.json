@@ -23,5 +23,6 @@
   "ERROR_PASSWORD_LOWERCASE": "Mật khẩu phải có ít nhất một chữ cái viết thường",
   "ERROR_PASSWORD_NUMBER": "Mật khẩu phải có ít nhất một chữ số",
   "ERROR_PASSWORD_SPECIAL": "Mật khẩu phải có ít nhất một ký tự đặc biệt",
-  "ASKED_AT": "Hỏi vào lúc {0}"
+  "ASKED_AT": "Hỏi vào lúc {0}",
+  "ANSWERED_AT": "Trả lời vào lúc {0}"
 }

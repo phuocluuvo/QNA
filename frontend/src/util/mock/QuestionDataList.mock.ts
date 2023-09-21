@@ -1,13 +1,13 @@
 import { faker } from "@faker-js/faker";
-import { UserType } from "../type/User.type";
 import { PostListType, PostType } from "../type/Post.type";
-import { TagType } from "../type/Tag.type";
 import users from "./UserData.mock";
 import tagList from "./TagData.mock";
+import { AnswerListType } from "../type/Answer.type";
+import answerList from "./AnswareDataList.mock";
 
 function generateRandomQuestionDataList(id: number): PostType {
   const title = faker.lorem.sentence();
-  const content = faker.lorem.paragraphs({min: 4, max: 30},'\n');
+  const content = faker.lorem.paragraphs({ min: 4, max: 30 }, "\n");
   const user = users[Math.floor(Math.random() * 10)];
   const tags = tagList(Math.floor(Math.random() * 5));
   const images = [{ url: faker.image.urlPicsumPhotos() }];
@@ -17,6 +17,7 @@ function generateRandomQuestionDataList(id: number): PostType {
   const voteNumber = faker.number.int({ min: 0, max: 1000 });
   const viewsNumber = faker.number.int({ min: 0, max: 10000 });
   const answerNumber = faker.number.int({ min: 0, max: 1000 });
+  const _answerList: AnswerListType = answerList;
 
   return {
     id,
@@ -31,6 +32,7 @@ function generateRandomQuestionDataList(id: number): PostType {
     viewsNumber,
     images,
     answerNumber,
+    answerList: _answerList,
   };
 }
 
