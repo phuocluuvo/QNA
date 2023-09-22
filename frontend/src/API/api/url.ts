@@ -6,4 +6,6 @@ export const url = {
   RESET_PASSWORD: "/api/user/do-reset-password",
   CHECK_EXISTS_USER: "/api/user/check-exists-user",
   USER: "/api/user",
+  QUESTION: "/api/question/{id}",
+  QUESTION_LIST: "/api/question-list",
 };

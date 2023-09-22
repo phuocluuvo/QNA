@@ -74,9 +74,7 @@ function AnswareItem({
           </Flex>
           <VStack>
             {/* display raw text */}
-            <Text aria-multiline={true}>
-              {answer.content}
-            </Text>
+            <Text aria-multiline={true}>{answer.content}</Text>
             <HStack w={"full"} mb={"1"} mr={2} alignItems={"flex-start"}>
               <Author
                 user={answer.user}

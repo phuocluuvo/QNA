@@ -1,5 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { url } from "./url";
+import { FormQuestion } from "../type/Form.type";
 const enum REQUEST_METHOD {
   GET = "GET",
   POST = "POST",
@@ -43,7 +44,9 @@ async function getAuthorizeHeader() {
   }
 }
 
-const getAuthorizeHeaderPromised = async (): Promise<AxiosRequestConfig<any>> => {
+const getAuthorizeHeaderPromised = async (): Promise<
+  AxiosRequestConfig<any>
+> => {
   if (token !== "") {
     return Promise.resolve({
       headers: { Authorization: token },
@@ -64,10 +67,10 @@ const getAuthorizeHeaderPromised = async (): Promise<AxiosRequestConfig<any>> =>
       }
     });
     try {
-          return await promise;
-      } catch (error) {
-          throw error;
-      }
+      return await promise;
+    } catch (error) {
+      throw error;
+    }
   }
 };
 
@@ -118,4 +121,24 @@ const requestUpdateUserProfile = (form: FormData) => {
   return apiFormData.put(url.USER, form, {
     headers: { Authorization: token },
   });
+};
+
+const getQuestion = (form: FormQuestion) => {
+  return api.post(url.QUESTION, form);
+};
+
+const getQuestionList = () => {
+  return api.post(url.QUESTION_LIST);
+};
+
+export default {
+  api,
+  apiFormData,
+  requestSignUp,
+  requestUpdateUserProfile,
+  makeApiRequestingWithAuthorized,
+  setUserToken,
+  getUserToken,
+  getQuestion,
+  getQuestionList,
 };
