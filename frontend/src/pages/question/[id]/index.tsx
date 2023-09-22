@@ -1,10 +1,12 @@
 "use client";
+import actionGetQuestion from "@/API/redux/actions/ActionGetQuestion";
 import { Colors } from "@/assets/constant/Colors";
 import { Pages } from "@/assets/constant/Pages";
 import AnswareItem from "@/components/AnswerItem";
 import Author from "@/components/Author";
 import ErrorContent from "@/components/Error";
 import LinkButton from "@/components/LinkButton";
+import TagQuestion from "@/components/TagQuestion";
 import VoteButton from "@/components/VoteButton";
 import { LanguageHelper } from "@/util/Language/Language.util";
 import helper from "@/util/helper";
@@ -28,32 +30,35 @@ import {
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 function Question() {
   const { getTranslate } = LanguageHelper(Pages.HOME);
   const { colorMode } = useColorMode();
   const router = useRouter();
   const { id } = router.query;
   const [hydrated, setHydrated] = useState(false);
+  const dispatch = useDispatch();
   useEffect(() => {
-    async function fetchQuestion() {
-      try {
-        // @ts-ignore
-        let data = QuestionDataList.postList.at(id - 1);
-        console.log("adu:", data);
-
-        // @ts-ignore
-        setState((oldState) =>
-          helper.mappingState(oldState, {
-            question: data,
-            // @ts-ignore
-            count: data.voteNumber,
-          })
-        );
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    fetchQuestion();
+    let form = {
+      id: Number(id),
+    };
+    dispatch(
+      actionGetQuestion(
+        form,
+        (data) => {
+          // @ts-ignore
+          setState((oldState) =>
+            helper.mappingState(oldState, {
+              question: data,
+              count: data.voteNumber,
+            })
+          );
+        },
+        () => {
+          console.log("error");
+        }
+      )
+    );
   }, [id]);
   const [state, setState] = useState<{
     count: number;
@@ -156,24 +161,7 @@ function Question() {
                           <Heading>{state.question.title}</Heading>
                           <HStack>
                             {state.question.tags?.map((tag) => (
-                              <Tag
-                                key={tag.id}
-                                size={"md"}
-                                colorScheme={"telegram"}
-                                py={1}
-                                px={2}
-                                my={2}
-                                rounded={"full"}
-                                cursor={"pointer"}
-                                _hover={{
-                                  bgColor: "orange.400",
-                                  color: "white",
-                                  transition: "all 0.3s ease-in-out",
-                                }}
-                                onClick={() => router.push(`/tag/${tag.id}`)}
-                              >
-                                {tag.name}
-                              </Tag>
+                              <TagQuestion key={tag.id} tag={tag} />
                             ))}
                           </HStack>
                         </Box>
@@ -210,7 +198,9 @@ function Question() {
                     {/* display raw text */}
 
                     <Text aria-multiline={true}>
-                      {parseLines(state.question.content)}
+                      {state.question.content
+                        ? parseLines(state.question.content)
+                        : null}
                     </Text>
                   </Box>
                 </HStack>
@@ -242,7 +232,7 @@ function Question() {
                   (question, index) =>
                     index < 5 && (
                       <Box
-                        key={question.id}
+                        key={index}
                         style={{
                           margin: "10px",
                           marginBlock: "20px",
