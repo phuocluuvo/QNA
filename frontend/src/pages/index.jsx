@@ -2,12 +2,25 @@ import Head from "next/head";
 import { Fragment, useEffect, useState } from "react";
 import { clientNamespaces } from "ni18n";
 import QuestionDataList from "../util/mock/QuestionDataList.mock";
-import { Box, Flex, HStack, Text, useColorMode } from "@chakra-ui/react";
-import { Colors } from "@/assets/constant/Colors";
+import { Flex, HStack, useColorMode } from "@chakra-ui/react";
+
 import QuestionItem from "@/components/QuestionItem";
+import TabsQuestion from "@/components/TabsQuestion";
+import { useDispatch, useSelector } from "react-redux";
+import actionGetQuestionList from "@/API/redux/actions/ActionGetQuestionList";
 export default function Home() {
+  const dispatch = useDispatch();
+
   const { colorMode } = useColorMode();
   const [hydrated, setHydrated] = useState(false);
+  const [questionList, setQuestionList] = useState(null);
+  useEffect(() => {
+    dispatch(
+      actionGetQuestionList((res) => {
+        setQuestionList(res);
+      })
+    );
+  }, []);
   useEffect(() => {
     setHydrated(true);
   }, []);
@@ -15,6 +28,7 @@ export default function Home() {
     // Returns null on first render, so the client and server match
     return null;
   }
+
   const pageNumClick = (page, limit) => {
     router.push({
       pathname: router.pathname,
@@ -45,24 +59,23 @@ export default function Home() {
           wrap={"wrap"}
           flex={{ base: 1, md: 0.8 }}
         >
-          {QuestionDataList.postList.map((question, index) => (
+          {questionList.postList.map((question, index) => (
             <QuestionItem
-              key={question.id}
+              key={index}
               question={question}
-              isLast={index === QuestionDataList.postList.length - 1}
+              isLast={index === questionList.postList.length - 1}
               isDarkMode={colorMode === "dark"}
             />
           ))}
         </Flex>
-        <Box
-          rounded={"md"}
-          pos={"sticky"}
-          top={"11%"}
-          flex={{ base: 0, md: 0.2 }}
-          // w={80}
-          height={"50vh"}
-          bg={Colors(colorMode === "dark").PRIMARY_BG}
-        ></Box>
+        <TabsQuestion
+          containerStyles={{
+            pos: "sticky",
+            top: "11%",
+            flex: { base: 0, md: 0.2 },
+            display: { base: "none", md: "flex" },
+          }}
+        />
       </HStack>
     </Fragment>
   );
