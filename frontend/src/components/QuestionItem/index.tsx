@@ -17,6 +17,7 @@ import { PostType } from "@/util/type/Post.type";
 import { useRouter } from "next/router";
 import { ChatIcon, ViewIcon } from "@chakra-ui/icons";
 import Author from "../Author";
+import TagQuestion from "../TagQuestion";
 function QuestionItem({
   question,
   isDarkMode,
@@ -65,8 +66,9 @@ function QuestionItem({
           <Image
             src={question.images[0].url}
             alt="Picture of the author"
-            width={{ base: 75, md: 150 }}
-            height={{ base: "full", md: 300 }}
+            width={150}
+            display={{ base: "none", md: "block" }}
+            height={300}
             rounded={"md"}
             style={{
               maxHeight: "150px",
@@ -86,7 +88,7 @@ function QuestionItem({
           onClick
             ? onClick
             : // @ts-ignore
-              router.push(`question/${question.id}`);
+              router.push(router.basePath + `/question/${question.id}`);
         }}
         cursor={"pointer"}
       >
@@ -98,16 +100,7 @@ function QuestionItem({
         </Text>
         <HStack>
           {question.tags?.map((tag) => (
-            <Tag
-              key={tag.id}
-              size={"sm"}
-              colorScheme={"telegram"}
-              py={1}
-              px={2}
-              rounded={"full"}
-            >
-              {tag.name}
-            </Tag>
+            <TagQuestion tag={tag} key={tag.id} />
           ))}
         </HStack>
         <HStack w={"full"}>
