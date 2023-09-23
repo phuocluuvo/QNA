@@ -12,13 +12,4 @@ export class UserService {
   async findAll(): Promise<User[]> {
     return this.userRepository.find();
   }
-
-  async createOne() {
-    this.userRepository.create({
-      name: "ewe",
-      avatar: "đưaawdwa",
-      email: "ưdaadwdwadw",
-      isVerify: true,
-    });
-  }
 }
