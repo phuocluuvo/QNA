@@ -1,8 +1,8 @@
-import { Entity, Column, PrimaryColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Question {
-  @PrimaryColumn({ type: "uuid" })
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @Column({ length: 300 })
@@ -11,9 +11,9 @@ export class Question {
   @Column("text")
   content: string;
 
-  @Column()
+  @Column({ default: 0 })
   views: number;
 
-  @Column()
+  @Column({ default: 0 })
   vote: number;
 }
