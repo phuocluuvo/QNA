@@ -1,5 +1,5 @@
 import {
-  IsEnum,
+  IsEmail,
   IsNotEmpty,
   IsString,
   Matches,
@@ -7,14 +7,23 @@ import {
   MinLength,
 } from "class-validator";
 import { Role } from "../../enums/role.enum";
+import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateUserDto {
-  @IsNotEmpty()
+  @ApiProperty()
+  @IsNotEmpty({
+    message: "Username is required",
+  })
   username: string;
 
-  @IsString()
+  @ApiProperty()
+  @IsString({
+    message: "Email must be a string",
+  })
+  @IsEmail()
   email: string;
 
+  @ApiProperty()
   @IsString()
   @MinLength(4)
   @MaxLength(20)
@@ -23,10 +32,9 @@ export class CreateUserDto {
   })
   password: string;
 
-  @IsString()
-  @IsEnum(Role)
+  @ApiProperty({ enum: ["admin", "user"] })
   @IsNotEmpty({
     message: "Role is required",
   })
-  role: string;
+  role: Role[];
 }

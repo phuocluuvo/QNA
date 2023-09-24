@@ -1,9 +1,10 @@
 import { Controller, Post, UseGuards, Req } from "@nestjs/common";
-import { ApiOperation } from "@nestjs/swagger";
+import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { AuthService } from "./auth.service";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { Request } from "express";
 
+@ApiTags("auth")
 @Controller("auth")
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -14,7 +15,6 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post("/login")
   async login(@Req() req: Request) {
-    console.log(req);
     return await this.authService.login(req["user"]);
   }
 }
