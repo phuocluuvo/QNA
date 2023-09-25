@@ -5,13 +5,16 @@ import {
   MaxLength,
   MinLength,
 } from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
 
 export class LoginUserDto {
+  @ApiProperty()
   @IsNotEmpty({
     message: "Username is required",
   })
   username: string;
 
+  @ApiProperty()
   @IsString()
   @MinLength(4)
   @MaxLength(20)
