@@ -9,7 +9,7 @@ export class UsersService {
   constructor(
     @Inject("USERS_REPOSITORY")
     private userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
@@ -48,13 +48,15 @@ export class UsersService {
     }
   }
 
-  async findById(id: string): Promise<User | undefined> {
+  async findById(id: string): Promise<Partial<User> | undefined> {
     try {
       const user = await this.userRepository.findOne({
         where: { id },
       });
 
       if (user) {
+        delete user.password;
+        delete user.refreshToken;
         return user;
       }
     } catch (err) {

@@ -17,6 +17,18 @@ export class CreateUserDto {
   username: string;
 
   @ApiProperty()
+  @IsNotEmpty({
+    message: "Fullname is required",
+  })
+  fullname: string;
+
+  @ApiProperty()
+  avatar: string;
+
+  @ApiProperty()
+  dob: Date
+
+  @ApiProperty()
   @IsString({
     message: "Email must be a string",
   })
@@ -25,8 +37,7 @@ export class CreateUserDto {
 
   @ApiProperty()
   @IsString()
-  @MinLength(4)
-  @MaxLength(20)
+  @MinLength(8)
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
     message: "password too weak",
   })

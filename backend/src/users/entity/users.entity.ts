@@ -15,6 +15,15 @@ export class User {
   @Column({ nullable: false })
   username: string;
 
+  @Column({ nullable: false })
+  fullname: string;
+
+  @Column({ nullable: true })
+  avatar: string;
+
+  @Column({ nullable: true })
+  dob: Date
+
   @Column({ nullable: false, unique: true })
   email: string;
 

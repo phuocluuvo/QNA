@@ -10,7 +10,6 @@ import {
   Delete,
 } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
-import { CreateUserDto } from "./dto/create-user.dto";
 import { UsersService } from "./users.service";
 import { AccessTokenGuard } from "../auth/guards/accessToken.guard";
 import { UpdateUserDto } from "./dto/update-user.dto";
@@ -18,7 +17,7 @@ import { UpdateUserDto } from "./dto/update-user.dto";
 @ApiTags("user")
 @Controller("user")
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @ApiOperation({
     summary: "get profile user",
@@ -26,7 +25,8 @@ export class UsersController {
   @UseGuards(AccessTokenGuard)
   @Get("profile")
   getProfile(@Request() req) {
-    return req.user;
+    //Todo filter
+    return this.usersService.findById(req.user["sub"]);
   }
 
   @ApiOperation({
