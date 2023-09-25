@@ -36,5 +36,8 @@ export class CreateUserDto {
   @IsNotEmpty({
     message: "Role is required",
   })
-  role: Role[];
+  role: Role;
+
+  @ApiProperty()
+  refreshToken: string;
 }

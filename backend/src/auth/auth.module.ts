@@ -4,21 +4,26 @@ import { PassportModule } from "@nestjs/passport";
 import { UsersModule } from "../users/users.module";
 import { AuthService } from "./auth.service";
 import { jwtConstants } from "../constants/constants";
-import { JwtStrategy } from "./strategies/jwt.strategy";
-import { LocalStrategy } from "./strategies/local.strategy";
 import { AuthController } from "./auth.controller";
 import { RolesGuard } from "./guards/roles.guard";
+import { AccessTokenStrategy } from "./strategies/accessToken.strategy";
+import { RefreshTokenStrategy } from "./strategies/refreshToken.strategy";
 
 @Module({
   imports: [
     PassportModule,
     JwtModule.register({
-      secret: jwtConstants.secret,
+      secret: jwtConstants.access,
       signOptions: { expiresIn: "23d" },
     }),
     forwardRef(() => UsersModule),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy, RolesGuard],
+  providers: [
+    AuthService,
+    AccessTokenStrategy,
+    RefreshTokenStrategy,
+    RolesGuard,
+  ],
   controllers: [AuthController],
   exports: [AuthService],
 })

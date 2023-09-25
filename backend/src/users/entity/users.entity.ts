@@ -22,11 +22,14 @@ export class User {
   password: string;
 
   @Column({ type: "enum", enum: Role, default: Role.USER })
-  role: Role[];
+  role: Role;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
 
   @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
+
+  @Column({ default: null })
+  refreshToken: string;
 }

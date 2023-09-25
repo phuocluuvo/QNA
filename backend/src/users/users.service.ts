@@ -1,8 +1,8 @@
-import { Injectable, Inject } from "@nestjs/common";
+import { Injectable, Inject, NotFoundException } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { User } from "./entity/users.entity";
-import * as bcrypt from "bcrypt";
+import { UpdateUserDto } from "./dto/update-user.dto";
 
 @Injectable()
 export class UsersService {
@@ -11,33 +11,71 @@ export class UsersService {
     private userRepository: Repository<User>,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto): Promise<User> {
     try {
-      const user = new User();
-      const hashPassword = await bcrypt.hash(createUserDto.password, 10);
-      user.username = createUserDto.username;
-      user.email = createUserDto.email;
-      user.password = hashPassword;
-      user.role = createUserDto.role;
+      const user: User = this.userRepository.create(createUserDto);
       return this.userRepository.save(user);
     } catch (err) {
       throw new Error(`Error creating ${err} user ${err.message}`);
     }
   }
 
-  async findOne(email: string, password: string): Promise<User | undefined> {
+  async findOne(username: string): Promise<User | undefined> {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { username },
+      });
+
+      if (user) {
+        return user;
+      }
+    } catch (err) {
+      throw new Error(`Error finding ${err} user ${err.message}`);
+    }
+  }
+
+  async findOneByEmail(email: string): Promise<User | undefined> {
     try {
       const user = await this.userRepository.findOne({
         where: { email },
       });
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (user && isMatch) {
+
+      if (user) {
         return user;
-      } else {
-        throw new Error(`User not found`);
       }
     } catch (err) {
       throw new Error(`Error finding ${err} user ${err.message}`);
+    }
+  }
+
+  async findById(id: string): Promise<User | undefined> {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { id },
+      });
+
+      if (user) {
+        return user;
+      }
+    } catch (err) {
+      throw new Error(`Error finding ${err} user ${err.message}`);
+    }
+  }
+
+  async update(id: string, userDto: UpdateUserDto) {
+    try {
+      const user = await this.userRepository.preload({
+        id,
+        ...userDto,
+      });
+
+      if (!user) {
+        throw new NotFoundException(`There is no user under id ${id}`);
+      }
+
+      return this.userRepository.save(user);
+    } catch (err) {
+      throw new Error(`Error update ${err} user ${err.message}`);
     }
   }
 }
