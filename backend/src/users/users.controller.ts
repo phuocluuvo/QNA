@@ -30,7 +30,7 @@ export class UsersController {
   @UseGuards(AccessTokenGuard)
   @Get("profile")
   async getProfile(@Request() req) {
-    const user = await this.usersService.findById(req.user["sub"]);
+    const user = await this.usersService.getProfile(req.user["sub"]);
     return plainToClass(UserDto, user, { excludeExtraneousValues: true });
   }
 

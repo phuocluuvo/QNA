@@ -42,9 +42,11 @@ export class UsersService {
    */
   async findOne(username: string): Promise<User | undefined> {
     try {
-      const user = await this.userRepository.findOne({
-        where: { username },
-      });
+      const user = await this.userRepository
+        .createQueryBuilder("user")
+        .addSelect("user.password")
+        .where({ username })
+        .getOne();
 
       if (user) {
         return user;
@@ -84,9 +86,11 @@ export class UsersService {
    */
   async findById(id: string): Promise<Partial<User> | undefined> {
     try {
-      const user = await this.userRepository.findOne({
-        where: { id },
-      });
+      const user = await this.userRepository
+        .createQueryBuilder("user")
+        .addSelect("user.refreshToken")
+        .where({ id })
+        .getOne();
 
       if (user) {
         return user;
@@ -97,7 +101,7 @@ export class UsersService {
   }
 
   /**
-   * Update user information only auth.
+   * Update user information, only auth use.
    *
    * @param id ID of the user to update.
    * @param userDto Data for updating the user.
@@ -119,6 +123,27 @@ export class UsersService {
       return this.userRepository.save(user);
     } catch (err) {
       throw new Error(`Error update ${err} user ${err.message}`);
+    }
+  }
+
+  /**
+   * Find a user by ID.
+   *
+   * @param id ID of the user to search for.
+   * @returns Promise<Partial<User> | undefined> The found user or undefined if not found.
+   * @throws Error if there's an error during the search process.
+   */
+  async getProfile(id: string): Promise<User | undefined> {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { id },
+      });
+
+      if (user) {
+        return user;
+      }
+    } catch (err) {
+      throw new Error(`Error finding ${err} user ${err.message}`);
     }
   }
 
