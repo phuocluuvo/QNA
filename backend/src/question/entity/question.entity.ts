@@ -20,9 +20,6 @@ export class Question {
   @Column({ default: 0 })
   views: number;
 
-  @Column({ default: 0 })
-  vote: number;
-
   @Column()
   user: string;
 

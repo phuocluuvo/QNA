@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  Param,
   Patch,
   Request,
   UseGuards,
@@ -30,15 +29,15 @@ export class UsersController {
   })
   @UseGuards(AccessTokenGuard)
   @Get("profile")
-  getProfile(@Request() req) {
-    const user = this.usersService.findById(req.user["sub"]);
+  async getProfile(@Request() req) {
+    const user = await this.usersService.findById(req.user["sub"]);
     return plainToClass(UserDto, user, { excludeExtraneousValues: true });
   }
 
   /**
    * Update the profile of a user.
    *
-   * @param id ID of the user to update.
+   * @param req get id login user
    * @param updateUserDto Data for updating the user profile.
    * @returns Promise<User> The updated user profile.
    */
@@ -46,8 +45,12 @@ export class UsersController {
     summary: "update profile user",
   })
   @UseGuards(AccessTokenGuard)
-  @Patch(":id")
-  update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+  @Patch()
+  async update(@Request() req, @Body() updateUserDto: UpdateUserDto) {
+    const id = req.user["sub"];
+    const user = await this.usersService.updateProfile(id, updateUserDto);
+    return plainToClass(UserDto, user, {
+      excludeExtraneousValues: true,
+    });
   }
 }
