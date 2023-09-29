@@ -3,9 +3,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { Question } from "../../question/entity/question.entity";
 
 @Entity()
 export class User {
@@ -33,12 +35,15 @@ export class User {
   @Column({ type: "enum", enum: Role, default: Role.USER })
   role: Role;
 
+  @Column({ default: null, select: false })
+  refreshToken: string;
+
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
 
   @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
 
-  @Column({ default: null })
-  refreshToken: string;
+  @OneToMany(() => Question, (question) => question.user)
+  questions: Question[];
 }

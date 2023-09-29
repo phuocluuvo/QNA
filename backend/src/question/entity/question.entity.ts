@@ -2,9 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { User } from "../../users/entity/users.entity";
 
 @Entity()
 export class Question {
@@ -20,7 +23,8 @@ export class Question {
   @Column({ default: 0 })
   views: number;
 
-  @Column()
+  @ManyToOne(() => User, (user) => user.questions)
+  @JoinColumn({ name: "user_id" })
   user: string;
 
   @CreateDateColumn({ name: "created_at" })

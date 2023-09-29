@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { Repository } from "typeorm";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { User } from "./entity/users.entity";
@@ -7,8 +12,6 @@ import * as argon2 from "argon2";
 
 @Injectable()
 export class UsersService {
-  asy;
-
   constructor(
     @Inject("USERS_REPOSITORY")
     private userRepository: Repository<User>,
@@ -129,7 +132,13 @@ export class UsersService {
    * @throws Error if there's an error during the update process.
    */
   async updateProfile(id: string, userDto: UpdateUserDto) {
-    userDto["password"] = await argon2.hash(userDto["password"]);
-    return await this.update(id, userDto);
+    try {
+      userDto["password"] = await argon2.hash(userDto["password"]);
+      delete userDto.username;
+      delete userDto.refreshToken;
+      return await this.update(id, userDto);
+    } catch (e) {
+      throw new BadRequestException("Email already exists");
+    }
   }
 }

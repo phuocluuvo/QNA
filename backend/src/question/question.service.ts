@@ -15,7 +15,7 @@ export class QuestionService {
   constructor(
     @Inject("QUESTION_REPOSITORY")
     private questionRepository: Repository<Question>,
-  ) { }
+  ) {}
 
   /**
    * Find questions based on pagination options.
@@ -100,12 +100,15 @@ export class QuestionService {
   /**
    * Get a question by its ID and increase its view count.
    *
-   * @param id - The ID of the question.
+   * @param questionId - The ID of the question.
    * @returns The question with an increased view count.
    * @throws NotFoundException if the question does not exist.
    */
-  async getAndIncreaseViewCount(id: string): Promise<Question> {
-    const question = await this.findOneById(id);
+  async getAndIncreaseViewCount(questionId: string): Promise<Question> {
+    const question = await this.questionRepository.findOne({
+      where: { id: questionId },
+      relations: ["user"],
+    });
     if (!question) {
       throw new NotFoundException("Question not found");
     }
