@@ -1,4 +1,4 @@
-import { Injectable, Inject, NotFoundException } from "@nestjs/common";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { User } from "./entity/users.entity";
@@ -9,8 +9,15 @@ export class UsersService {
   constructor(
     @Inject("USERS_REPOSITORY")
     private userRepository: Repository<User>,
-  ) { }
+  ) {}
 
+  /**
+   * Create a new user.
+   *
+   * @param createUserDto Data for creating a new user.
+   * @returns Promise<User> The created user.
+   * @throws Error if there's an error during the creation process.
+   */
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
       const user: User = this.userRepository.create(createUserDto);
@@ -20,6 +27,13 @@ export class UsersService {
     }
   }
 
+  /**
+   * Find a user by username.
+   *
+   * @param username Username to search for.
+   * @returns Promise<User | undefined> The found user or undefined if not found.
+   * @throws Error if there's an error during the search process.
+   */
   async findOne(username: string): Promise<User | undefined> {
     try {
       const user = await this.userRepository.findOne({
@@ -34,6 +48,13 @@ export class UsersService {
     }
   }
 
+  /**
+   * Find a user by email.
+   *
+   * @param email Email to search for.
+   * @returns Promise<User | undefined> The found user or undefined if not found.
+   * @throws Error if there's an error during the search process.
+   */
   async findOneByEmail(email: string): Promise<User | undefined> {
     try {
       const user = await this.userRepository.findOne({
@@ -48,6 +69,13 @@ export class UsersService {
     }
   }
 
+  /**
+   * Find a user by ID.
+   *
+   * @param id ID of the user to search for.
+   * @returns Promise<Partial<User> | undefined> The found user or undefined if not found.
+   * @throws Error if there's an error during the search process.
+   */
   async findById(id: string): Promise<Partial<User> | undefined> {
     try {
       const user = await this.userRepository.findOne({
@@ -55,8 +83,6 @@ export class UsersService {
       });
 
       if (user) {
-        delete user.password;
-        delete user.refreshToken;
         return user;
       }
     } catch (err) {
@@ -64,6 +90,15 @@ export class UsersService {
     }
   }
 
+  /**
+   * Update user information.
+   *
+   * @param id ID of the user to update.
+   * @param userDto Data for updating the user.
+   * @returns Promise<User> The updated user.
+   * @throws NotFoundException if the user with the given ID is not found.
+   * @throws Error if there's an error during the update process.
+   */
   async update(id: string, userDto: UpdateUserDto) {
     try {
       const user = await this.userRepository.preload({

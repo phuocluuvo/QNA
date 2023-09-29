@@ -7,24 +7,21 @@ import {
 } from "typeorm";
 
 @Entity()
-export class Question {
+export class Answer {
   @PrimaryGeneratedColumn("uuid")
   id: string;
+
+  @Column()
+  questionId: string;
 
   @Column({ length: 300 })
   title: string;
 
-  @Column("text")
-  content: string;
+  @Column({ default: 0 })
+  upVotes: number;
 
   @Column({ default: 0 })
-  views: number;
-
-  @Column({ default: 0 })
-  vote: number;
-
-  @Column()
-  user: string;
+  downVotes: number;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;

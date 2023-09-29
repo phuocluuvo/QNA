@@ -1,9 +1,9 @@
 import { Role } from "../../enums/role.enum";
 import {
   Column,
+  CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
-  CreateDateColumn,
   UpdateDateColumn,
 } from "typeorm";
 
@@ -12,17 +12,17 @@ export class User {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, unique: true })
   username: string;
 
   @Column({ nullable: false })
   fullname: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, default: null })
   avatar: string;
 
-  @Column({ nullable: true })
-  dob: Date
+  @Column({ nullable: true, default: null })
+  dob: Date;
 
   @Column({ nullable: false, unique: true })
   email: string;
