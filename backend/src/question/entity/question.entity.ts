@@ -25,7 +25,7 @@ export class Question {
 
   @ManyToOne(() => User, (user) => user.questions)
   @JoinColumn({ name: "user_id" })
-  user: string;
+  user: User;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;

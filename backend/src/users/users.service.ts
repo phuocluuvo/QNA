@@ -34,6 +34,27 @@ export class UsersService {
   }
 
   /**
+   * Find a user by obj.
+   *
+   * @param obj params.
+   * @returns Promise<User | undefined> The found user or undefined if not found.
+   * @throws Error if there's an error during the search process.
+   */
+  async find(obj: any): Promise<User | undefined> {
+    try {
+      const user = await this.userRepository.findOne({
+        where: obj,
+      });
+
+      if (user) {
+        return user;
+      }
+    } catch (err) {
+      throw new Error(`Error finding ${err} user ${err.message}`);
+    }
+  }
+
+  /**
    * Find a user by username.
    *
    * @param username Username to search for.

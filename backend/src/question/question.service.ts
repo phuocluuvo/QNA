@@ -37,10 +37,13 @@ export class QuestionService {
    * @throws NotFoundException if the question does not exist.
    */
   async findOneById(id: string) {
-    const question = await this.questionRepository.findOneById(id);
+    const question = await this.questionRepository.findOne({
+      where: { id: id },
+      relations: ["user"],
+    });
 
     if (!question) {
-      throw new NotFoundException(`There is no quiestion under id ${id}`);
+      throw new NotFoundException(`There is no question under id ${id}`);
     }
     return question;
   }
@@ -75,28 +78,23 @@ export class QuestionService {
     const questionTrans = plainToClass(UpdateQuestionDto, questionDto, {
       excludeExtraneousValues: true,
     });
-    const product = await this.questionRepository.preload({
+    const question = await this.questionRepository.preload({
       id,
       ...questionTrans,
     });
 
-    if (!product) {
-      throw new NotFoundException(`There is no product under id ${id}`);
-    }
-
-    return this.questionRepository.save(product);
+    return this.questionRepository.save(question);
   }
 
   /**
    * Remove a question by its ID.
    *
-   * @param id - The ID of the question to remove.
    * @returns The removed question.
    * @throws NotFoundException if the question does not exist.
+   * @param question
    */
-  async remove(id: string) {
-    const product = await this.findOneById(id);
-    return this.questionRepository.remove(product);
+  async remove(question: Question) {
+    return this.questionRepository.remove(question);
   }
 
   /**

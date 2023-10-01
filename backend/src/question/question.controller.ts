@@ -3,7 +3,9 @@ import {
   Controller,
   DefaultValuePipe,
   Delete,
+  ForbiddenException,
   Get,
+  NotFoundException,
   Param,
   ParseIntPipe,
   Patch,
@@ -20,11 +22,16 @@ import { UpdateQuestionDto } from "./dto/update-question.dto";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { AccessTokenGuard } from "../auth/guards/accessToken.guard";
 import { Request } from "express";
+import { Action } from "../enums/action.enum";
+import { CaslAbilityFactory } from "../casl/casl-ability.factory";
 
 @ApiTags("question")
 @Controller("question")
 export class QuestionController {
-  constructor(private readonly questionService: QuestionService) {}
+  constructor(
+    private readonly questionService: QuestionService,
+    private readonly caslAbilityFactory: CaslAbilityFactory,
+  ) {}
 
   /**
    * Search and paginate questions.
@@ -89,6 +96,7 @@ export class QuestionController {
    *
    * @param id The ID of the question to update.
    * @param questionDto The data for updating the question.
+   * @param req
    * @returns Promise<Question> The updated question.
    */
   @ApiOperation({
@@ -99,14 +107,27 @@ export class QuestionController {
   async update(
     @Param("id") id: string,
     @Body() questionDto: UpdateQuestionDto,
+    @Req() req: Request,
   ): Promise<Question> {
-    return this.questionService.update(id, questionDto);
+    const ability = this.caslAbilityFactory.createForUser(req.user);
+    const question = await this.questionService.findOneById(id);
+
+    if (!question) {
+      throw new NotFoundException(`There is no product under id ${id}`);
+    }
+
+    if (ability.can(Action.Update, question)) {
+      return this.questionService.update(id, questionDto);
+    } else {
+      throw new ForbiddenException("Access Denied. Not author");
+    }
   }
 
   /**
    * Delete a question.
    *
    * @param id The ID of the question to delete.
+   * @param req get user login
    * @returns Promise<Question> The deleted question.
    */
   @ApiOperation({
@@ -114,7 +135,21 @@ export class QuestionController {
   })
   @Delete(":id")
   @UseGuards(AccessTokenGuard)
-  async remove(@Param("id") id: string): Promise<Question> {
-    return this.questionService.remove(id);
+  async remove(
+    @Param("id") id: string,
+    @Req() req: Request,
+  ): Promise<Question> {
+    const ability = this.caslAbilityFactory.createForUser(req.user);
+    const question = await this.questionService.findOneById(id);
+
+    if (!question) {
+      throw new NotFoundException(`There is no product under id ${id}`);
+    }
+
+    if (ability.can(Action.Delete, question)) {
+      return this.questionService.remove(question);
+    } else {
+      throw new ForbiddenException("Access Denied. Not author");
+    }
   }
 }

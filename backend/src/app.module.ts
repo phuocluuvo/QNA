@@ -5,9 +5,10 @@ import { AnswerModule } from "./answer/answer.module";
 import { QuestionModule } from "./question/question.module";
 import { AuthModule } from "./auth/auth.module";
 import { UsersModule } from "./users/users.module";
+import { CaslModule } from './casl/casl.module';
 
 @Module({
-  imports: [UsersModule, AnswerModule, QuestionModule, AuthModule],
+  imports: [UsersModule, AnswerModule, QuestionModule, AuthModule, CaslModule],
   controllers: [AppController],
   providers: [AppService],
 })
