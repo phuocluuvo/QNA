@@ -4,6 +4,8 @@ services:
     image: redis:latest
     networks:
       - sail
+    ports:
+      - "6379:6379"
 
   mysql:
     image: mysql:5.7
@@ -32,6 +34,7 @@ services:
       - mysql
     environment:
       REDIS_HOST: redis
+      REDIS_PORT: 6379
       MYSQL_HOST: mysql
       MYSQL_PORT: 3306
       MYSQL_USER: root
