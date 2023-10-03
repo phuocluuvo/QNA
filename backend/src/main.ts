@@ -9,6 +9,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()
+    .addBearerAuth()
     .setTitle("QNA API Documentation")
     .setDescription("QNA API description")
     .setVersion("1.0")

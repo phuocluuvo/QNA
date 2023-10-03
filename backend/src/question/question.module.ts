@@ -10,5 +10,6 @@ import { CaslModule } from "../casl/casl.module";
   imports: [DatabaseModule, UsersModule, CaslModule],
   controllers: [QuestionController],
   providers: [...questionProviders, QuestionService],
+  exports: [QuestionService],
 })
 export class QuestionModule {}

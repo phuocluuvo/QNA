@@ -6,7 +6,7 @@ import {
   Request,
   UseGuards,
 } from "@nestjs/common";
-import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { UsersService } from "./users.service";
 import { AccessTokenGuard } from "../auth/guards/accessToken.guard";
 import { UpdateUserDto } from "./dto/update-user.dto";
@@ -27,6 +27,7 @@ export class UsersController {
   @ApiOperation({
     summary: "get profile user",
   })
+  @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
   @Get("profile")
   async getProfile(@Request() req) {
@@ -44,6 +45,7 @@ export class UsersController {
   @ApiOperation({
     summary: "update profile user",
   })
+  @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
   @Patch()
   async update(@Request() req, @Body() updateUserDto: UpdateUserDto) {

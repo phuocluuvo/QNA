@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { Question } from "../../question/entity/question.entity";
+import { Answer } from "../../answer/entity/answer.entity";
 
 @Entity()
 export class User {
@@ -46,4 +47,7 @@ export class User {
 
   @OneToMany(() => Question, (question) => question.user)
   questions: Question[];
+
+  @OneToMany(() => Answer, (answer) => answer.user)
+  answers: Answer[];
 }

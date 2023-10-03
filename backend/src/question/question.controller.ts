@@ -19,7 +19,7 @@ import { QuestionService } from "./question.service";
 import { CreateQuestionDto } from "./dto/create-question.dto";
 import { Pagination } from "nestjs-typeorm-paginate";
 import { UpdateQuestionDto } from "./dto/update-question.dto";
-import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { AccessTokenGuard } from "../auth/guards/accessToken.guard";
 import { Request } from "express";
 import { Action } from "../enums/action.enum";
@@ -81,6 +81,7 @@ export class QuestionController {
   @ApiOperation({
     summary: "create question",
   })
+  @ApiBearerAuth()
   @Post()
   @UseGuards(AccessTokenGuard)
   create(
@@ -102,6 +103,7 @@ export class QuestionController {
   @ApiOperation({
     summary: "update question",
   })
+  @ApiBearerAuth()
   @Patch(":id")
   @UseGuards(AccessTokenGuard)
   async update(
@@ -133,6 +135,7 @@ export class QuestionController {
   @ApiOperation({
     summary: "delete question",
   })
+  @ApiBearerAuth()
   @Delete(":id")
   @UseGuards(AccessTokenGuard)
   async remove(
@@ -143,7 +146,7 @@ export class QuestionController {
     const question = await this.questionService.findOneById(id);
 
     if (!question) {
-      throw new NotFoundException(`There is no product under id ${id}`);
+      throw new NotFoundException(`There is no question under id ${id}`);
     }
 
     if (ability.can(Action.Delete, question)) {

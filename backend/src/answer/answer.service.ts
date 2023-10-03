@@ -1,6 +1,14 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { Answer } from "./entity/answer.entity";
+import { CreateAnswerDto } from "./dto/create-answer.dto";
+import { plainToClass } from "class-transformer";
+import { UpdateAnswerDto } from "./dto/update-answer.dto";
+import {
+  IPaginationOptions,
+  paginate,
+  Pagination,
+} from "nestjs-typeorm-paginate";
 
 @Injectable()
 export class AnswerService {
@@ -9,7 +17,85 @@ export class AnswerService {
     private answerRepository: Repository<Answer>,
   ) {}
 
-  async getAnswers(questionId: string): Promise<Answer[]> {
-    return this.answerRepository.findBy({ questionId });
+  /**
+   * Find answers based on questionId and paginate the results.
+   *
+   * @param questionId - The ID of the question to filter answers.
+   * @param options - Pagination options.
+   * @returns Paginated list of answers.
+   */
+  async find(
+    questionId: string,
+    options: IPaginationOptions,
+  ): Promise<Pagination<Answer>> {
+    const queryBuilder = this.answerRepository.createQueryBuilder("answer");
+
+    queryBuilder.innerJoinAndSelect("answer.user", "user");
+    queryBuilder.innerJoinAndSelect("answer.question", "question");
+    queryBuilder.where(questionId ? { question: { id: questionId } } : {});
+    return paginate<Answer>(queryBuilder, options);
+  }
+
+  /**
+   * Find an answer by its ID.
+   *
+   * @param id - The ID of the answer to retrieve.
+   * @returns The answer with the specified ID.
+   * @throws NotFoundException if the answer with the given ID does not exist.
+   */
+  async findOneById(id: string) {
+    const answer = await this.answerRepository.findOne({
+      where: { id: id },
+      relations: ["user", "question"],
+    });
+
+    if (!answer) {
+      throw new NotFoundException(`There is no answer under id ${id}`);
+    }
+    return answer;
+  }
+
+  /**
+   * Create a new answer.
+   *
+   * @param answerDto - The data to create a new answer.
+   * @param userId - The ID of the user creating the answer.
+   * @returns The created answer.
+   */
+  async create(answerDto: CreateAnswerDto, userId: string) {
+    const answerTrans = plainToClass(CreateAnswerDto, answerDto, {
+      excludeExtraneousValues: true,
+    });
+    answerTrans["user"] = userId;
+    answerTrans["question"] = answerDto.questionId;
+    return this.answerRepository.save(answerTrans);
+  }
+
+  /**
+   * Update an existing answer.
+   *
+   * @param id - The ID of the answer to update.
+   * @param answerDto - The updated data for the answer.
+   * @returns The updated answer.
+   */
+  async update(id: string, answerDto: UpdateAnswerDto) {
+    const answerTrans = plainToClass(UpdateAnswerDto, answerDto, {
+      excludeExtraneousValues: true,
+    });
+    const answer = await this.answerRepository.preload({
+      id,
+      ...answerTrans,
+    });
+    return this.answerRepository.save(answer);
+  }
+
+  /**
+   * Remove an answer.
+   *
+   * @param answer - The answer entity to remove.
+   * @returns The removed answer.
+   */
+  async remove(answer: Answer) {
+    return this.answerRepository.remove(answer);
   }
 }

@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
-import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { AuthService } from "./auth.service";
 import { Request } from "express";
 import { CreateUserDto } from "../users/dto/create-user.dto";
@@ -49,6 +49,7 @@ export class AuthController {
   @ApiOperation({
     summary: "Logout as a user",
   })
+  @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
   @Get("logout")
   async logout(@Req() req: Request) {
@@ -65,6 +66,7 @@ export class AuthController {
   @ApiOperation({
     summary: "Refresh token",
   })
+  @ApiBearerAuth()
   @UseGuards(RefreshTokenGuard)
   @Get("refresh")
   refreshTokens(@Req() req: Request) {
