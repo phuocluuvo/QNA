@@ -3,7 +3,6 @@ import {
   IsNotEmpty,
   IsString,
   Matches,
-  MaxLength,
   MinLength,
 } from "class-validator";
 import { Role } from "../../enums/role.enum";
@@ -26,7 +25,7 @@ export class CreateUserDto {
   avatar: string;
 
   @ApiProperty()
-  dob: Date
+  dob: Date;
 
   @ApiProperty()
   @IsString({
@@ -39,7 +38,7 @@ export class CreateUserDto {
   @IsString()
   @MinLength(8)
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-    message: "password too weak",
+    message: "Password too weak",
   })
   password: string;
 

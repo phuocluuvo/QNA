@@ -2,39 +2,57 @@ import {
   Body,
   Controller,
   Get,
-  Post,
-  UseGuards,
-  Request,
   Patch,
-  Param,
-  Delete,
+  Request,
+  UseGuards,
 } from "@nestjs/common";
-import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { UsersService } from "./users.service";
 import { AccessTokenGuard } from "../auth/guards/accessToken.guard";
 import { UpdateUserDto } from "./dto/update-user.dto";
+import { plainToClass } from "class-transformer";
+import { UserDto } from "./dto/user.dto";
 
 @ApiTags("user")
 @Controller("user")
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
+  /**
+   * Get the profile of the authenticated user.
+   *
+   * @param req The request object.
+   * @returns Promise<UserDto> The profile of the authenticated user.
+   */
   @ApiOperation({
     summary: "get profile user",
   })
+  @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
   @Get("profile")
-  getProfile(@Request() req) {
-    //Todo filter
-    return this.usersService.findById(req.user["sub"]);
+  async getProfile(@Request() req) {
+    const user = await this.usersService.getProfile(req.user["sub"]);
+    return plainToClass(UserDto, user, { excludeExtraneousValues: true });
   }
 
+  /**
+   * Update the profile of a user.
+   *
+   * @param req get id login user
+   * @param updateUserDto Data for updating the user profile.
+   * @returns Promise<User> The updated user profile.
+   */
   @ApiOperation({
     summary: "update profile user",
   })
+  @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
-  @Patch(":id")
-  update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+  @Patch()
+  async update(@Request() req, @Body() updateUserDto: UpdateUserDto) {
+    const id = req.user["sub"];
+    const user = await this.usersService.updateProfile(id, updateUserDto);
+    return plainToClass(UserDto, user, {
+      excludeExtraneousValues: true,
+    });
   }
 }

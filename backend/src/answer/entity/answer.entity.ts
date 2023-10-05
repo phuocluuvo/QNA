@@ -4,31 +4,32 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { User } from "../../users/entity/users.entity";
-import { Answer } from "../../answer/entity/answer.entity";
+import { Question } from "../../question/entity/question.entity";
 
 @Entity()
-export class Question {
+export class Answer {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @Column({ length: 300 })
-  title: string;
-
-  @Column("text")
   content: string;
-
-  @Column({ default: 0 })
-  views: number;
 
   @Column({ default: 0 })
   votes: number;
 
-  @ManyToOne(() => User, (user) => user.questions)
+  @ManyToOne(() => Question, (question) => question.answers, {
+    onDelete: "CASCADE",
+  })
+  @JoinColumn({ name: "question_id" })
+  question: Question;
+
+  @ManyToOne(() => User, (user) => user.answers, {
+    onDelete: "CASCADE",
+  })
   @JoinColumn({ name: "user_id" })
   user: User;
 
@@ -37,7 +38,4 @@ export class Question {
 
   @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
-
-  @OneToMany(() => Answer, (answer) => answer.question)
-  answers: Answer[];
 }
