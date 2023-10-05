@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import { Question } from "../../question/entity/question.entity";
 import { Answer } from "../../answer/entity/answer.entity";
+import { Vote } from "../../vote/entity/vote.entity";
 
 @Entity()
 export class User {
@@ -50,4 +51,7 @@ export class User {
 
   @OneToMany(() => Answer, (answer) => answer.user)
   answers: Answer[];
+
+  @OneToMany(() => Vote, (vote) => vote.user)
+  votes: Vote[];
 }

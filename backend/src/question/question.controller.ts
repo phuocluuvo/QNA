@@ -24,12 +24,14 @@ import { AccessTokenGuard } from "../auth/guards/accessToken.guard";
 import { Request } from "express";
 import { Action } from "../enums/action.enum";
 import { CaslAbilityFactory } from "../casl/casl-ability.factory";
+import { VoteService } from "../vote/vote.service";
 
 @ApiTags("question")
 @Controller("question")
 export class QuestionController {
   constructor(
     private readonly questionService: QuestionService,
+    private readonly voteService: VoteService,
     private readonly caslAbilityFactory: CaslAbilityFactory,
   ) {}
 
