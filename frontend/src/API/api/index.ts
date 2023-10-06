@@ -6,6 +6,7 @@ import {
   FormSignUp,
   FromUserLogin,
 } from "../type/Form.type";
+import { getSession } from "next-auth/react";
 const enum REQUEST_METHOD {
   GET = "GET",
   POST = "POST",
@@ -20,7 +21,7 @@ let apiFormData = axios.create({
     Accept: "application/json",
   },
 });
-let token: string = "";
+// let token: string = "";
 let api = axios.create({
   baseURL,
   timeout: 10000,
@@ -31,30 +32,41 @@ let api = axios.create({
   },
 });
 
-async function getAuthorizeHeader() {
-  if (token !== "") {
-    return {
-      headers: { Authorization: token },
-    };
-  } else {
-    const storedUser = localStorage.getItem("userLogin");
-    if (storedUser) {
-      let user = JSON.parse(storedUser);
-      token = "Bearer " + user.accessToken;
-      return {
-        headers: {
-          Authorization: token,
-        },
-      };
-    } else {
-      return {};
-    }
-  }
-}
+// async function getAuthorizeHeader() {
+//   if (token !== "") {
+//     return {
+//       headers: { Authorization: token },
+//     };
+//   } else {
+//     const storedUser = localStorage.getItem("userLogin");
+//     if (storedUser) {
+//       let user = JSON.parse(storedUser);
+//       token = "Bearer " + user.accessToken;
+//       return {
+//         headers: {
+//           Authorization: token,
+//         },
+//       };
+//     } else {
+//       return {};
+//     }
+//   }
+// }
 
 const getAuthorizeHeaderPromised = async (): Promise<
   AxiosRequestConfig<any>
 > => {
+  let token = "";
+  const session = await getSession();
+  if (session) {
+    token = `Bearer ${session.user.accessToken}`;
+  } else {
+    const storedUser = localStorage.getItem("userLogin");
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      token = `Bearer ${user.accessToken}`;
+    }
+  }
   if (token !== "") {
     return Promise.resolve({
       headers: { Authorization: token },
@@ -62,6 +74,7 @@ const getAuthorizeHeaderPromised = async (): Promise<
   } else {
     const promise = new Promise<AxiosRequestConfig<any>>((resolve, reject) => {
       const storedUser = localStorage.getItem("userLogin");
+      console.log("storedUser:", storedUser);
       if (storedUser) {
         let user = JSON.parse(storedUser);
         token = "Bearer " + user.accessToken;
@@ -106,13 +119,13 @@ const makeApiRequestingWithAuthorized = async (
   }
 };
 
-const setUserToken = (userToken: string) => {
-  token = "Bearer " + userToken;
-};
+// const setUserToken = (userToken: string) => {
+//   token = "Bearer " + userToken;
+// };
 
-const getUserToken = () => {
-  return token;
-};
+// const getUserToken = () => {
+//   return token;
+// };
 
 const requestSignUp = (form: FormSignUp) => {
   return api.post(url.SIGN_UP, form);
@@ -124,12 +137,12 @@ const removeEmpty = (obj: { [x: string]: any }) => {
     }
   }
 };
-const requestUpdateUserProfile = (form: FormData) => {
-  removeEmpty(form);
-  return apiFormData.put(url.USER, form, {
-    headers: { Authorization: token },
-  });
-};
+// const requestUpdateUserProfile = (form: FormData) => {
+//   removeEmpty(form);
+//   return apiFormData.put(url.USER, form, {
+//     headers: { Authorization: token },
+//   });
+// };
 
 const getQuestion = (form: FormQuestion) => {
   return api.post(url.QUESTION + form.id, form);
@@ -151,24 +164,25 @@ const requestSignIn = (form: FromUserLogin) => {
   return api.post(url.SIGN_IN, form);
 };
 
-const getRefreshToken = (token:{
-  sub: string;
-  refreshToken: string;
-}) => {
+const getRefreshToken = (token: { sub: string; refreshToken: string }) => {
   return api.get(url.REFRESH_TOKEN, {});
 };
 
+const signOut = () => {
+  return makeApiRequestingWithAuthorized(REQUEST_METHOD.GET, url.SIGN_OUT, {});
+};
 export default {
   api,
   apiFormData,
   requestSignUp,
-  requestUpdateUserProfile,
+  // requestUpdateUserProfile,
   makeApiRequestingWithAuthorized,
-  setUserToken,
-  getUserToken,
+  // setUserToken,
+  // getUserToken,
   getQuestion,
   getQuestionList,
   createQuestion,
   requestSignIn,
   getRefreshToken,
+  signOut,
 };

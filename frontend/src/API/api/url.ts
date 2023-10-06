@@ -10,4 +10,5 @@ export const url = {
   QUESTION: "/api/question",
   QUESTION_LIST: "/api/question-list",
   REFRESH_TOKEN: "/api/auth/refresh",
+  SIGN_OUT: "/api/auth/logout",
 };
