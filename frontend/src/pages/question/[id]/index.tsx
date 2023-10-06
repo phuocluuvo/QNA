@@ -1,7 +1,7 @@
-"use client";
-import actionGetQuestion from "@/API/redux/actions/ActionGetQuestion";
+import actionGetQuestion from "@/API/redux/actions/question/ActionGetQuestion";
 import { Colors } from "@/assets/constant/Colors";
 import { Pages } from "@/assets/constant/Pages";
+import AnswerEditor from "@/components/AnswerEditor";
 import AnswareItem from "@/components/AnswerItem";
 import Author from "@/components/Author";
 import ErrorContent from "@/components/Error";
@@ -12,9 +12,11 @@ import { LanguageHelper } from "@/util/Language/Language.util";
 import helper from "@/util/helper";
 import QuestionDataList from "@/util/mock/QuestionDataList.mock";
 import { PostType } from "@/util/type/Post.type";
+import { UserType } from "@/util/type/User.type";
 import { ChatIcon, ViewIcon } from "@chakra-ui/icons";
 import {
   Box,
+  Button,
   Container,
   Divider,
   Flex,
@@ -38,10 +40,14 @@ function Question() {
   const { id } = router.query;
   const [hydrated, setHydrated] = useState(false);
   const dispatch = useDispatch();
+  // @ts-ignore
+  let userData: UserType = null;
   useEffect(() => {
     let form = {
       id: Number(id),
     };
+    // @ts-ignore
+    userData = localStorage.getItem("userLogin");
     dispatch(
       actionGetQuestion(
         form,
@@ -188,22 +194,40 @@ function Question() {
                         </HStack>
                       </Flex>
                     </Box>
-                    <Image
-                      src={state.question.images?.at(0)?.url}
-                      style={{
-                        margin: "auto",
-                        marginBlock: "20px",
+                    <Box
+                      dangerouslySetInnerHTML={{
+                        __html: state.question.content,
                       }}
+                      fontSize={"sm"}
+                      maxW={"full"}
                     />
-                    {/* display raw text */}
-
-                    <Text aria-multiline={true}>
-                      {state.question.content
-                        ? parseLines(state.question.content)
-                        : null}
-                    </Text>
+                    {userData ? (
+                      state.question.user.id === userData?.id ? (
+                        <HStack
+                          py={2}
+                          divider={<Divider orientation="vertical" />}
+                        >
+                          <Button
+                            colorScheme="orange"
+                            size={"sm"}
+                            variant="link"
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            colorScheme="orange"
+                            size={"sm"}
+                            variant="link"
+                          >
+                            Remove
+                          </Button>
+                        </HStack>
+                      ) : null
+                    ) : null}
                   </Box>
                 </HStack>
+                {userData ? <Divider mb={5} /> : null}
+                <AnswerEditor />
                 <Box>
                   {state.question.answerList &&
                     state.question.answerList?.answerList.map((answer) => (
