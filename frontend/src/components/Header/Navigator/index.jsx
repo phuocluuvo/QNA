@@ -1,9 +1,11 @@
 import {
   Avatar,
   Box,
+  Button,
   Flex,
   HStack,
   IconButton,
+  Toast,
   VStack,
   useColorMode,
   useDisclosure,
@@ -12,11 +14,38 @@ import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import React from "react";
 import LinkButton from "@/components/LinkButton";
 import { Colors } from "@/assets/constant/Colors";
-function Navigator({ isLogged = false, getTranslate, isMobile }) {
+import { useSelector } from "react-redux";
+import { useSession, signIn, signOut } from "next-auth/react";
+import { useRouter } from "next/router";
+import api from "@/API/api";
+function Navigator({ getTranslate, isMobile }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { colorMode } = useColorMode();
   const handleClick = () => (isOpen ? onClose() : onOpen());
-
+  const userData = useSelector((state) => state.userReducer.data);
+  const { data: session } = useSession();
+  const routes = useRouter();
+  const LogoutHandle = async () => {
+    await api.signOut().then(async (res) => {
+      await signOut({ redirect: false, callbackUrl: "/user/signin" })
+        .then((res) => {
+          console.log("logout success", res);
+          localStorage.removeItem("userLogin");
+          Toast({
+            title: "Logout success",
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+          });
+        })
+        .catch((err) => {
+          console.log("logout failed:", err);
+        });
+    }),
+      (err) => {
+        console.log("logout failed:", err);
+      };
+  };
   return isMobile ? (
     <Flex
       as="nav"
@@ -71,23 +100,27 @@ function Navigator({ isLogged = false, getTranslate, isMobile }) {
           text={getTranslate("ABOUT")}
           onClick={handleClick}
         />
-        {isLogged ? (
+        {session?.user ? (
           <LinkButton
-            href="/users/logout"
+            href="/auth/logout"
             text={getTranslate("LOGOUT")}
-            onClick={handleClick}
+            onClick={LogoutHandle}
           />
         ) : (
           <>
-            <LinkButton
-              style={{ paddingX: 0 }}
-              href="/users/login"
-              text={getTranslate("LOGIN")}
-            />
+            {/* check if current routes is login */}
+            {routes.pathname === "/auth/signin" ? null : (
+              <LinkButton
+                style={{ paddingX: 0 }}
+                href="/auth/signin"
+                onClick={signIn}
+                text={getTranslate("LOGIN")}
+              />
+            )}
             <LinkButton
               style={{ paddingX: 0 }}
               textStyle={{ color: Colors(colorMode).PRIMARY }}
-              href="/users/sign-up"
+              href="/auth/signup"
               text={getTranslate("SIGNUP")}
             />
           </>
@@ -96,10 +129,17 @@ function Navigator({ isLogged = false, getTranslate, isMobile }) {
     </Flex>
   ) : (
     <>
-      {isLogged ? (
+      {session?.user ? (
         <IconButton
           variant="ghost"
-          icon={<Avatar size={"xs"} name="Louis" />}
+          icon={
+            <Avatar
+              size={"xs"}
+              name={userData?.name ? userData.name : "Unknown"}
+              src={userData?.avatar}
+            />
+          }
+          onClick={LogoutHandle}
         />
       ) : (
         <HStack spacing={0}>
@@ -110,17 +150,20 @@ function Navigator({ isLogged = false, getTranslate, isMobile }) {
             }}
             text={getTranslate("ABOUT")}
           />
-          <LinkButton
-            style={{ paddingX: 0 }}
-            href="/users/login"
-            text={getTranslate("LOGIN")}
-          />
+          {routes.pathname === "/auth/signin" ? null : (
+            <LinkButton
+              style={{ paddingX: 0 }}
+              href="/auth/signin"
+              onClick={signIn}
+              text={getTranslate("LOGIN")}
+            />
+          )}
           <LinkButton
             style={{
               paddingX: 0,
             }}
             textStyle={{ color: Colors(colorMode).PRIMARY }}
-            href="/users/sign-up"
+            href="/auth/signup"
             text={getTranslate("SIGNUP")}
           />
         </HStack>
