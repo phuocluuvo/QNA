@@ -19,7 +19,6 @@ export default function actionSignIn(
     dispatch(requestGetUser());
     api.requestSignIn(form).then((res: any) => {
       console.log("requestSignIn:", res);
-      api.setUserToken(res.data?._token);
       // dispatch(successSignIn(res.data));
       dispatch(
         responseHandler(
