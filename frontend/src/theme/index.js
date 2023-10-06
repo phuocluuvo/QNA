@@ -1,6 +1,7 @@
 import { extendTheme } from "@chakra-ui/react";
 import { mode } from "@chakra-ui/theme-tools";
 import { Button } from "./components/button.theme";
+import { Input } from "./components/input.theme";
 const styles = {
   global: (props) => ({
     body: {
@@ -12,6 +13,7 @@ const styles = {
 
 const components = {
   Button,
+  Input,
 };
 
 const theme = extendTheme({
