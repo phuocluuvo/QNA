@@ -1,12 +1,13 @@
+import { FormQuestion } from "@/API/type/Form.type";
+
+import questionDataList from "@/util/mock/QuestionDataList.mock";
 import {
   failureGetQuestionList,
   requestGetQuestionList,
   successGetQuestionList,
-} from "../reducers/QuestionSlice";
-import { FormQuestion } from "@/API/type/Form.type";
-import { responseHandler } from "./ResponseHandler";
-import { finishedRequest, requesting } from "../reducers/GlobalSlice";
-import questionDataList from "@/util/mock/QuestionDataList.mock";
+} from "../../reducers/QuestionSlice";
+import { responseHandler } from "../ResponseHandler";
+import { finishedRequest, requesting } from "../../reducers/GlobalSlice";
 export default function actionGetQuestionList(
   callbackSuccess: () => {},
   callbackError: () => {}
@@ -36,9 +37,18 @@ export default function actionGetQuestionList(
     // });
     dispatch(finishedRequest());
     if (questionDataList) {
+      // sort by createdDate
+      let sortedQuestion = [...questionDataList.postList].sort(
+        (a: any, b: any) =>
+          new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime()
+      );
+      let newQuestionDataList = {
+        ...questionDataList,
+        postList: sortedQuestion,
+      };
       let fakeData = {
         data: {
-          data: questionDataList,
+          data: { data: newQuestionDataList },
         },
         status: 200,
       };

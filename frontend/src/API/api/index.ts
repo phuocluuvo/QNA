@@ -1,14 +1,20 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { url } from "./url";
-import { FormQuestion } from "../type/Form.type";
+import {
+  FormCreateQuestion,
+  FormQuestion,
+  FormSignUp,
+  FromUserLogin,
+} from "../type/Form.type";
 const enum REQUEST_METHOD {
   GET = "GET",
   POST = "POST",
   PUT = "PUT",
   DELETE = "DELETE",
 }
+const baseURL = "http://localhost:3001";
 let apiFormData = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  baseURL,
   headers: {
     "Content-Type": "multipart/form-data",
     Accept: "application/json",
@@ -16,10 +22,12 @@ let apiFormData = axios.create({
 });
 let token: string = "";
 let api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  baseURL,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
   },
 });
 
@@ -32,7 +40,7 @@ async function getAuthorizeHeader() {
     const storedUser = localStorage.getItem("userLogin");
     if (storedUser) {
       let user = JSON.parse(storedUser);
-      token = "Bearer " + user._token;
+      token = "Bearer " + user.accessToken;
       return {
         headers: {
           Authorization: token,
@@ -56,7 +64,7 @@ const getAuthorizeHeaderPromised = async (): Promise<
       const storedUser = localStorage.getItem("userLogin");
       if (storedUser) {
         let user = JSON.parse(storedUser);
-        token = "Bearer " + user._token;
+        token = "Bearer " + user.accessToken;
         resolve({
           headers: {
             Authorization: token,
@@ -106,8 +114,8 @@ const getUserToken = () => {
   return token;
 };
 
-const requestSignUp = (form: FormData) => {
-  return api.post(url.USER, form);
+const requestSignUp = (form: FormSignUp) => {
+  return api.post(url.SIGN_UP, form);
 };
 const removeEmpty = (obj: { [x: string]: any }) => {
   for (var key in obj) {
@@ -124,11 +132,30 @@ const requestUpdateUserProfile = (form: FormData) => {
 };
 
 const getQuestion = (form: FormQuestion) => {
-  return api.post(url.QUESTION, form);
+  return api.post(url.QUESTION + form.id, form);
 };
 
 const getQuestionList = () => {
   return api.post(url.QUESTION_LIST);
+};
+
+const createQuestion = (form: FormCreateQuestion) => {
+  return makeApiRequestingWithAuthorized(
+    REQUEST_METHOD.POST,
+    url.QUESTION,
+    form
+  );
+};
+
+const requestSignIn = (form: FromUserLogin) => {
+  return api.post(url.SIGN_IN, form);
+};
+
+const getRefreshToken = (token:{
+  sub: string;
+  refreshToken: string;
+}) => {
+  return api.get(url.REFRESH_TOKEN, {});
 };
 
 export default {
@@ -141,4 +168,7 @@ export default {
   getUserToken,
   getQuestion,
   getQuestionList,
+  createQuestion,
+  requestSignIn,
+  getRefreshToken,
 };
