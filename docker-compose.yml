@@ -4,12 +4,17 @@ services:
     image: redis:latest
     networks:
       - sail
+    ports:
+      - "6379:6379"
 
   mysql:
     image: mysql:5.7
+    command: --character-set-server=utf8 --collation-server=utf8_general_ci
     environment:
       MYSQL_ROOT_PASSWORD: pass
       MYSQL_DATABASE: QNA_database
+      MYSQL_CHARSET: utf8mb4
+      MYSQL_COLLATION: utf8mb4_unicode_ci
     ports:
       - "3306:3306"
     networks:
@@ -29,6 +34,7 @@ services:
       - mysql
     environment:
       REDIS_HOST: redis
+      REDIS_PORT: 6379
       MYSQL_HOST: mysql
       MYSQL_PORT: 3306
       MYSQL_USER: root
@@ -40,27 +46,26 @@ services:
       - sail
     restart: always
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    volumes:
-      - ./frontend:/usr/src/app
-      - /usr/src/app/node_modules
-
-    working_dir: /usr/src/app
-    command: yarn run dev
-    depends_on:
-      - backend
-    environment:
-      - WDS_SOCKET_HOST=127.0.0.1
-      - CHOKIDAR_USEPOLLING=true
-      - WATCHPACK_POLLING=true
-    ports:
-      - "3000:3000"
-    networks:
-      - sail
-    restart: always
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   volumes:
+  #     - ./frontend:/usr/src/app
+  #     - /usr/src/app/node_modules
+  #   working_dir: /usr/src/app
+  #   command: yarn run dev
+  #   depends_on:
+  #     - backend
+  #   environment:
+  #     - WDS_SOCKET_HOST=127.0.0.1
+  #     - CHOKIDAR_USEPOLLING=true
+  #     - WATCHPACK_POLLING=true
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - sail
+  #   restart: always
 
 networks:
   sail:

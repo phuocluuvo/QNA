@@ -1,14 +1,8 @@
-import { IsNotEmpty, IsString } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 import { Expose } from "class-transformer";
+import { IsNotEmpty, IsString } from "class-validator";
 
-export class CreateQuestionDto {
-  @ApiProperty()
-  @Expose()
-  @IsNotEmpty()
-  @IsString()
-  title: string;
-
+export class UpdateAnswerDto {
   @ApiProperty()
   @Expose()
   @IsNotEmpty()
