@@ -21,9 +21,12 @@ interface Post {
 
 interface PostList {
   postList: Array<PostType>;
-  pagination: {
+  meta: {
+    totalItems: number;
+    itemCount: number;
+    itemsPerPage: number;
+    totalPages: number;
     currentPage: number;
-    totalPageNumber: number;
   };
 }
 
