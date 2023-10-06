@@ -1,13 +1,12 @@
 import Head from "next/head";
 import { Fragment, useEffect, useState } from "react";
 import { clientNamespaces } from "ni18n";
-import QuestionDataList from "../util/mock/QuestionDataList.mock";
 import { Flex, HStack, useColorMode } from "@chakra-ui/react";
 
 import QuestionItem from "@/components/QuestionItem";
 import TabsQuestion from "@/components/TabsQuestion";
-import { useDispatch, useSelector } from "react-redux";
-import actionGetQuestionList from "@/API/redux/actions/ActionGetQuestionList";
+import { useDispatch } from "react-redux";
+import actionGetQuestionList from "@/API/redux/actions/question/ActionGetQuestionList";
 export default function Home() {
   const dispatch = useDispatch();
 
@@ -17,7 +16,7 @@ export default function Home() {
   useEffect(() => {
     dispatch(
       actionGetQuestionList((res) => {
-        setQuestionList(res);
+        setQuestionList(res.data);
       })
     );
   }, []);
