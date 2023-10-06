@@ -2,6 +2,7 @@
 import { Colors } from "@/assets/constant/Colors";
 import {
   Avatar,
+  Box,
   HStack,
   Heading,
   Image,
@@ -31,6 +32,18 @@ function QuestionItem({
 }) {
   const [count, setCount] = React.useState(question.voteNumber);
   const router = useRouter();
+  const hasImage = /<img.*?src="(.*?)"/.test(question.content);
+  let contentSource = question.content;
+  let imageSource = "";
+  if (hasImage) {
+    const tempElement = document.createElement("div");
+    tempElement.innerHTML = question.content;
+    const imageElement = tempElement.querySelector("img");
+    if (imageElement) {
+      imageSource = imageElement.src;
+    }
+    contentSource = tempElement.innerText;
+  }
   return (
     <HStack
       mx={{ base: 2, md: 1 }}
@@ -61,24 +74,22 @@ function QuestionItem({
           onClick={() => setCount(count - 1)}
         />
       </VStack>
-      {question.images ? (
-        question.images?.length > 0 ? (
-          <Image
-            src={question.images[0].url}
-            alt="Picture of the author"
-            width={150}
-            display={{ base: "none", md: "block" }}
-            height={300}
-            rounded={"md"}
-            style={{
-              maxHeight: "150px",
-              maxWidth: "200px",
-              marginBlock: "20px",
-              marginRight: "10px",
-              objectFit: "cover",
-            }}
-          />
-        ) : null
+      {imageSource ? (
+        <Image
+          src={imageSource}
+          alt="Picture of the author"
+          width={150}
+          display={{ base: "none", md: "block" }}
+          height={300}
+          rounded={"md"}
+          style={{
+            maxHeight: "150px",
+            maxWidth: "200px",
+            marginBlock: "20px",
+            marginRight: "10px",
+            objectFit: "cover",
+          }}
+        />
       ) : null}
       <VStack
         key={question.id}
@@ -95,9 +106,16 @@ function QuestionItem({
         <Text fontWeight={"bold"} maxW={"full"} noOfLines={1}>
           {question.title}
         </Text>
-        <Text fontSize={"sm"} maxW={"full"} noOfLines={2}>
-          {question.content}
-        </Text>
+        <Box
+          dangerouslySetInnerHTML={{
+            __html: question.content.replace(/<img.*?>/g, ""),
+          }}
+          fontSize={"sm"}
+          maxW={"full"}
+          noOfLines={2}
+        >
+          {/* {question.content} */}
+        </Box>
         <HStack>
           {question.tags?.map((tag) => (
             <TagQuestion tag={tag} key={tag.id} />
