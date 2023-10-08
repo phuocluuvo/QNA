@@ -1,12 +1,14 @@
 import {
   IsDate,
   IsEmail,
-  IsNotEmpty, IsOptional,
-  IsString, IsUrl, Length,
-  Matches, Max,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
+  Length,
+  Matches,
   MinLength,
 } from "class-validator";
-import { Role } from "../../enums/role.enum";
 import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateUserDto {
@@ -14,14 +16,18 @@ export class CreateUserDto {
   @IsNotEmpty({
     message: "Username is required",
   })
-  @Length(6, 20, { message: 'Username length must be between 6 and 20 characters' })
+  @Length(6, 20, {
+    message: "Username length must be between 6 and 20 characters",
+  })
   username: string;
 
   @ApiProperty()
   @IsNotEmpty({
     message: "Fullname is required",
   })
-  @Length(6, 50, { message: 'Fullname length must be between 6 and 50 characters' })
+  @Length(6, 50, {
+    message: "Fullname length must be between 6 and 50 characters",
+  })
   fullname: string;
 
   @ApiProperty()
