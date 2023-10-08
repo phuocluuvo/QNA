@@ -1,16 +1,12 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-} from "@nestjs/common";
-import { UsersService } from "../users/users.service";
-import { JwtService } from "@nestjs/jwt";
-import { CreateUserDto } from "../users/dto/create-user.dto";
-import { LoginUserDto } from "../users/dto/login-user.dto";
+import {BadRequestException, ForbiddenException, Injectable,} from "@nestjs/common";
+import {UsersService} from "../users/users.service";
+import {JwtService} from "@nestjs/jwt";
+import {CreateUserDto} from "../users/dto/create-user.dto";
+import {LoginUserDto} from "../users/dto/login-user.dto";
 import * as argon2 from "argon2";
-import { jwtConstants } from "../constants/constants";
-import { Role } from "../enums/role.enum";
-import { User } from "../users/entity/users.entity";
+import {jwtConstants} from "../constants/constants";
+import {Role} from "../enums/role.enum";
+import {User} from "../users/entity/users.entity";
 
 @Injectable()
 export class AuthService {
@@ -64,7 +60,8 @@ export class AuthService {
       newUser.role,
     );
     await this.updateRefreshToken(newUser.id, tokens.refreshToken);
-    return tokens;
+    delete newUser.password;
+    return {...newUser,...tokens};
   }
 
   /**
@@ -83,7 +80,9 @@ export class AuthService {
       throw new BadRequestException("Password is incorrect");
     const tokens = await this.getTokens(user.id, user.username, user.role);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
-    return tokens;
+    delete user.password;
+    // user["token"] = tokens;
+    return {...user,...tokens};
   }
 
   /**
@@ -128,9 +127,11 @@ export class AuthService {
    * @param userId ID of the user.
    * @param username Username of the user.
    * @param role Role of the user.
-   * @returns Promise<{ accessToken: string; refreshToken: string }> The tokens.
+   * @returns Promise<accessToken: string; refreshToken: string > The tokens.
    */
   async getTokens(userId: string, username: string, role: Role) {
+    const accessTokenExpiresIn = 15 * 60; // 15 minutes in seconds
+    const refreshTokenExpiresIn = 7 * 24 * 60 * 60; //
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {
@@ -140,7 +141,7 @@ export class AuthService {
         },
         {
           secret: jwtConstants.access,
-          expiresIn: "15m",
+          expiresIn: accessTokenExpiresIn,
         },
       ),
       this.jwtService.signAsync(
@@ -152,13 +153,14 @@ export class AuthService {
         {
           //Change
           secret: jwtConstants.refesh,
-          expiresIn: "7d",
+          expiresIn: refreshTokenExpiresIn,
         },
       ),
     ]);
 
     return {
       accessToken,
+      expires_in: this.calculateExpiryDate(accessTokenExpiresIn),
       refreshToken,
     };
   }
@@ -168,7 +170,7 @@ export class AuthService {
    *
    * @param userId ID of the user.
    * @param refreshToken Refresh token.
-   * @returns Promise<{ accessToken: string; refreshToken: string }> The refreshed tokens.
+   * @returns Promise< accessToken: string; refreshToken: string > The refreshed tokens.
    * @throws ForbiddenException if the user or the refresh token is invalid.
    */
   async refreshTokens(userId: string, refreshToken: string) {
@@ -183,5 +185,10 @@ export class AuthService {
     const tokens = await this.getTokens(user.id, user.username, user.role);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
     return tokens;
+  }
+
+  private calculateExpiryDate(expiresInSeconds: number): Date {
+    const currentTime : Date = new Date();
+    return new Date(currentTime.getTime() + expiresInSeconds * 1000);
   }
 }
