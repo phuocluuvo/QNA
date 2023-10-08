@@ -7,8 +7,8 @@ export const url = {
   RESET_PASSWORD: "/api/user/do-reset-password",
   CHECK_EXISTS_USER: "/api/user/check-exists-user",
   USER: "/api/user",
-  QUESTION: "/api/question",
-  QUESTION_LIST: "/api/question-list",
+  QUESTION: "/api/question/{id}",
+  QUESTION_LIST: "/api/question",
   REFRESH_TOKEN: "/api/auth/refresh",
   SIGN_OUT: "/api/auth/logout",
 };
