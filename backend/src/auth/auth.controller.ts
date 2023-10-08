@@ -61,14 +61,14 @@ export class AuthController {
    * Refresh access tokens for a user.
    *
    * @param req The request object to access the authenticated user's ID and refresh token.
-   * @returns Promise<{ accessToken: string; refreshToken: string }> The refreshed tokens.
+   * @returns Promise< accessToken: string; refreshToken: string > The refreshed tokens.
    */
   @ApiOperation({
     summary: "Refresh token",
   })
   @ApiBearerAuth()
   @UseGuards(RefreshTokenGuard)
-  @Get("refresh")
+  @Post("refresh")
   refreshTokens(@Req() req: Request) {
     const userId = req.user["sub"];
     const refreshToken = req.user["refreshToken"];

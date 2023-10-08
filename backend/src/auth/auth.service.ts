@@ -1,12 +1,16 @@
-import {BadRequestException, ForbiddenException, Injectable,} from "@nestjs/common";
-import {UsersService} from "../users/users.service";
-import {JwtService} from "@nestjs/jwt";
-import {CreateUserDto} from "../users/dto/create-user.dto";
-import {LoginUserDto} from "../users/dto/login-user.dto";
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from "@nestjs/common";
+import { UsersService } from "../users/users.service";
+import { JwtService } from "@nestjs/jwt";
+import { CreateUserDto } from "../users/dto/create-user.dto";
+import { LoginUserDto } from "../users/dto/login-user.dto";
 import * as argon2 from "argon2";
-import {jwtConstants} from "../constants/constants";
-import {Role} from "../enums/role.enum";
-import {User} from "../users/entity/users.entity";
+import { jwtConstants } from "../constants/constants";
+import { Role } from "../enums/role.enum";
+import { User } from "../users/entity/users.entity";
 
 @Injectable()
 export class AuthService {
@@ -61,7 +65,7 @@ export class AuthService {
     );
     await this.updateRefreshToken(newUser.id, tokens.refreshToken);
     delete newUser.password;
-    return {...newUser,...tokens};
+    return { ...newUser, ...tokens };
   }
 
   /**
@@ -82,7 +86,7 @@ export class AuthService {
     await this.updateRefreshToken(user.id, tokens.refreshToken);
     delete user.password;
     // user["token"] = tokens;
-    return {...user,...tokens};
+    return { ...user, ...tokens };
   }
 
   /**
@@ -188,7 +192,7 @@ export class AuthService {
   }
 
   private calculateExpiryDate(expiresInSeconds: number): Date {
-    const currentTime : Date = new Date();
+    const currentTime: Date = new Date();
     return new Date(currentTime.getTime() + expiresInSeconds * 1000);
   }
 }
