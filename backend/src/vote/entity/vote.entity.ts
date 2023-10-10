@@ -20,7 +20,7 @@ export class Vote {
   @Column({ type: "enum", enum: VoteType, name: "vote_type" })
   voteType: VoteType;
 
-  @ManyToOne(() => User, (user) => user.votes)
+  @ManyToOne(() => User, (user) => user.votes, { nullable: false })
   @JoinColumn({ name: "user_id" })
   user: User;
 

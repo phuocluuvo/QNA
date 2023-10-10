@@ -9,12 +9,16 @@ import {
   paginate,
   Pagination,
 } from "nestjs-typeorm-paginate";
+import { VoteAnswerDto } from "../vote/dto/vote-answer.dto";
+import { VoteService } from "../vote/vote.service";
+import { VoteType } from "../enums/vote-type.enum";
 
 @Injectable()
 export class AnswerService {
   constructor(
     @Inject("ANSWER_REPOSITORY")
     private answerRepository: Repository<Answer>,
+    private readonly voteService: VoteService,
   ) {}
 
   /**
@@ -67,7 +71,7 @@ export class AnswerService {
       excludeExtraneousValues: true,
     });
     answerTrans["user"] = userId;
-    answerTrans["question"] = answerDto.questionId;
+    answerTrans["question"] = answerDto.question_id;
     return this.answerRepository.save(answerTrans);
   }
 
@@ -97,5 +101,38 @@ export class AnswerService {
    */
   async remove(answer: Answer) {
     return this.answerRepository.remove(answer);
+  }
+
+  /**
+   * update vote count.
+   *
+   * @param userId
+   * @param answerVoteDto
+   * @returns The question with an increased view count.
+   * @throws NotFoundException if the question does not exist.
+   */
+  async updateVote(
+    userId: string,
+    answerVoteDto: VoteAnswerDto,
+  ): Promise<Answer> {
+    const answer = await this.findOneById(answerVoteDto.answer_id);
+
+    if (!answer) {
+      throw new NotFoundException("Question not found");
+    }
+
+    const createVote = await this.voteService.voteAnswer(userId, answerVoteDto);
+
+    if (answerVoteDto.vote_type === VoteType.UPVOTE) {
+      answer.votes += createVote;
+    } else if (answerVoteDto.vote_type === VoteType.DOWNVOTE) {
+      answer.votes -= createVote;
+    }
+
+    try {
+      return this.answerRepository.save(answer);
+    } catch (error) {
+      throw new Error("Error updating vote");
+    }
   }
 }

@@ -2,18 +2,16 @@ import { VoteType } from "../../enums/vote-type.enum";
 import { Expose } from "class-transformer";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEnum, IsNotEmpty, IsUUID } from "class-validator";
-import { Answer } from "../../answer/entity/answer.entity";
 
 export class VoteAnswerDto {
   @ApiProperty()
   @IsNotEmpty()
-  @Expose()
   @IsUUID()
-  answer: Answer;
+  answer_id: string;
 
-  @ApiProperty({ enum: ["up_vote", "down_vote"] })
+  @ApiProperty()
   @IsNotEmpty()
   @IsEnum(VoteType)
   @Expose()
-  voteType: VoteType;
+  vote_type: VoteType;
 }
