@@ -25,7 +25,9 @@ export class QuestionService {
    */
   async find(options: IPaginationOptions): Promise<Pagination<Question>> {
     const queryBuilder = this.questionRepository.createQueryBuilder("question");
-    queryBuilder.innerJoinAndSelect("question.user", "user");
+    queryBuilder
+      .innerJoinAndSelect("question.user", "user")
+      .orderBy("question.updatedAt", "DESC");
     return paginate<Question>(queryBuilder, options);
   }
 
