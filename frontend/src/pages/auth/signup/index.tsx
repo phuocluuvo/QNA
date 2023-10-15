@@ -25,6 +25,7 @@ import actionSignUp from "@/API/redux/actions/user/ActionSignUp";
 import { FormSignUp } from "@/API/type/Form.type";
 import LinkButton from "@/components/LinkButton";
 import { Colors } from "@/assets/constant/Colors";
+import { signIn } from "next-auth/react";
 function Login() {
   const { colorMode } = useColorMode();
   const dispatch = useDispatch();
@@ -263,6 +264,7 @@ function Login() {
               style={{ padding: 0, minW: "unset", maxW: "unset" }}
               textStyle={{ paddingLeft: 1, minW: "unset", maxW: "unset" }}
               text={getTranslate("LOGIN")}
+              onClick={signIn}
               href={router.basePath + "/user/signin"}
             />
           </Center>

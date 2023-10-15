@@ -1,6 +1,7 @@
 import axios from "axios";
 import { url } from "./url";
-import { getSession } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
+import { useRouter } from "next/router";
 const BASE_URL = "http://localhost:3001";
 export const apiFormData = axios.create({
   baseURL: BASE_URL,
@@ -30,20 +31,22 @@ async function refreshToken(refreshToken: string): Promise<{
   refreshToken: string;
   expires_in: Date;
 }> {
-  const res = await axios.post(BASE_URL + url.REFRESH_TOKEN, {
-    refreshToken: refreshToken,
-  }, {
+  const res = await fetch(BASE_URL + url.REFRESH_TOKEN, {
+    method: "POST",
     headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      refreshToken: refreshToken,
+    }),
   });
-  const data = res.data;
-  console.log("newRefreshToken:", { data });  
+  const data = await res.json();
+  console.log("newRefreshToken:", { data });
 
   return data;
 }
 export async function AuthApi(
   method: "GET" | "POST" | "DELETE" | "UPDATE",
   url: string,
-  data = {}
+  data = null
 ) {
   const session = await getSession();
   console.log("before: ", session?.user.accessToken);
@@ -52,29 +55,38 @@ export async function AuthApi(
     method: method,
     url: BASE_URL + url,
     headers: {
-      Authorization: `Bearer ${session?.user.accessToken}`,
+      Authorization: `bearer ${session?.user.accessToken}`,
       "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
     },
-    ...(method === "GET" ? {} : { data: JSON.stringify(data) }),
+    data: method === "GET" ? null : JSON.stringify(data),
   };
 
-  let res = await axios(config);
-
-  if (res.status == 401) {
-    if (session) {
-      await refreshToken(session?.user.refreshToken ?? "").then((data) => {
-        session.user.accessToken = data.accessToken;
-        session.user.refreshToken = data.refreshToken;
-        session.user.expires_in = data.expires_in;
-      });
-    }
-    console.log("after: ", session?.user.accessToken);
-
-    config.headers.Authorization = `Bearer ${session?.user.accessToken}`;
-    res = await axios(config);
-
+  try {
+    let res = await axios(config);
     return res;
-  }
+  } catch (error) {
+    console.error(error);
+    // @ts-ignore
+    if (error.response && (error.response.status == 401 || error.response.status == 400)) {
+      if (session) {
+        let data = await refreshToken(session?.user.refreshToken ?? "");
+        if (data) {
+          session.user.accessToken = data.accessToken;
+          session.user.refreshToken = data.refreshToken;
+          session.user.expires_in = data.expires_in;
+        }
+      }
+      console.log("after: ", session?.user.accessToken);
 
-  return res;
+      config.headers.Authorization = `bearer ${session?.user.accessToken}`;
+      let res = await axios(config);
+
+      return res;
+    } else {
+      signIn();
+      // throw error;
+    }
+  }
 }

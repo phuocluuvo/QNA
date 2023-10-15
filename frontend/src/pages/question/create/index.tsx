@@ -18,6 +18,9 @@ import helper from "@/util/helper";
 import useStateWithCallback from "@/hooks/useStateWithCallback";
 import { useDispatch, useSelector } from "react-redux";
 import actionCreateQuestion from "@/API/redux/actions/question/ActionCreateQuestion";
+import useAxiosAuth from "@/hooks/useAxiosAuth";
+import { url } from "@/API/api/url";
+import { useRouter } from "next/router";
 type State = {
   title: string;
   bodyQuestion: string;
@@ -27,6 +30,8 @@ function CreateQuestion() {
     title: "",
     bodyQuestion: "",
   });
+  const route = useRouter();
+  const axiosAuth = useAxiosAuth();
   const { colorMode } = useColorMode();
   const dispacth = useDispatch();
   const handleChangeBodyQuestion = (value: string) => {
@@ -47,6 +52,7 @@ function CreateQuestion() {
     }
     return error;
   };
+
   const createQuestionHandle = (
     values: State,
     actions: FormikHelpers<State>
@@ -55,12 +61,15 @@ function CreateQuestion() {
       title: values.title,
       content: state.bodyQuestion,
     };
-    setTimeout(() => {
+    setTimeout(async () => {
+      // const res = await axiosAuth.post(url.QUESTION, form);
+      // console.log("actionCreateQuestion: ", res.data);
       dispacth(
         actionCreateQuestion(
           form,
           (res) => {
-            console.log("res.data: ", res.data);
+            console.log("actionCreateQuestion: ", res);
+            route.push(`/question/${res.id}`);
           },
           () => {}
         )

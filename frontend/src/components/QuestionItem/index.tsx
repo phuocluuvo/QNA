@@ -14,23 +14,24 @@ import {
 import React from "react";
 import VoteButton from "../VoteButton";
 import helper from "@/util/helper";
-import { PostType } from "@/util/type/Post.type";
+import { QuestionType } from "@/util/type/Question.type";
 import { useRouter } from "next/router";
 import { ChatIcon, ViewIcon } from "@chakra-ui/icons";
 import Author from "../Author";
 import TagQuestion from "../TagQuestion";
+import moment from "moment";
 function QuestionItem({
   question,
   isDarkMode,
   onClick,
   isLast,
 }: {
-  question: PostType;
+  question: QuestionType;
   isDarkMode?: boolean;
   onClick?: () => void;
   isLast?: boolean;
 }) {
-  const [count, setCount] = React.useState(question.voteNumber);
+  const [count, setCount] = React.useState(question.votes);
   const router = useRouter();
   const hasImage = /<img.*?src="(.*?)"/.test(question.content);
   let contentSource = question.content;
@@ -55,7 +56,8 @@ function QuestionItem({
       height={170}
       w={{ base: "80%", md: "fit-content" }}
       mb={2}
-      flex={{ base: 1, lg: isLast ? "none" : 1 }}
+      // flex={{ base: 1, lg: isLast ? "none" : 1 }}
+      flex={1}
       transition={"ease-in-out 0.2s"}
       p={3}
       bg={Colors(isDarkMode).PRIMARY_BG}
@@ -94,6 +96,7 @@ function QuestionItem({
       <VStack
         key={question.id}
         spacing={1}
+        flex={1}
         alignItems={"flex-start"}
         onClick={() => {
           onClick
@@ -104,6 +107,13 @@ function QuestionItem({
         cursor={"pointer"}
       >
         <Text fontWeight={"bold"} maxW={"full"} noOfLines={1}>
+          {moment(question.createdAt).isAfter(moment().subtract(3, "days")) ? (
+            <Tag mr="3">
+              <Text fontSize={"xs"}>New</Text>
+            </Tag>
+          ) : (
+            ""
+          )}
           {question.title}
         </Text>
         <Box
@@ -121,6 +131,7 @@ function QuestionItem({
             <TagQuestion tag={tag} key={tag.id} />
           ))}
         </HStack>
+        <Spacer />
         <HStack w={"full"}>
           <VStack spacing={0} alignItems={"flex-start"}>
             <Author
@@ -133,7 +144,7 @@ function QuestionItem({
                   textDecoration: "underline",
                 },
               }}
-              bottomText={helper.formatDate(question.createdDate, true)}
+              bottomText={helper.formatDate(question.createdAt, true)}
               bottomTextStyle={{
                 color: "gray.500",
                 fontSize: "xs",
@@ -166,9 +177,7 @@ function QuestionItem({
                 marginRight: "10px",
               }}
             >
-              {helper.numberFormat(
-                question.viewsNumber ? question.viewsNumber : 0
-              )}{" "}
+              {helper.numberFormat(question.views ? question.views : 0)}{" "}
               <ViewIcon />
             </Text>
           </HStack>

@@ -1,7 +1,7 @@
 import NextAuth, { AuthOptions } from "next-auth";
 import CredentialProvider from "next-auth/providers/credentials";
 import api from "@/API/api";
-import { UserType } from "@/util/type/User.type";
+
 export const authOptions: AuthOptions = {
   providers: [
     CredentialProvider({
@@ -23,12 +23,17 @@ export const authOptions: AuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user, account }) {
-      console.log("jwt:", token, user);
-      return { ...token, ...user };
+      console.log("jwt__:", token, user);
+      return {
+        ...token,
+        ...user,
+      };
     },
     async session({ session, token }) {
-      console.log("session:", session, token);
+      console.log("old_session__:", session);
+      console.log("token__:", token);
       session.user = token as any;
+      console.log("new_session__:", session);
       return session;
     },
     async redirect({ url, baseUrl }) {

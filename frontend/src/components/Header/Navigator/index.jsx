@@ -1,7 +1,6 @@
 import {
   Avatar,
   Box,
-  Button,
   Flex,
   HStack,
   IconButton,
@@ -9,6 +8,10 @@ import {
   VStack,
   useColorMode,
   useDisclosure,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import React from "react";
@@ -46,6 +49,7 @@ function Navigator({ getTranslate, isMobile }) {
         console.log("logout failed:", err);
       };
   };
+  const DashboardHandle = () => {};
   return isMobile ? (
     <Flex
       as="nav"
@@ -127,48 +131,52 @@ function Navigator({ getTranslate, isMobile }) {
         )}
       </VStack>
     </Flex>
+  ) : session?.user ? (
+    <Menu>
+      <IconButton
+        as={MenuButton}
+        variant="ghost"
+        icon={
+          <Avatar
+            size={"xs"}
+            name={session.user.fullname ? session.user.fullname : "Unknown"}
+            src={session.user.avatar}
+          />
+        }
+      />
+      <MenuList>
+        <MenuItem onClick={DashboardHandle}>
+          {getTranslate("DASHBOARD")}
+        </MenuItem>
+        <MenuItem onClick={LogoutHandle}>{getTranslate("LOGOUT")}</MenuItem>
+      </MenuList>
+    </Menu>
   ) : (
-    <>
-      {session?.user ? (
-        <IconButton
-          variant="ghost"
-          icon={
-            <Avatar
-              size={"xs"}
-              name={userData?.name ? userData.name : "Unknown"}
-              src={userData?.avatar}
-            />
-          }
-          onClick={LogoutHandle}
+    <HStack spacing={0}>
+      <LinkButton
+        href="/about"
+        style={{
+          paddingX: 0,
+        }}
+        text={getTranslate("ABOUT")}
+      />
+      {routes.pathname === "/auth/signin" ? null : (
+        <LinkButton
+          style={{ paddingX: 0 }}
+          href="/auth/signin"
+          onClick={signIn}
+          text={getTranslate("LOGIN")}
         />
-      ) : (
-        <HStack spacing={0}>
-          <LinkButton
-            href="/about"
-            style={{
-              paddingX: 0,
-            }}
-            text={getTranslate("ABOUT")}
-          />
-          {routes.pathname === "/auth/signin" ? null : (
-            <LinkButton
-              style={{ paddingX: 0 }}
-              href="/auth/signin"
-              onClick={signIn}
-              text={getTranslate("LOGIN")}
-            />
-          )}
-          <LinkButton
-            style={{
-              paddingX: 0,
-            }}
-            textStyle={{ color: Colors(colorMode).PRIMARY }}
-            href="/auth/signup"
-            text={getTranslate("SIGNUP")}
-          />
-        </HStack>
       )}
-    </>
+      <LinkButton
+        style={{
+          paddingX: 0,
+        }}
+        textStyle={{ color: Colors(colorMode).PRIMARY }}
+        href="/auth/signup"
+        text={getTranslate("SIGNUP")}
+      />
+    </HStack>
   );
 }
 

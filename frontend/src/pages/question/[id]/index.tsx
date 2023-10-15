@@ -11,7 +11,7 @@ import VoteButton from "@/components/VoteButton";
 import { LanguageHelper } from "@/util/Language/Language.util";
 import helper from "@/util/helper";
 import QuestionDataList from "@/util/mock/QuestionDataList.mock";
-import { PostType } from "@/util/type/Post.type";
+import { QuestionType } from "@/util/type/Question.type";
 import { UserType } from "@/util/type/User.type";
 import { ChatIcon, ViewIcon } from "@chakra-ui/icons";
 import {
@@ -22,9 +22,7 @@ import {
   Flex,
   HStack,
   Heading,
-  Image,
   Spacer,
-  Tag,
   Text,
   VStack,
   useColorMode,
@@ -32,7 +30,12 @@ import {
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { ni18nConfig } from "../../../../ni18n.config";
+import { clientNamespaces, loadTranslations } from "ni18n";
+import { GetStaticProps } from "next";
+import { ActionTypes } from "@/API/constant/ActionTypes.enum";
+
 function Question() {
   const { getTranslate } = LanguageHelper(Pages.HOME);
   const { colorMode } = useColorMode();
@@ -41,34 +44,41 @@ function Question() {
   const [hydrated, setHydrated] = useState(false);
   const dispatch = useDispatch();
   // @ts-ignore
+  const questionsRequesting = useSelector(
+    (state: { questionReducer: { type: ActionTypes } }) =>
+      state.questionReducer.type
+  );
+  // @ts-ignore
   let userData: UserType = null;
   useEffect(() => {
-    let form = {
-      id: Number(id),
-    };
-    // @ts-ignore
-    userData = localStorage.getItem("userLogin");
-    dispatch(
-      actionGetQuestion(
-        form,
-        (data) => {
-          // @ts-ignore
-          setState((oldState) =>
-            helper.mappingState(oldState, {
-              question: data,
-              count: data.voteNumber,
-            })
-          );
-        },
-        () => {
-          console.log("error");
-        }
-      )
-    );
+    if (id) {
+      let form = {
+        id: id as string,
+      };
+      // @ts-ignore
+      userData = localStorage.getItem("userLogin");
+      dispatch(
+        actionGetQuestion(
+          form,
+          (data) => {
+            // @ts-ignore
+            setState((oldState) =>
+              helper.mappingState(oldState, {
+                question: data,
+                count: data.votes,
+              })
+            );
+          },
+          () => {
+            console.log("error");
+          }
+        )
+      );
+    }
   }, [id]);
   const [state, setState] = useState<{
     count: number;
-    question: PostType;
+    question: QuestionType;
     isDarkMode: boolean;
   }>({
     count: 0,
@@ -88,7 +98,28 @@ function Question() {
   const parseLines = (value: string) => value.replace(/(\\n)/g, "\n");
   return (
     <>
-      {state.question ? (
+      {questionsRequesting === ActionTypes.REQUEST_GET_QUESTION ? (
+        <Box
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: Colors(isDarkMode).PRIMARY_BG,
+            zIndex: 1000,
+          }}
+        >
+          <Flex
+            w={"full"}
+            h={"full"}
+            alignItems={"center"}
+            justifyContent={"center"}
+          >
+            <Heading size={"lg"}>Loading...</Heading>
+          </Flex>
+        </Box>
+      ) : questionsRequesting === ActionTypes.SUCCESS_GET_QUESTION && state.question ? (
         <>
           <Head>
             <title>{state.question.title}</title>
@@ -104,7 +135,7 @@ function Question() {
                 md: "row",
               }}
             >
-              <Box>
+              <Box flex={1}>
                 <HStack alignItems={"start"} mb={10}>
                   <VStack
                     spacing={0}
@@ -144,7 +175,7 @@ function Question() {
                       <ChatIcon />
                       <Text>{state.question.answerNumber}</Text>
                       <ViewIcon />
-                      <Text>{state.question.viewsNumber}</Text>
+                      <Text>{state.question.views}</Text>
                     </VStack>
                   </VStack>
                   <Box>
@@ -160,7 +191,7 @@ function Question() {
                         textStyle={{
                           minW: "fit-content",
                         }}
-                        onClick={() => router.push("/")}
+                        onClick={() => router.back()}
                       />
                       <Flex direction={"column"} mb={"10"}>
                         <Box>
@@ -179,7 +210,7 @@ function Question() {
                             headingText={getTranslate("ANSWERED_AT").replace(
                               "{0}",
                               helper.formatDate(
-                                state.question.createdDate,
+                                state.question.createdAt,
                                 false,
                                 "H:mm A - ddd, DD/MM/YYYY"
                               )
@@ -252,7 +283,7 @@ function Question() {
                 bg={Colors(colorMode === "dark").PRIMARY_BG}
               >
                 <Heading size={"sm"}>Related questions</Heading>
-                {QuestionDataList.postList.map(
+                {QuestionDataList.items.map(
                   (question, index) =>
                     index < 5 && (
                       <Box
@@ -271,7 +302,7 @@ function Question() {
                             flex={0.2}
                             backgroundColor={Colors(isDarkMode).PRIMARY}
                           >
-                            <Text color={"white"}>{question.voteNumber}</Text>
+                            <Text color={"white"}>{question.votes}</Text>
                           </Box>
                           <LinkButton
                             text={question.title}
@@ -300,14 +331,23 @@ function Question() {
             </Flex>
           </Container>
         </>
-      ) : (
+      ) : questionsRequesting === ActionTypes.FAILURE_GET_QUESTION ? (
         <ErrorContent
           errorTitle={getTranslate("ERROR_TITLE")}
           errorMessage={getTranslate("ERROR_MESSAGE")}
         />
-      )}
+      ) : null}
     </>
   );
 }
-
+// export const getStaticProps: GetStaticProps = async (props) => {
+//   return {
+//     props: {
+//       ...(await loadTranslations(ni18nConfig, props.locale, [
+//         "home-page",
+//       ])),
+//       ...clientNamespaces(ni18nConfig, ["home-page"]),
+//     },
+//   };
+// };
 export default Question;

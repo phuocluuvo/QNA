@@ -8,53 +8,22 @@ import {
 } from "../../reducers/QuestionSlice";
 import { responseHandler } from "../ResponseHandler";
 import { finishedRequest, requesting } from "../../reducers/GlobalSlice";
+import api from "@/API/api";
+import { QuestionListType } from "@/util/type/Question.type";
 export default function actionGetQuestionList(
-  callbackSuccess: () => {},
+  query: { page: number; limit: number },
+  callbackSuccess: (res: QuestionListType) => {},
   callbackError: () => {}
 ) {
   return (dispatch: any) => {
     dispatch(requesting());
     dispatch(requestGetQuestionList());
-    // Api.getQuestionList().then((res: any) => {
-    //   console.log("getQuestionList:", res);
-    //   dispatch(finishedRequest());
-    //   let fakeData = {
-    //     status: 200,
-    //     data: {
-    //       ...questionDataList,
-    //     },
-    //   };
-    //   dispatch(
-    //     responseHandler(
-    //       fakeData,
-    //       callbackSuccess,
-    //       callbackError,
-    //       true,
-    //       successGetQuestion,
-    //       failureGetQuestion
-    //     )
-    //   );
-    // });
-    dispatch(finishedRequest());
-    if (questionDataList) {
-      // sort by createdDate
-      let sortedQuestion = [...questionDataList.postList].sort(
-        (a: any, b: any) =>
-          new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime()
-      );
-      let newQuestionDataList = {
-        ...questionDataList,
-        postList: sortedQuestion,
-      };
-      let fakeData = {
-        data: {
-          data: { data: newQuestionDataList },
-        },
-        status: 200,
-      };
+    api.getQuestionList(query).then((res: any) => {
+      console.log("getQuestionList:", res);
+      dispatch(finishedRequest());
       dispatch(
         responseHandler(
-          fakeData,
+          res,
           callbackSuccess,
           callbackError,
           true,
@@ -62,6 +31,35 @@ export default function actionGetQuestionList(
           failureGetQuestionList
         )
       );
-    }
+    });
+    // dispatch(finishedRequest());
+
+    // if (questionDataList) {
+    //   // sort by createdAt
+    //   let sortedQuestion = [...questionDataList.items].sort(
+    //     (a: any, b: any) =>
+    //       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    //   );
+    //   let newQuestionDataList = {
+    //     ...questionDataList,
+    //     items: sortedQuestion,
+    //   };
+    //   let fakeData = {
+    //     data: {
+    //       data: { data: newQuestionDataList },
+    //     },
+    //     status: 200,
+    //   };
+    //   dispatch(
+    //     responseHandler(
+    //       fakeData,
+    //       callbackSuccess,
+    //       callbackError,
+    //       true,
+    //       successGetQuestionList,
+    //       failureGetQuestionList
+    //     )
+    //   );
+    // }
   };
 }

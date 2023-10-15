@@ -36,7 +36,7 @@ const questionSlice = createSlice({
     },
     successGetQuestionList: (state, actions) => {
       state.requesting = false;
-      state.questionList = actions.payload.data;
+      state.questionList = actions.payload;
       state.type = ActionTypes.SUCCESS_GET_QUESTION_LIST;
     },
     failureGetQuestionList: (state, actions) => {
@@ -52,6 +52,7 @@ const questionSlice = createSlice({
     successCreateQuestion: (state, actions) => {
       state.requesting = false;
       state.type = ActionTypes.SUCCESS_CREATE_QUESTION;
+      state.questionDetail = actions.payload;
     },
     failureCreateQuestion: (state, actions) => {
       state.requesting = false;

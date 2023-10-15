@@ -48,7 +48,7 @@ function Author({
         onClick ? onClick() : router.push(`/user/${user.id}`);
       }}
     >
-      <Avatar size={"sm"} name={user.name} src={user.avatar} />
+      <Avatar size={"sm"} name={user.fullname} src={user.avatar} />
       <VStack alignItems={"start"} spacing={0}>
         {/* @ts-ignore */}
         {headingText ? (
@@ -64,7 +64,7 @@ function Author({
             onClick ? onClick() : router.push(`/user/${user.id}`);
           }}
         >
-          {user.name}
+          {user.fullname}
         </Text>
         {bottomText ? (
           <Text {...bottomTextStyle} fontSize={"xs"}>

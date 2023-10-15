@@ -5,7 +5,15 @@ const nextConfig = {
     locales: ["en", "vi"],
   },
   images: {
-    domains: ["picsum.photos", "https://i.pravatar.cc"],
+    domains: [
+      "picsum.photos",
+      "https://i.pravatar.cc",
+      "https://res.cloudinary.com/",
+    ],
+  },
+  experimental: {
+    serverActions: true,
+    appDir: false,
   },
 };
 

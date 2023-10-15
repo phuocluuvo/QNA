@@ -1,4 +1,4 @@
-import { PostType } from "@/util/type/Post.type";
+import { QuestionType } from "@/util/type/Question.type";
 
 export type FormQuestion = {
   id: number | string;

@@ -13,7 +13,9 @@ import { ni18nConfig } from "../../ni18n.config";
 import "react-quill/dist/quill.snow.css";
 import { SessionProvider } from "next-auth/react";
 import Head from "next/head";
+import NextNProgress from "nextjs-progressbar";
 import { Provider } from "react-redux";
+import { Colors } from "@/assets/constant/Colors";
 // @ts-ignore
 function App({ Component, pageProps: { session, ...pageProps } }) {
   return (
@@ -37,6 +39,13 @@ function App({ Component, pageProps: { session, ...pageProps } }) {
               </Head>
               <Header {...pageProps} />
               <GoToTopButton {...pageProps} />
+              <NextNProgress
+                color={Colors(false).PRIMARY}
+                startPosition={0.3}
+                stopDelayMs={200}
+                height={3}
+                showOnShallow={true}
+              />
               <Component data-i18n-is-dynamic-list={true} {...pageProps} />
             </ThemeProvider>
           </ColorModeProvider>

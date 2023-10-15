@@ -16,16 +16,12 @@ import { Field, Form, Formik } from "formik";
 import React from "react";
 import { LanguageHelper } from "@/util/Language/Language.util";
 import { Pages } from "@/assets/constant/Pages";
-import { useDispatch } from "react-redux";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
-import { getCsrfToken, signIn } from "next-auth/react";
+import { getCsrfToken, getSession, signIn } from "next-auth/react";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
-export default function SignIn({
-  csrfToken,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function SignIn() {
   const { colorMode } = useColorMode();
-  const dispatch = useDispatch();
   const [show, setShow] = React.useState(false);
   const router = useRouter();
   const { getTranslate } = LanguageHelper(Pages.HOME);
@@ -94,21 +90,18 @@ export default function SignIn({
           }}
         >
           {(props) => (
-            <Form
-              method="post"
-              action="/api/auth/callback/credentials"
-            >
+            <Form method="post" action="/api/auth/callback/credentials">
               <Field name="username">
                 {/* @ts-ignore */}
                 {({ field, form }) => (
                   <FormControl
                     isInvalid={form.errors.username && form.touched.username}
                   >
-                    <input
+                    {/* <input
                       name="csrfToken"
                       type="hidden"
                       defaultValue={csrfToken}
-                    />
+                    /> */}
 
                     <FormLabel>{getTranslate("USERNAME")}</FormLabel>
                     <Input
@@ -171,10 +164,15 @@ export default function SignIn({
     </Container>
   );
 }
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  return {
-    props: {
-      csrfToken: await getCsrfToken(context),
-    },
-  };
-}
+// export async function getServerSideProps(context: GetServerSidePropsContext) {
+//   const csrfToken = await getCsrfToken(context);
+//   const { req } = context;
+//   const session = await getSession({ req });
+//   if (session) {
+//     return {
+//       redirect: { destination: "/" },
+//     };
+//   }
+
+//   return { props: { csrfToken } };
+// }

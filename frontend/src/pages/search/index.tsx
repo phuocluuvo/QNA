@@ -3,34 +3,32 @@ import { Fragment, useEffect, useState } from "react";
 import { clientNamespaces } from "ni18n";
 import QuestionDataList from "../../util/mock/QuestionDataList.mock";
 import {
-  Box,
   Flex,
   HStack,
   Text,
   VStack,
   useColorMode,
 } from "@chakra-ui/react";
-import { Colors } from "@/assets/constant/Colors";
 import QuestionItem from "@/components/QuestionItem";
 import { useRouter } from "next/router";
-import { PostType } from "@/util/type/Post.type";
+import { QuestionType } from "@/util/type/Question.type";
 import TabsQuestion from "@/components/TabsQuestion";
 export default function Search() {
   const { colorMode } = useColorMode();
   const router = useRouter();
   const [hydrated, setHydrated] = useState(false);
-  const [questions, setQuestions] = useState<Array<PostType>>([]);
+  const [questions, setQuestions] = useState<Array<QuestionType>>([]);
   const [isNotFound, setIsNotFound] = useState(false);
   useEffect(() => {
     if (router.query.q) {
-      let questions = QuestionDataList.postList.filter((question) =>
+      let questions = QuestionDataList.items.filter((question) =>
         question.title
           .toLocaleLowerCase()
           .includes(router.query.q?.toString().toLocaleLowerCase() || "")
       );
       if (questions.length === 0) {
         //get random 3 question
-        let randomQuestion = QuestionDataList.postList
+        let randomQuestion = QuestionDataList.items
           .sort(() => Math.random() - Math.random())
           .slice(0, 3);
         setIsNotFound(true);
@@ -135,11 +133,11 @@ export default function Search() {
 
 // @ts-ignore
 export async function getServerSideProps({ params, query, ...props }) {
-  // const postList = await getPosts(query.limit, query.page);
-  const postList = undefined;
+  // const items = await getPosts(query.limit, query.page);
+  const items = undefined;
   return {
     props: {
-      postList: postList ? postList : [],
+      items: items ? items : [],
       pagination: {
         current_page: 1,
         limit: 10,
