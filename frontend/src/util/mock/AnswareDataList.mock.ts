@@ -5,8 +5,8 @@ import users from "./UserData.mock";
 interface Answer {
   id: number | string;
   content: string;
-  voteNumber: number;
-  createdDate: string;
+  votes: number;
+  createdAt: string;
   updatedDate: string;
   status: number;
   user: string;
@@ -32,8 +32,8 @@ function generateAnswerList(): AnswerListType {
         faker.number.int({ min: 1, max: 3 }),
         "\n"
       ),
-      voteNumber: faker.number.int({ min: 0, max: 1000 }),
-      createdDate: faker.date.past().toISOString(),
+      votes: faker.number.int({ min: 0, max: 1000 }),
+      createdAt: faker.date.past().toISOString(),
       updatedDate: faker.date.recent().toISOString(),
       status: faker.datatype.boolean() ? 1 : 0,
       user: { ...users[1] },

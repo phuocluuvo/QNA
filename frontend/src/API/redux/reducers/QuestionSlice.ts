@@ -36,7 +36,7 @@ const questionSlice = createSlice({
     },
     successGetQuestionList: (state, actions) => {
       state.requesting = false;
-      state.questionList = actions.payload.data;
+      state.questionList = actions.payload;
       state.type = ActionTypes.SUCCESS_GET_QUESTION_LIST;
     },
     failureGetQuestionList: (state, actions) => {
@@ -44,6 +44,20 @@ const questionSlice = createSlice({
       state.questionList = [];
       state.error = actions.payload.error;
       state.type = ActionTypes.FAILURE_GET_QUESTION_LIST;
+    },
+    requestCreateQuestion: (state) => {
+      state.requesting = true;
+      state.type = ActionTypes.REQUEST_CREATE_QUESTION;
+    },
+    successCreateQuestion: (state, actions) => {
+      state.requesting = false;
+      state.type = ActionTypes.SUCCESS_CREATE_QUESTION;
+      state.questionDetail = actions.payload;
+    },
+    failureCreateQuestion: (state, actions) => {
+      state.requesting = false;
+      state.error = actions.payload.error;
+      state.type = ActionTypes.FAILURE_CREATE_QUESTION;
     },
   },
 });
@@ -55,6 +69,9 @@ export const {
   requestGetQuestionList,
   successGetQuestionList,
   failureGetQuestionList,
+  requestCreateQuestion,
+  successCreateQuestion,
+  failureCreateQuestion,
 } = questionSlice.actions;
 
 export default questionSlice.reducer;

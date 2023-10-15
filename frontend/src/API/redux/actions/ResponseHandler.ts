@@ -2,32 +2,25 @@ import { AnyAction, Dispatch } from "@reduxjs/toolkit";
 import { resetAll } from "../reducers/RootReducer";
 
 export function responseHandler(
-  res: {
-    status: number;
-    data: {
-      message?: string;
-      data?: any;
-      result_code?: string;
-    };
-  },
+  res: any,
   callbackSuccess: (...props: any) => void,
   callbackError: (...props: any) => void,
   isSaveReducer: boolean,
   successReducer: any,
-  failReducer: any
+  failReducer: any,
 ): any {
   //   Languages = LanguagesUtils.getCurrentLanguage();
   return (dispatch: Dispatch<AnyAction>): any => {
     if (res.status === 200 || res.status === 201) {
       //Please don't change anything in this file
       return dispatch(
-        successCb(res.data.data, callbackSuccess, isSaveReducer, successReducer)
+        successCb(res.data, callbackSuccess, isSaveReducer, successReducer)
       );
     } else if (res.status === 401) {
       //   eventListener.logOutEvent();
       return dispatch(resetAll());
     }
-    if (res.status === null) {
+    if (res.status === null || res.ok === false) {
       //Please don't change anything in this file
       return dispatch(
         failCb(
@@ -39,12 +32,12 @@ export function responseHandler(
       );
     } else {
       let messageApi = "";
-      let resultCode = "";
-      if (res.data.result_code != null) {
-        resultCode = res.data.result_code;
+      let resultCode = 0;
+      if (res.status != null) {
+        resultCode = res.status;
       }
-      if (res.data.message != null) {
-        messageApi = res.data.message;
+      if (res.statusText != null) {
+        messageApi = res.statusText;
       }
       return dispatch(
         failCb(
@@ -53,7 +46,7 @@ export function responseHandler(
           isSaveReducer,
           failReducer,
           messageApi,
-          res.data.data,
+          res.data,
           res.status,
           resultCode
         )
@@ -84,7 +77,7 @@ export function failCb(
   messageApi?: string,
   data?: any,
   statusCode?: number,
-  resultCode?: string
+  resultCode?: number
 ) {
   if (!messageApi) {
     messageApi = "";

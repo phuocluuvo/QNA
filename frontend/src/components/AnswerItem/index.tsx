@@ -23,7 +23,7 @@ function AnswareItem({
 }) {
   const [state, setState] = React.useState({
     // @ts-ignore
-    count: answer.voteNumber ?? 0,
+    count: answer.votes ?? 0,
     isDarkMode: false,
   });
   return (
@@ -87,7 +87,7 @@ function AnswareItem({
                 headingText={getTranslate("ANSWERED_AT").replace(
                   "{0}",
                   helper.formatDate(
-                    answer.createdDate,
+                    answer.createdAt,
                     false,
                     "H:mm A - ddd, DD/MM/YYYY"
                   )

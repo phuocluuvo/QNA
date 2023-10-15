@@ -20,6 +20,7 @@ import ChangeLanguageButton from "./ChangeLanguageButton";
 import { Dimensions } from "@/assets/constant/Dimensions";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useSelector } from "react-redux";
 
 function Header() {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -74,9 +75,7 @@ function Header() {
             <Button
               as={Link}
               variant="main_button"
-              display={
-                routes.pathname === "/question/create" ? "none" : "flex"
-              }
+              display={routes.pathname === "/question/create" ? "none" : "flex"}
               color={"white"}
               href={"/question/create"}
             >
@@ -98,7 +97,6 @@ function Header() {
           />
           <Navigator
             getTranslate={getTranslate}
-            isLogged={false}
             isMobile={isMobile}
           />
         </HStack>
