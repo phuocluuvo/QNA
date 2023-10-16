@@ -27,9 +27,8 @@ function TabsQuestion({ questions, containerStyles }: Props) {
     >
       <Tabs position="relative" variant="unstyled">
         <TabList>
-          <Tab>One</Tab>
-          <Tab>Two</Tab>
-          <Tab>Three</Tab>
+          <Tab>New</Tab>
+          <Tab>Unanswer</Tab>
         </TabList>
         <TabIndicator
           mt="-1.5px"
@@ -43,9 +42,6 @@ function TabsQuestion({ questions, containerStyles }: Props) {
           </TabPanel>
           <TabPanel>
             <p>two!</p>
-          </TabPanel>
-          <TabPanel>
-            <p>three!</p>
           </TabPanel>
         </TabPanels>
       </Tabs>

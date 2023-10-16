@@ -13,16 +13,27 @@ import {
 } from "@chakra-ui/react";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import dynamic from "next/dynamic";
-import { Field, Form, Formik } from "formik";
+import { Field, Form, Formik, FormikHelpers } from "formik";
 import helper from "@/util/helper";
 import useStateWithCallback from "@/hooks/useStateWithCallback";
+import { useDispatch, useSelector } from "react-redux";
+import actionCreateQuestion from "@/API/redux/actions/question/ActionCreateQuestion";
+import useAxiosAuth from "@/hooks/useAxiosAuth";
+import { url } from "@/API/api/url";
+import { useRouter } from "next/router";
+type State = {
+  title: string;
+  bodyQuestion: string;
+};
 function CreateQuestion() {
-  const [state, setState] = useStateWithCallback({
+  const [state, setState] = useStateWithCallback<State>({
     title: "",
     bodyQuestion: "",
   });
+  const route = useRouter();
+  const axiosAuth = useAxiosAuth();
   const { colorMode } = useColorMode();
-
+  const dispacth = useDispatch();
   const handleChangeBodyQuestion = (value: string) => {
     // @ts-ignore
     setState((oldState) =>
@@ -42,15 +53,36 @@ function CreateQuestion() {
     return error;
   };
 
+  const createQuestionHandle = (
+    values: State,
+    actions: FormikHelpers<State>
+  ) => {
+    let form = {
+      title: values.title,
+      content: state.bodyQuestion,
+    };
+    setTimeout(async () => {
+      // const res = await axiosAuth.post(url.QUESTION, form);
+      // console.log("actionCreateQuestion: ", res.data);
+      dispacth(
+        actionCreateQuestion(
+          form,
+          (res) => {
+            console.log("actionCreateQuestion: ", res);
+            route.push(`/question/${res.id}`);
+          },
+          () => {}
+        )
+      );
+      actions.setSubmitting(false);
+    }, 1000);
+  };
   return (
     <Container my={0} minW={{ lg: "70%", base: "90%" }} maxH={"30vh"}>
       <Formik
         initialValues={{ title: "", bodyQuestion: "" }}
         onSubmit={(values, actions) => {
-          setTimeout(() => {
-            alert(JSON.stringify(values, null, 2));
-            actions.setSubmitting(false);
-          }, 1000);
+          createQuestionHandle(values, actions);
         }}
       >
         {(props) => (
@@ -80,12 +112,18 @@ function CreateQuestion() {
                   </FormControl>
                 )}
               </Field>
-              <Field name="body">
+              <Field name="bodyQuestion">
                 {({ field, form }: any) => (
                   <FormControl
                     isInvalid={form.errors.body && form.touched.body}
                   >
-                    <FormLabel>Question Body</FormLabel>
+                    <FormLabel>
+                      Content
+                      <Text fontSize="sm" color="gray.500">
+                        Your question needs to be as detailed as possible for
+                        people to answer it correctly.
+                      </Text>
+                    </FormLabel>
                     <ReactQuill
                       id="body"
                       theme="snow"

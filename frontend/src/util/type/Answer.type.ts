@@ -3,8 +3,8 @@ import { UserType } from "./User.type";
 interface Answer {
   id: string | number;
   content: string;
-  voteNumber: number;
-  createdDate: string;
+  votes: number;
+  createdAt: string;
   updatedDate: string;
   status: number;
   user: UserType;

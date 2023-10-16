@@ -4,19 +4,52 @@ import {
   Flex,
   HStack,
   IconButton,
+  Toast,
   VStack,
   useColorMode,
   useDisclosure,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import React from "react";
 import LinkButton from "@/components/LinkButton";
 import { Colors } from "@/assets/constant/Colors";
-function Navigator({ isLogged = false, getTranslate, isMobile }) {
+import { useSelector } from "react-redux";
+import { useSession, signIn, signOut } from "next-auth/react";
+import { useRouter } from "next/router";
+import api from "@/API/api";
+function Navigator({ getTranslate, isMobile }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { colorMode } = useColorMode();
   const handleClick = () => (isOpen ? onClose() : onOpen());
-
+  const userData = useSelector((state) => state.userReducer.data);
+  const { data: session } = useSession();
+  const routes = useRouter();
+  const LogoutHandle = async () => {
+    await api.signOut().then(async (res) => {
+      await signOut({ redirect: false, callbackUrl: "/user/signin" })
+        .then((res) => {
+          console.log("logout success", res);
+          localStorage.removeItem("userLogin");
+          Toast({
+            title: "Logout success",
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+          });
+        })
+        .catch((err) => {
+          console.log("logout failed:", err);
+        });
+    }),
+      (err) => {
+        console.log("logout failed:", err);
+      };
+  };
+  const DashboardHandle = () => {};
   return isMobile ? (
     <Flex
       as="nav"
@@ -71,61 +104,79 @@ function Navigator({ isLogged = false, getTranslate, isMobile }) {
           text={getTranslate("ABOUT")}
           onClick={handleClick}
         />
-        {isLogged ? (
+        {session?.user ? (
           <LinkButton
-            href="/users/logout"
+            href="/auth/logout"
             text={getTranslate("LOGOUT")}
-            onClick={handleClick}
+            onClick={LogoutHandle}
           />
         ) : (
           <>
-            <LinkButton
-              style={{ paddingX: 0 }}
-              href="/users/login"
-              text={getTranslate("LOGIN")}
-            />
+            {/* check if current routes is login */}
+            {routes.pathname === "/auth/signin" ? null : (
+              <LinkButton
+                style={{ paddingX: 0 }}
+                href="/auth/signin"
+                onClick={signIn}
+                text={getTranslate("LOGIN")}
+              />
+            )}
             <LinkButton
               style={{ paddingX: 0 }}
               textStyle={{ color: Colors(colorMode).PRIMARY }}
-              href="/users/sign-up"
+              href="/auth/signup"
               text={getTranslate("SIGNUP")}
             />
           </>
         )}
       </VStack>
     </Flex>
+  ) : session?.user ? (
+    <Menu>
+      <IconButton
+        as={MenuButton}
+        variant="ghost"
+        icon={
+          <Avatar
+            size={"xs"}
+            name={session.user.fullname ? session.user.fullname : "Unknown"}
+            src={session.user.avatar}
+          />
+        }
+      />
+      <MenuList>
+        <MenuItem onClick={DashboardHandle}>
+          {getTranslate("DASHBOARD")}
+        </MenuItem>
+        <MenuItem onClick={LogoutHandle}>{getTranslate("LOGOUT")}</MenuItem>
+      </MenuList>
+    </Menu>
   ) : (
-    <>
-      {isLogged ? (
-        <IconButton
-          variant="ghost"
-          icon={<Avatar size={"xs"} name="Louis" />}
+    <HStack spacing={0}>
+      <LinkButton
+        href="/about"
+        style={{
+          paddingX: 0,
+        }}
+        text={getTranslate("ABOUT")}
+      />
+      {routes.pathname === "/auth/signin" ? null : (
+        <LinkButton
+          style={{ paddingX: 0 }}
+          href="/auth/signin"
+          onClick={signIn}
+          text={getTranslate("LOGIN")}
         />
-      ) : (
-        <HStack spacing={0}>
-          <LinkButton
-            href="/about"
-            style={{
-              paddingX: 0,
-            }}
-            text={getTranslate("ABOUT")}
-          />
-          <LinkButton
-            style={{ paddingX: 0 }}
-            href="/users/login"
-            text={getTranslate("LOGIN")}
-          />
-          <LinkButton
-            style={{
-              paddingX: 0,
-            }}
-            textStyle={{ color: Colors(colorMode).PRIMARY }}
-            href="/users/sign-up"
-            text={getTranslate("SIGNUP")}
-          />
-        </HStack>
       )}
-    </>
+      <LinkButton
+        style={{
+          paddingX: 0,
+        }}
+        textStyle={{ color: Colors(colorMode).PRIMARY }}
+        href="/auth/signup"
+        text={getTranslate("SIGNUP")}
+      />
+    </HStack>
   );
 }
 
