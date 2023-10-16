@@ -6,7 +6,7 @@ export class CreateAnswerDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsUUID()
-  questionId: string;
+  question_id: string;
 
   @ApiProperty()
   @Expose()

@@ -24,6 +24,7 @@ import { AccessTokenGuard } from "../auth/guards/accessToken.guard";
 import { Request } from "express";
 import { Action } from "../enums/action.enum";
 import { CaslAbilityFactory } from "../casl/casl-ability.factory";
+import { VoteQuestionDto } from "../vote/dto/vote-question.dto";
 
 @ApiTags("question")
 @Controller("question")
@@ -154,5 +155,23 @@ export class QuestionController {
     } else {
       throw new ForbiddenException("Access Denied. Not author");
     }
+  }
+
+  /**
+   * Vote for a question.
+   *
+   * @param questionVoteDto
+   * @param req - The request object.
+   * @returns The result of the vote.
+   */
+  @ApiOperation({
+    summary: "vote question",
+  })
+  @ApiBearerAuth()
+  @Post("vote")
+  @UseGuards(AccessTokenGuard)
+  async vote(@Body() questionVoteDto: VoteQuestionDto, @Req() req: Request) {
+    const userId = req.user["sub"];
+    return this.questionService.updateVote(userId, questionVoteDto);
   }
 }
