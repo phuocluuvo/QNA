@@ -37,6 +37,7 @@ export class AnswerService {
     queryBuilder.innerJoinAndSelect("answer.user", "user");
     queryBuilder.innerJoinAndSelect("answer.question", "question");
     queryBuilder.where(questionId ? { question: { id: questionId } } : {});
+    queryBuilder.orderBy("answer.isApproved", "DESC");
     return paginate<Answer>(queryBuilder, options);
   }
 

@@ -21,6 +21,9 @@ export class Answer {
   @Column({ default: 0 })
   votes: number;
 
+  @Column({ name: "is_approved", default: false })
+  isApproved: boolean;
+
   @ManyToOne(() => Question, (question) => question.answers, {
     onDelete: "CASCADE",
   })
