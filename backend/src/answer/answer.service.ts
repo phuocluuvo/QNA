@@ -9,12 +9,17 @@ import {
   paginate,
   Pagination,
 } from "nestjs-typeorm-paginate";
+import { VoteAnswerDto } from "../vote/dto/vote-answer.dto";
+import { VoteService } from "../vote/vote.service";
+import { VoteType } from "../enums/vote-type.enum";
+import { ApproveAnswerDto } from "./dto/approve-answer.dto";
 
 @Injectable()
 export class AnswerService {
   constructor(
     @Inject("ANSWER_REPOSITORY")
     private answerRepository: Repository<Answer>,
+    private readonly voteService: VoteService,
   ) {}
 
   /**
@@ -29,10 +34,13 @@ export class AnswerService {
     options: IPaginationOptions,
   ): Promise<Pagination<Answer>> {
     const queryBuilder = this.answerRepository.createQueryBuilder("answer");
-
     queryBuilder.innerJoinAndSelect("answer.user", "user");
     queryBuilder.innerJoinAndSelect("answer.question", "question");
-    queryBuilder.where(questionId ? { question: { id: questionId } } : {});
+    queryBuilder.where(
+      questionId ? { question: { id: questionId } } : { id: "no_id" },
+    );
+    queryBuilder.orderBy("answer.isApproved", "DESC");
+
     return paginate<Answer>(queryBuilder, options);
   }
 
@@ -56,6 +64,22 @@ export class AnswerService {
   }
 
   /**
+   * Find an answer.
+   *
+   * @param option - The option of the answer to retrieve.
+   * @returns The answer with the specified ID.
+   * @throws NotFoundException if the answer with the given ID does not exist.
+   */
+  async findOne(option: any) {
+    const answer = await this.answerRepository.findOne({
+      where: option,
+      relations: ["user", "question"],
+    });
+
+    return answer;
+  }
+
+  /**
    * Create a new answer.
    *
    * @param answerDto - The data to create a new answer.
@@ -67,7 +91,7 @@ export class AnswerService {
       excludeExtraneousValues: true,
     });
     answerTrans["user"] = userId;
-    answerTrans["question"] = answerDto.questionId;
+    answerTrans["question"] = answerDto.question_id;
     return this.answerRepository.save(answerTrans);
   }
 
@@ -97,5 +121,57 @@ export class AnswerService {
    */
   async remove(answer: Answer) {
     return this.answerRepository.remove(answer);
+  }
+
+  /**
+   * update vote count.
+   *
+   * @param userId
+   * @param answerVoteDto
+   * @returns The question with an increased view count.
+   * @throws NotFoundException if the question does not exist.
+   */
+  async updateVote(
+    userId: string,
+    answerVoteDto: VoteAnswerDto,
+  ): Promise<Answer> {
+    const answer = await this.findOneById(answerVoteDto.answer_id);
+
+    if (!answer) {
+      throw new NotFoundException("Question not found");
+    }
+
+    const createVote = await this.voteService.voteAnswer(userId, answerVoteDto);
+
+    if (answerVoteDto.vote_type === VoteType.UPVOTE) {
+      answer.votes += createVote;
+    } else if (answerVoteDto.vote_type === VoteType.DOWNVOTE) {
+      answer.votes -= createVote;
+    }
+
+    try {
+      return this.answerRepository.save(answer);
+    } catch (error) {
+      throw new Error("Error updating vote");
+    }
+  }
+
+  async approveAnswer(approveAnswerDto: ApproveAnswerDto): Promise<Answer> {
+    const exitApproved = await this.findOne({
+      question: { id: approveAnswerDto.question_id },
+      isApproved: true,
+    });
+    const answerTrans = new UpdateAnswerDto();
+
+    if (exitApproved && exitApproved.id == approveAnswerDto.answer_id) {
+      answerTrans["isApproved"] = false;
+      return await this.update(approveAnswerDto.answer_id, answerTrans);
+    } else if (exitApproved && exitApproved.id != approveAnswerDto.answer_id) {
+      answerTrans["isApproved"] = false;
+      await this.update(exitApproved.id, answerTrans);
+    }
+
+    answerTrans["isApproved"] = true;
+    return await this.update(approveAnswerDto.answer_id, answerTrans);
   }
 }
