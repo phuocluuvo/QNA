@@ -26,6 +26,7 @@ import { QuestionService } from "../question/question.service";
 import { UpdateAnswerDto } from "./dto/update-answer.dto";
 import { Action } from "../enums/action.enum";
 import { VoteAnswerDto } from "../vote/dto/vote-answer.dto";
+import { ApproveAnswerDto } from "./dto/approve-answer.dto";
 
 @ApiTags("answer")
 @Controller("answer")
@@ -176,5 +177,49 @@ export class AnswerController {
   async vote(@Body() answerVoteDto: VoteAnswerDto, @Req() req: Request) {
     const userId = req.user["sub"];
     return this.answerService.updateVote(userId, answerVoteDto);
+  }
+
+  /**
+   * Approve for an answer.
+   *
+   * @param approveAnswerDto
+   * @param req - The request object.
+   * @returns The result of the vote.
+   */
+  @ApiOperation({
+    summary: "approve answer",
+  })
+  @ApiBearerAuth()
+  @Post("approve")
+  @UseGuards(AccessTokenGuard)
+  async approve(
+    @Body() approveAnswerDto: ApproveAnswerDto,
+    @Req() req: Request,
+  ): Promise<Answer> {
+    const ability = this.caslAbilityFactory.createForUser(req.user);
+
+    const answer = await this.answerService.findOneById(
+      approveAnswerDto.answer_id,
+    );
+    if (!answer) {
+      throw new NotFoundException(
+        `There is no answer under id ${approveAnswerDto.answer_id}`,
+      );
+    }
+
+    const question = await this.questionService.findOneById(
+      approveAnswerDto.question_id,
+    );
+    if (!question) {
+      throw new NotFoundException(
+        `There is no question under id ${approveAnswerDto.question_id}`,
+      );
+    }
+
+    if (ability.can(Action.Update, question)) {
+      return this.answerService.approveAnswer(approveAnswerDto);
+    } else {
+      throw new ForbiddenException("Access Denied. Not author");
+    }
   }
 }
