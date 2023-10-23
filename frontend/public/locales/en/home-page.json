@@ -35,5 +35,8 @@
   "ALREADY_HAVE_ACCOUNT": "Already have an account?",
   "ASKED_AT": "Asked at {0}",
   "ANSWERED_AT": "Answered at {0}",
-  "INTRODUCTION": "Ask questions, get answers! Welcome to the ultimate Q&amp;A platform for developers and programmers."
+  "INTRODUCTION": "Ask questions, get answers! Welcome to the ultimate Q&amp;A platform for developers and programmers.",
+  "ANSWER_PLACEHOLDER": "Enter your answer",
+  "SUBMIT": "Submit",
+  "LOGIN_TO_ANSWER": "Login to answer"
 }

@@ -35,5 +35,8 @@
   "ALREADY_HAVE_ACCOUNT": "Đã có tài khoản?",
   "ASKED_AT": "Hỏi vào lúc {0}",
   "ANSWERED_AT": "Trả lời vào lúc {0}",
-  "INTRODUCTION": "Nơi bạn đặt câu hỏi, chúng tôi trả lời! Chào mừng bạn đến với trang web hỏi đáp dành cho các lập trình viên và nhà phát triển."
+  "INTRODUCTION": "Nơi bạn đặt câu hỏi, chúng tôi trả lời! Chào mừng bạn đến với trang web hỏi đáp dành cho các lập trình viên và nhà phát triển.",
+  "ANSWER_PLACEHOLDER": "Nhập câu trả lời",
+  "SUBMIT": "Gửi",
+  "LOGIN_TO_ANSWER": "Đăng nhập để trả lời"
 }
