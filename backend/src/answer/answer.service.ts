@@ -33,11 +33,13 @@ export class AnswerService {
     options: IPaginationOptions,
   ): Promise<Pagination<Answer>> {
     const queryBuilder = this.answerRepository.createQueryBuilder("answer");
-
     queryBuilder.innerJoinAndSelect("answer.user", "user");
     queryBuilder.innerJoinAndSelect("answer.question", "question");
-    queryBuilder.where(questionId ? { question: { id: questionId } } : {});
+    queryBuilder.where(
+      questionId ? { question: { id: questionId } } : { id: "no_id" },
+    );
     queryBuilder.orderBy("answer.isApproved", "DESC");
+
     return paginate<Answer>(queryBuilder, options);
   }
 

@@ -55,7 +55,6 @@ export class AnswerController {
     @Query("limit", new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
   ): Promise<Pagination<Answer>> {
     limit = limit > 100 ? 100 : limit;
-    console.log(questionId);
     return this.answerService.find(questionId, {
       page,
       limit,
