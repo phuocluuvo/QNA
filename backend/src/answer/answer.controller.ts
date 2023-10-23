@@ -26,14 +26,12 @@ import { QuestionService } from "../question/question.service";
 import { UpdateAnswerDto } from "./dto/update-answer.dto";
 import { Action } from "../enums/action.enum";
 import { VoteAnswerDto } from "../vote/dto/vote-answer.dto";
-import { VoteService } from "../vote/vote.service";
 
 @ApiTags("answer")
 @Controller("answer")
 export class AnswerController {
   constructor(
     private readonly answerService: AnswerService,
-    private readonly voteService: VoteService,
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly questionService: QuestionService,
   ) {}
@@ -52,11 +50,12 @@ export class AnswerController {
   @Get()
   @UseGuards()
   find(
-    @Query("questionId") questionId: string,
+    @Query("question_id") questionId: string,
     @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
     @Query("limit", new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
   ): Promise<Pagination<Answer>> {
     limit = limit > 100 ? 100 : limit;
+    console.log(questionId);
     return this.answerService.find(questionId, {
       page,
       limit,
