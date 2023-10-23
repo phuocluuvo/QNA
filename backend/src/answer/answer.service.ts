@@ -12,6 +12,7 @@ import {
 import { VoteAnswerDto } from "../vote/dto/vote-answer.dto";
 import { VoteService } from "../vote/vote.service";
 import { VoteType } from "../enums/vote-type.enum";
+import { ApproveAnswerDto } from "./dto/approve-answer.dto";
 
 @Injectable()
 export class AnswerService {
@@ -33,10 +34,13 @@ export class AnswerService {
     options: IPaginationOptions,
   ): Promise<Pagination<Answer>> {
     const queryBuilder = this.answerRepository.createQueryBuilder("answer");
-
     queryBuilder.innerJoinAndSelect("answer.user", "user");
     queryBuilder.innerJoinAndSelect("answer.question", "question");
-    queryBuilder.where(questionId ? { question: { id: questionId } } : {});
+    queryBuilder.where(
+      questionId ? { question: { id: questionId } } : { id: "no_id" },
+    );
+    queryBuilder.orderBy("answer.isApproved", "DESC");
+
     return paginate<Answer>(queryBuilder, options);
   }
 
@@ -56,6 +60,22 @@ export class AnswerService {
     if (!answer) {
       throw new NotFoundException(`There is no answer under id ${id}`);
     }
+    return answer;
+  }
+
+  /**
+   * Find an answer.
+   *
+   * @param option - The option of the answer to retrieve.
+   * @returns The answer with the specified ID.
+   * @throws NotFoundException if the answer with the given ID does not exist.
+   */
+  async findOne(option: any) {
+    const answer = await this.answerRepository.findOne({
+      where: option,
+      relations: ["user", "question"],
+    });
+
     return answer;
   }
 
@@ -134,5 +154,24 @@ export class AnswerService {
     } catch (error) {
       throw new Error("Error updating vote");
     }
+  }
+
+  async approveAnswer(approveAnswerDto: ApproveAnswerDto): Promise<Answer> {
+    const exitApproved = await this.findOne({
+      question: { id: approveAnswerDto.question_id },
+      isApproved: true,
+    });
+    const answerTrans = new UpdateAnswerDto();
+
+    if (exitApproved && exitApproved.id == approveAnswerDto.answer_id) {
+      answerTrans["isApproved"] = false;
+      return await this.update(approveAnswerDto.answer_id, answerTrans);
+    } else if (exitApproved && exitApproved.id != approveAnswerDto.answer_id) {
+      answerTrans["isApproved"] = false;
+      await this.update(exitApproved.id, answerTrans);
+    }
+
+    answerTrans["isApproved"] = true;
+    return await this.update(approveAnswerDto.answer_id, answerTrans);
   }
 }
