@@ -17,7 +17,6 @@ import {
 import { CaslAbilityFactory } from "../casl/casl-ability.factory";
 import { AnswerService } from "./answer.service";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { Pagination } from "nestjs-typeorm-paginate";
 import { Answer } from "./entity/answer.entity";
 import { AccessTokenGuard } from "../auth/guards/accessToken.guard";
 import { Request } from "express";
@@ -27,6 +26,7 @@ import { UpdateAnswerDto } from "./dto/update-answer.dto";
 import { Action } from "../enums/action.enum";
 import { VoteAnswerDto } from "../vote/dto/vote-answer.dto";
 import { ApproveAnswerDto } from "./dto/approve-answer.dto";
+import { PublicGuard } from "../auth/guards/public.guard";
 
 @ApiTags("answer")
 @Controller("answer")
@@ -41,6 +41,7 @@ export class AnswerController {
    * Get paginated answers based on the provided questionId.
    *
    * @param questionId - The ID of the question to filter answers.
+   * @param req - Get login user.
    * @param page - The page number for pagination.
    * @param limit - The limit of items per page for pagination.
    * @returns Paginated list of answers.
@@ -49,14 +50,16 @@ export class AnswerController {
     summary: "get paginate answers",
   })
   @Get()
-  @UseGuards()
+  @UseGuards(PublicGuard)
   find(
     @Query("question_id") questionId: string,
+    @Req() req: Request,
     @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
     @Query("limit", new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
-  ): Promise<Pagination<Answer>> {
+  ) {
     limit = limit > 100 ? 100 : limit;
-    return this.answerService.find(questionId, {
+    const userId = req.user["sub"];
+    return this.answerService.find(questionId, userId, {
       page,
       limit,
     });

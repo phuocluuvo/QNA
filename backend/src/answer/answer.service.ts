@@ -26,21 +26,30 @@ export class AnswerService {
    * Find answers based on questionId and paginate the results.
    *
    * @param questionId - The ID of the question to filter answers.
+   * @param userId
    * @param options - Pagination options.
    * @returns Paginated list of answers.
    */
   async find(
     questionId: string,
+    userId: string,
     options: IPaginationOptions,
   ): Promise<Pagination<Answer>> {
     const queryBuilder = this.answerRepository.createQueryBuilder("answer");
     queryBuilder.innerJoinAndSelect("answer.user", "user");
     queryBuilder.innerJoinAndSelect("answer.question", "question");
+    queryBuilder.leftJoinAndSelect(
+      "answer.vote",
+      "vote",
+      "vote.user_id = :userId AND vote.answer_id = answer.id",
+      { userId },
+    );
+
     queryBuilder.where(
       questionId ? { question: { id: questionId } } : { id: "no_id" },
     );
     queryBuilder.orderBy("answer.isApproved", "DESC");
-
+    console.log("queryBuilder", queryBuilder.getQuery());
     return paginate<Answer>(queryBuilder, options);
   }
 

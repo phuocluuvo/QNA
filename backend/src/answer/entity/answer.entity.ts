@@ -4,11 +4,13 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { User } from "../../users/entity/users.entity";
 import { Question } from "../../question/entity/question.entity";
+import { Vote } from "../../vote/entity/vote.entity";
 
 @Entity()
 export class Answer {
@@ -35,6 +37,9 @@ export class Answer {
   })
   @JoinColumn({ name: "user_id" })
   user: User;
+
+  @OneToMany(() => Vote, (vote) => vote.answer)
+  vote: Vote[];
 
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
