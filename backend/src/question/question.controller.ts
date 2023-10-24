@@ -25,6 +25,7 @@ import { Request } from "express";
 import { Action } from "../enums/action.enum";
 import { CaslAbilityFactory } from "../casl/casl-ability.factory";
 import { VoteQuestionDto } from "../vote/dto/vote-question.dto";
+import { PublicGuard } from "../auth/guards/public.guard";
 
 @ApiTags("question")
 @Controller("question")
@@ -61,15 +62,17 @@ export class QuestionController {
    * Get a question by its ID and increase its view count.
    *
    * @param id The ID of the question to retrieve.
+   * @param req Login user
    * @returns Promise<Question> The question with the specified ID.
    */
   @ApiOperation({
     summary: "get question",
   })
   @Get(":id")
-  @UseGuards()
-  async findOneById(@Param("id") id: string) {
-    return this.questionService.getAndIncreaseViewCount(id);
+  @UseGuards(PublicGuard)
+  async findOneById(@Param("id") id: string, @Req() req: Request) {
+    const userId = req.user["sub"];
+    return this.questionService.getAndIncreaseViewCount(id, userId);
   }
 
   /**

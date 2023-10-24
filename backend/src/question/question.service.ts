@@ -141,20 +141,38 @@ export class QuestionService {
    * Get a question by its ID and increase its view count.
    *
    * @param questionId - The ID of the question.
+   * @param userId logged in user id
    * @returns The question with an increased view count.
    * @throws NotFoundException if the question does not exist.
    */
-  async getAndIncreaseViewCount(questionId: string): Promise<Question> {
+  async getAndIncreaseViewCount(
+    questionId: string,
+    userId: string,
+  ): Promise<Question> {
     const question = await this.questionRepository.findOne({
       where: { id: questionId },
       relations: ["user"],
     });
+
     if (!question) {
       throw new NotFoundException("Question not found");
     }
 
     question.views += 1;
-    return this.questionRepository.save(question);
+    const result = await this.questionRepository.save(question);
+    result.vote = [];
+
+    if (userId) {
+      const voteInfo = await this.voteService.getVote({
+        user: { id: userId },
+        question: { id: questionId },
+      });
+
+      if (voteInfo) {
+        result.vote.push(voteInfo);
+      }
+    }
+    return result;
   }
 
   /**
