@@ -4,14 +4,17 @@ import { Question } from "./entity/question.entity";
 import { CreateQuestionDto } from "./dto/create-question.dto";
 import {
   IPaginationOptions,
-  paginate,
-  Pagination,
+  paginateRawAndEntities,
 } from "nestjs-typeorm-paginate";
 import { UpdateQuestionDto } from "./dto/update-question.dto";
 import { plainToClass } from "class-transformer";
 import { VoteType } from "../enums/vote-type.enum";
 import { VoteService } from "../vote/vote.service";
 import { VoteQuestionDto } from "../vote/dto/vote-question.dto";
+
+export class QuestionWithCount extends Question {
+  countAnswer: number;
+}
 
 @Injectable()
 export class QuestionService {
@@ -27,12 +30,43 @@ export class QuestionService {
    * @param options - Pagination options.
    * @returns A paginated list of questions.
    */
-  async find(options: IPaginationOptions): Promise<Pagination<Question>> {
+  async find(options: IPaginationOptions) {
     const queryBuilder = this.questionRepository.createQueryBuilder("question");
     queryBuilder
-      .innerJoinAndSelect("question.user", "user")
+      .select([
+        "question.id",
+        "question.title",
+        "question.content",
+        "question.views",
+        "question.votes",
+        "question.createdAt",
+        "question.updatedAt",
+        "user.id",
+        "user.username",
+        "user.fullname",
+        "user.avatar",
+        "user.dob",
+        "user.email",
+        "user.role",
+        "COUNT(answer.id) as countAnswer",
+      ])
+      .innerJoin("question.user", "user")
+      .leftJoin("question.answers", "answer")
+      .groupBy("question.id, user.id")
       .orderBy("question.updatedAt", "DESC");
-    return paginate<Question>(queryBuilder, options);
+
+    const [pagination, rawResults] = await paginateRawAndEntities<Question>(
+      queryBuilder,
+      options,
+    );
+    pagination.items.map((item, index) => {
+      const check = rawResults.find((raw: any) => raw.question_id === item.id);
+      if (check) {
+        item["countAnswer"] = rawResults[index]["countAnswer"];
+      }
+    });
+
+    return pagination;
   }
 
   /**
