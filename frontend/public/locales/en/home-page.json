@@ -38,5 +38,12 @@
   "INTRODUCTION": "Ask questions, get answers! Welcome to the ultimate Q&amp;A platform for developers and programmers.",
   "ANSWER_PLACEHOLDER": "Enter your answer",
   "SUBMIT": "Submit",
-  "LOGIN_TO_ANSWER": "Login to answer"
+  "LOGIN_TO_ANSWER": "Login to answer",
+  "APPROVE": "Approve",
+  "APPROVE_TOOLTIP": "This answer is approved by the author of the question",
+  "APPROVE_ANSWER": "Approve this answer?",
+  "APPROVE_CONFIRM_TITLE": "Are you sure you want to approve this answer?",
+  "UNAPPROVE": "Unapprove",
+  "UNAPPROVE_CONFIRM_TITLE": "Are you sure you want to unapprove this answer?",
+  "CANCEL": "Cancel"
 }
