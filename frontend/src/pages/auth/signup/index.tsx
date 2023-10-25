@@ -78,7 +78,7 @@ function Login() {
           (res: { data: any }) => {
             // save to local storage
             // localStorage.setItem("userLogin", JSON.stringify(res.data));
-            router.push(router.basePath + "/user/signin");
+            signIn();
           },
           () => {
             console.log("Error");

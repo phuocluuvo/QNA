@@ -16,6 +16,7 @@ import Head from "next/head";
 import NextNProgress from "nextjs-progressbar";
 import { Provider } from "react-redux";
 import { Colors } from "@/assets/constant/Colors";
+import "./index.css";
 // @ts-ignore
 function App({ Component, pageProps: { session, ...pageProps } }) {
   return (
