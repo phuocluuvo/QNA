@@ -49,7 +49,7 @@ export class AnswerService {
       questionId ? { question: { id: questionId } } : { id: "no_id" },
     );
     queryBuilder.orderBy("answer.isApproved", "DESC");
-    console.log("queryBuilder", queryBuilder.getQuery());
+
     return paginate<Answer>(queryBuilder, options);
   }
 

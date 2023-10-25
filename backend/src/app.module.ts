@@ -8,6 +8,7 @@ import { UsersModule } from "./users/users.module";
 import { CaslModule } from "./casl/casl.module";
 import { RedisCacheModule } from "./redis/cache.module";
 import { VoteModule } from "./vote/vote.module";
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { VoteModule } from "./vote/vote.module";
     CaslModule,
     RedisCacheModule,
     VoteModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -11,6 +11,7 @@ import {
 import { User } from "../../users/entity/users.entity";
 import { Question } from "../../question/entity/question.entity";
 import { Vote } from "../../vote/entity/vote.entity";
+import { Comment } from "../../comment/entity/comment.entity";
 
 @Entity()
 export class Answer {
@@ -40,6 +41,9 @@ export class Answer {
 
   @OneToMany(() => Vote, (vote) => vote.answer)
   vote: Vote[];
+
+  @OneToMany(() => Comment, (comment) => comment.answer)
+  comments: Comment[];
 
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;

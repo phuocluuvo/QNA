@@ -11,9 +11,12 @@ import { Action } from "../enums/action.enum";
 import { Injectable } from "@nestjs/common";
 import { Role } from "../enums/role.enum";
 import { Answer } from "../answer/entity/answer.entity";
+import { Comment } from "../comment/entity/comment.entity";
 
 type Subjects =
-  | InferSubjects<typeof Question | typeof User | typeof Answer>
+  | InferSubjects<
+      typeof Question | typeof User | typeof Answer | typeof Comment
+    >
   | "all";
 
 export type AppAbility = Ability<[Action, Subjects]>;
@@ -24,6 +27,10 @@ type FlatQuestion = Question & {
 
 type FlatAnswer = Answer & {
   "user.id": Answer["user"]["id"];
+};
+
+type FlatComment = Comment & {
+  "user.id": Comment["user"]["id"];
 };
 
 @Injectable()
@@ -41,6 +48,9 @@ export class CaslAbilityFactory {
         "user.id": userReq["sub"],
       });
       can<FlatAnswer>([Action.Update, Action.Delete], Answer, {
+        "user.id": userReq["sub"],
+      });
+      can<FlatComment>([Action.Update, Action.Delete], Comment, {
         "user.id": userReq["sub"],
       });
     }
