@@ -4,7 +4,7 @@ import { TagType } from "./Tag.type";
 import { UserType } from "./User.type";
 
 interface Post {
-  id: string | number;
+  id: string;
   title: string;
   content: string;
   votes: number;
@@ -16,7 +16,6 @@ interface Post {
   status: number;
   user: UserType;
   tags?: Array<TagType>;
-  answerList?: AnswerListType;
 }
 
 interface QuestionList {
