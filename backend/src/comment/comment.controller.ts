@@ -22,6 +22,7 @@ import { AccessTokenGuard } from "../auth/guards/accessToken.guard";
 import { CreateCommentDto } from "./dto/create-comment.dto";
 import { Action } from "../enums/action.enum";
 import { UpdateCommentDto } from "./dto/update-comment.dto";
+import { message } from "../constants/message.constants";
 
 @Controller("comment")
 export class CommentController {
@@ -115,13 +116,13 @@ export class CommentController {
     const comment = await this.commentService.findOneById(id);
 
     if (!comment) {
-      throw new NotFoundException(`There is no comment under id ${id}`);
+      throw new NotFoundException(message.NOT_FOUND.COMMENT);
     }
 
     if (ability.can(Action.Update, comment)) {
       return this.commentService.update(id, commentDto);
     } else {
-      throw new ForbiddenException("Access Denied. Not author");
+      throw new ForbiddenException(message.NOT_AUTHOR.COMMENT);
     }
   }
 
@@ -143,13 +144,13 @@ export class CommentController {
     const comment = await this.commentService.findOneById(id);
 
     if (!comment) {
-      throw new NotFoundException(`There is no comment under id ${id}`);
+      throw new NotFoundException(message.NOT_FOUND.COMMENT);
     }
 
     if (ability.can(Action.Delete, comment)) {
       return this.commentService.remove(comment);
     } else {
-      throw new ForbiddenException("Access Denied. Not author");
+      throw new ForbiddenException(message.NOT_AUTHOR.COMMENT);
     }
   }
 }

@@ -17,7 +17,6 @@ import {
 import { Question } from "./entity/question.entity";
 import { QuestionService } from "./question.service";
 import { CreateQuestionDto } from "./dto/create-question.dto";
-import { Pagination } from "nestjs-typeorm-paginate";
 import { UpdateQuestionDto } from "./dto/update-question.dto";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { AccessTokenGuard } from "../auth/guards/accessToken.guard";
@@ -26,6 +25,7 @@ import { Action } from "../enums/action.enum";
 import { CaslAbilityFactory } from "../casl/casl-ability.factory";
 import { VoteQuestionDto } from "../vote/dto/vote-question.dto";
 import { PublicGuard } from "../auth/guards/public.guard";
+import { message } from "../constants/message.constants";
 
 @ApiTags("question")
 @Controller("question")
@@ -119,13 +119,13 @@ export class QuestionController {
     const question = await this.questionService.findOneById(id);
 
     if (!question) {
-      throw new NotFoundException(`There is no product under id ${id}`);
+      throw new NotFoundException(message.NOT_FOUND.QUESTION);
     }
 
     if (ability.can(Action.Update, question)) {
       return this.questionService.update(id, questionDto);
     } else {
-      throw new ForbiddenException("Access Denied. Not author");
+      throw new ForbiddenException(message.NOT_AUTHOR.QUESTION);
     }
   }
 
@@ -150,13 +150,13 @@ export class QuestionController {
     const question = await this.questionService.findOneById(id);
 
     if (!question) {
-      throw new NotFoundException(`There is no question under id ${id}`);
+      throw new NotFoundException(message.NOT_FOUND.QUESTION);
     }
 
     if (ability.can(Action.Delete, question)) {
       return this.questionService.remove(question);
     } else {
-      throw new ForbiddenException("Access Denied. Not author");
+      throw new ForbiddenException(message.NOT_AUTHOR.QUESTION);
     }
   }
 

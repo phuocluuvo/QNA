@@ -27,6 +27,7 @@ import { Action } from "../enums/action.enum";
 import { VoteAnswerDto } from "../vote/dto/vote-answer.dto";
 import { ApproveAnswerDto } from "./dto/approve-answer.dto";
 import { PublicGuard } from "../auth/guards/public.guard";
+import { message } from "../constants/message.constants";
 
 @ApiTags("answer")
 @Controller("answer")
@@ -126,13 +127,13 @@ export class AnswerController {
     const answer = await this.answerService.findOneById(id);
 
     if (!answer) {
-      throw new NotFoundException(`There is no answer under id ${id}`);
+      throw new NotFoundException(message.NOT_FOUND.ANSWER);
     }
 
     if (ability.can(Action.Update, answer)) {
       return this.answerService.update(id, answerDto);
     } else {
-      throw new ForbiddenException("Access Denied. Not author");
+      throw new ForbiddenException(message.NOT_AUTHOR.ANSWER);
     }
   }
 
@@ -154,13 +155,13 @@ export class AnswerController {
     const answer = await this.answerService.findOneById(id);
 
     if (!answer) {
-      throw new NotFoundException(`There is no answer under id ${id}`);
+      throw new NotFoundException(message.NOT_FOUND.ANSWER);
     }
 
     if (ability.can(Action.Delete, answer)) {
       return this.answerService.remove(answer);
     } else {
-      throw new ForbiddenException("Access Denied. Not author");
+      throw new ForbiddenException(message.NOT_AUTHOR.ANSWER);
     }
   }
 
@@ -205,24 +206,20 @@ export class AnswerController {
       approveAnswerDto.answer_id,
     );
     if (!answer) {
-      throw new NotFoundException(
-        `There is no answer under id ${approveAnswerDto.answer_id}`,
-      );
+      throw new NotFoundException(message.NOT_FOUND.ANSWER);
     }
 
     const question = await this.questionService.findOneById(
       approveAnswerDto.question_id,
     );
     if (!question) {
-      throw new NotFoundException(
-        `There is no question under id ${approveAnswerDto.question_id}`,
-      );
+      throw new NotFoundException(message.NOT_FOUND.ANSWER);
     }
 
     if (ability.can(Action.Update, question)) {
       return this.answerService.approveAnswer(approveAnswerDto);
     } else {
-      throw new ForbiddenException("Access Denied. Not author");
+      throw new ForbiddenException(message.NOT_AUTHOR.QUESTION);
     }
   }
 }

@@ -13,6 +13,7 @@ import { VoteAnswerDto } from "../vote/dto/vote-answer.dto";
 import { VoteService } from "../vote/vote.service";
 import { VoteType } from "../enums/vote-type.enum";
 import { ApproveAnswerDto } from "./dto/approve-answer.dto";
+import { message } from "../constants/message.constants";
 
 @Injectable()
 export class AnswerService {
@@ -67,7 +68,7 @@ export class AnswerService {
     });
 
     if (!answer) {
-      throw new NotFoundException(`There is no answer under id ${id}`);
+      throw new NotFoundException(message.NOT_FOUND.ANSWER);
     }
     return answer;
   }
@@ -147,7 +148,7 @@ export class AnswerService {
     const answer = await this.findOneById(answerVoteDto.answer_id);
 
     if (!answer) {
-      throw new NotFoundException("Question not found");
+      throw new NotFoundException(message.NOT_FOUND.ANSWER);
     }
 
     const createVote = await this.voteService.voteAnswer(userId, answerVoteDto);

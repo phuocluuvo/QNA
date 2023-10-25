@@ -11,6 +11,7 @@ import { plainToClass } from "class-transformer";
 import { VoteType } from "../enums/vote-type.enum";
 import { VoteService } from "../vote/vote.service";
 import { VoteQuestionDto } from "../vote/dto/vote-question.dto";
+import { message } from "../constants/message.constants";
 
 export class QuestionWithCount extends Question {
   countAnswer: number;
@@ -83,7 +84,7 @@ export class QuestionService {
     });
 
     if (!question) {
-      throw new NotFoundException(`There is no question under id ${id}`);
+      throw new NotFoundException(message.NOT_FOUND.QUESTION);
     }
     return question;
   }
@@ -155,7 +156,7 @@ export class QuestionService {
     });
 
     if (!question) {
-      throw new NotFoundException("Question not found");
+      throw new NotFoundException(message.NOT_FOUND.QUESTION);
     }
 
     question.views += 1;
@@ -190,7 +191,7 @@ export class QuestionService {
     const question = await this.findOneById(questionVoteDto.question_id);
 
     if (!question) {
-      throw new NotFoundException("Question not found");
+      throw new NotFoundException(message.NOT_FOUND.QUESTION);
     }
 
     const createVote = await this.voteService.voteQuestion(

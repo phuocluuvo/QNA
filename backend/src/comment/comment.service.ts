@@ -11,6 +11,7 @@ import { plainToClass } from "class-transformer";
 import { CreateCommentDto } from "./dto/create-comment.dto";
 import { UpdateAnswerDto } from "../answer/dto/update-answer.dto";
 import { UpdateCommentDto } from "./dto/update-comment.dto";
+import { message } from "../constants/message.constants";
 
 @Injectable()
 export class CommentService {
@@ -54,7 +55,7 @@ export class CommentService {
     });
 
     if (!comment) {
-      throw new NotFoundException(`There is no comment under id ${id}`);
+      throw new NotFoundException(message.NOT_FOUND.COMMENT);
     }
     return comment;
   }
