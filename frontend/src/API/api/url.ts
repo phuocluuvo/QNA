@@ -8,7 +8,10 @@ export const url = {
   CHECK_EXISTS_USER: "/api/user/check-exists-user",
   USER: "/api/user",
   QUESTION: "/api/question",
+  VOTE_QUESTION: "/api/question/vote",
   QUESTION_LIST: "/api/question",
   REFRESH_TOKEN: "/api/auth/refresh",
   SIGN_OUT: "/api/auth/logout",
+  ANSWER: "/api/answer",
+  APPROVE_ANSWER: "/api/answer/approve",
 };

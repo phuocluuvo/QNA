@@ -20,7 +20,7 @@ const questionSlice = createSlice({
     },
     successGetQuestion: (state, actions) => {
       state.requesting = false;
-      state.questionDetail = actions.payload.data;
+      state.questionDetail = actions.payload;
       state.type = ActionTypes.SUCCESS_GET_QUESTION;
     },
     failureGetQuestion: (state, actions) => {
