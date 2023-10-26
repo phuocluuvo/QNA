@@ -185,7 +185,7 @@ export class UsersService {
       delete userDto.refreshToken;
       return await this.update(id, userDto);
     } catch (e) {
-      throw new BadRequestException(message.EXITED_EMAIL);
+      throw new BadRequestException(message.EXISTED.EMAIL);
     }
   }
 }
