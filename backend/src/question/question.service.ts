@@ -4,14 +4,15 @@ import { Question } from "./entity/question.entity";
 import { CreateQuestionDto } from "./dto/create-question.dto";
 import {
   IPaginationOptions,
-  paginate,
-  Pagination,
+  paginateRawAndEntities,
 } from "nestjs-typeorm-paginate";
 import { UpdateQuestionDto } from "./dto/update-question.dto";
 import { plainToClass } from "class-transformer";
 import { VoteType } from "../enums/vote-type.enum";
 import { VoteService } from "../vote/vote.service";
 import { VoteQuestionDto } from "../vote/dto/vote-question.dto";
+import { message } from "../constants/message.constants";
+import { TagService } from "../tag/tag.service";
 
 @Injectable()
 export class QuestionService {
@@ -19,6 +20,7 @@ export class QuestionService {
     @Inject("QUESTION_REPOSITORY")
     private questionRepository: Repository<Question>,
     private readonly voteService: VoteService,
+    private readonly tagService: TagService,
   ) {}
 
   /**
@@ -27,12 +29,43 @@ export class QuestionService {
    * @param options - Pagination options.
    * @returns A paginated list of questions.
    */
-  async find(options: IPaginationOptions): Promise<Pagination<Question>> {
+  async find(options: IPaginationOptions) {
     const queryBuilder = this.questionRepository.createQueryBuilder("question");
     queryBuilder
-      .innerJoinAndSelect("question.user", "user")
+      .select([
+        "question.id",
+        "question.title",
+        "question.content",
+        "question.views",
+        "question.votes",
+        "question.createdAt",
+        "question.updatedAt",
+        "user.id",
+        "user.username",
+        "user.fullname",
+        "user.avatar",
+        "user.dob",
+        "user.email",
+        "user.role",
+        "COUNT(answer.id) as countAnswer",
+      ])
+      .innerJoin("question.user", "user")
+      .leftJoin("question.answers", "answer")
+      .groupBy("question.id, user.id")
       .orderBy("question.updatedAt", "DESC");
-    return paginate<Question>(queryBuilder, options);
+
+    const [pagination, rawResults] = await paginateRawAndEntities<Question>(
+      queryBuilder,
+      options,
+    );
+    pagination.items.map((item, index) => {
+      const check = rawResults.find((raw: any) => raw.question_id === item.id);
+      if (check) {
+        item["countAnswer"] = rawResults[index]["countAnswer"];
+      }
+    });
+
+    return pagination;
   }
 
   /**
@@ -49,7 +82,7 @@ export class QuestionService {
     });
 
     if (!question) {
-      throw new NotFoundException(`There is no question under id ${id}`);
+      throw new NotFoundException(message.NOT_FOUND.QUESTION);
     }
     return question;
   }
@@ -69,6 +102,9 @@ export class QuestionService {
       excludeExtraneousValues: true,
     });
     questionTrans["user"] = userId;
+    questionTrans["tags"] = await this.tagService.checkAndTransTags(
+      questionDto.tag_ids ? questionDto.tag_ids : [],
+    );
     return this.questionRepository.save(questionTrans);
   }
 
@@ -84,6 +120,10 @@ export class QuestionService {
     const questionTrans = plainToClass(UpdateQuestionDto, questionDto, {
       excludeExtraneousValues: true,
     });
+    questionTrans["tags"] = await this.tagService.checkAndTransTags(
+      questionDto.tag_ids ? questionDto.tag_ids : [],
+    );
+
     const question = await this.questionRepository.preload({
       id,
       ...questionTrans,
@@ -107,20 +147,38 @@ export class QuestionService {
    * Get a question by its ID and increase its view count.
    *
    * @param questionId - The ID of the question.
+   * @param userId logged in user id
    * @returns The question with an increased view count.
    * @throws NotFoundException if the question does not exist.
    */
-  async getAndIncreaseViewCount(questionId: string): Promise<Question> {
+  async getAndIncreaseViewCount(
+    questionId: string,
+    userId: string,
+  ): Promise<Question> {
     const question = await this.questionRepository.findOne({
       where: { id: questionId },
       relations: ["user"],
     });
+
     if (!question) {
-      throw new NotFoundException("Question not found");
+      throw new NotFoundException(message.NOT_FOUND.QUESTION);
     }
 
     question.views += 1;
-    return this.questionRepository.save(question);
+    const result = await this.questionRepository.save(question);
+    result.vote = [];
+
+    if (userId) {
+      const voteInfo = await this.voteService.getVote({
+        user: { id: userId },
+        question: { id: questionId },
+      });
+
+      if (voteInfo) {
+        result.vote.push(voteInfo);
+      }
+    }
+    return result;
   }
 
   /**
@@ -138,7 +196,7 @@ export class QuestionService {
     const question = await this.findOneById(questionVoteDto.question_id);
 
     if (!question) {
-      throw new NotFoundException("Question not found");
+      throw new NotFoundException(message.NOT_FOUND.QUESTION);
     }
 
     const createVote = await this.voteService.voteQuestion(

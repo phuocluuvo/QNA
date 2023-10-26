@@ -11,6 +11,7 @@ import * as argon2 from "argon2";
 import { jwtConstants } from "../constants/constants";
 import { Role } from "../enums/role.enum";
 import { User } from "../users/entity/users.entity";
+import { message } from "../constants/message.constants";
 
 @Injectable()
 export class AuthService {
@@ -47,8 +48,7 @@ export class AuthService {
       throw new BadRequestException({
         statusCode: 400,
         error: "Bad Request",
-        message: "Validation failed",
-        data: errExits,
+        message: errExits,
       });
     }
 
@@ -78,14 +78,17 @@ export class AuthService {
   async signIn(data: LoginUserDto) {
     // Check if user exists
     const user = await this.usersService.findOne(data.username);
-    if (!user) throw new BadRequestException("User does not exist");
+
+    if (!user) throw new BadRequestException(message.NOT_EXITS_USER);
     const passwordMatches = await argon2.verify(user.password, data.password);
+
     if (!passwordMatches)
-      throw new BadRequestException("Password is incorrect");
+      throw new BadRequestException(message.PASSWORD_IS_INCORRECT);
+
     const tokens = await this.getTokens(user.id, user.username, user.role);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
     delete user.password;
-    // user["token"] = tokens;
+
     return { ...user, ...tokens };
   }
 
@@ -180,12 +183,13 @@ export class AuthService {
   async refreshTokens(userId: string, refreshToken: string) {
     const user = await this.usersService.findById(userId);
     if (!user || !user.refreshToken)
-      throw new ForbiddenException("Access Denied");
+      throw new ForbiddenException(message.ACCESS_DENIED);
     const refreshTokenMatches = await argon2.verify(
       user.refreshToken,
       refreshToken,
     );
-    if (!refreshTokenMatches) throw new ForbiddenException("Access Denied");
+    if (!refreshTokenMatches)
+      throw new ForbiddenException(message.ACCESS_DENIED);
     const tokens = await this.getTokens(user.id, user.username, user.role);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
     return tokens;

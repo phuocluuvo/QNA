@@ -17,7 +17,6 @@ import {
 import { Question } from "./entity/question.entity";
 import { QuestionService } from "./question.service";
 import { CreateQuestionDto } from "./dto/create-question.dto";
-import { Pagination } from "nestjs-typeorm-paginate";
 import { UpdateQuestionDto } from "./dto/update-question.dto";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { AccessTokenGuard } from "../auth/guards/accessToken.guard";
@@ -25,6 +24,8 @@ import { Request } from "express";
 import { Action } from "../enums/action.enum";
 import { CaslAbilityFactory } from "../casl/casl-ability.factory";
 import { VoteQuestionDto } from "../vote/dto/vote-question.dto";
+import { PublicGuard } from "../auth/guards/public.guard";
+import { message } from "../constants/message.constants";
 
 @ApiTags("question")
 @Controller("question")
@@ -49,7 +50,7 @@ export class QuestionController {
   find(
     @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
     @Query("limit", new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
-  ): Promise<Pagination<Question>> {
+  ): Promise<any> {
     limit = limit > 100 ? 100 : limit;
     return this.questionService.find({
       page,
@@ -61,15 +62,17 @@ export class QuestionController {
    * Get a question by its ID and increase its view count.
    *
    * @param id The ID of the question to retrieve.
+   * @param req Login user
    * @returns Promise<Question> The question with the specified ID.
    */
   @ApiOperation({
     summary: "get question",
   })
   @Get(":id")
-  @UseGuards()
-  async findOneById(@Param("id") id: string) {
-    return this.questionService.getAndIncreaseViewCount(id);
+  @UseGuards(PublicGuard)
+  async findOneById(@Param("id") id: string, @Req() req: Request) {
+    const userId = req.user["sub"];
+    return this.questionService.getAndIncreaseViewCount(id, userId);
   }
 
   /**
@@ -116,13 +119,13 @@ export class QuestionController {
     const question = await this.questionService.findOneById(id);
 
     if (!question) {
-      throw new NotFoundException(`There is no product under id ${id}`);
+      throw new NotFoundException(message.NOT_FOUND.QUESTION);
     }
 
     if (ability.can(Action.Update, question)) {
       return this.questionService.update(id, questionDto);
     } else {
-      throw new ForbiddenException("Access Denied. Not author");
+      throw new ForbiddenException(message.NOT_AUTHOR.QUESTION);
     }
   }
 
@@ -147,13 +150,13 @@ export class QuestionController {
     const question = await this.questionService.findOneById(id);
 
     if (!question) {
-      throw new NotFoundException(`There is no question under id ${id}`);
+      throw new NotFoundException(message.NOT_FOUND.QUESTION);
     }
 
     if (ability.can(Action.Delete, question)) {
       return this.questionService.remove(question);
     } else {
-      throw new ForbiddenException("Access Denied. Not author");
+      throw new ForbiddenException(message.NOT_AUTHOR.QUESTION);
     }
   }
 

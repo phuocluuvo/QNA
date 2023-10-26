@@ -9,6 +9,7 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { User } from "./entity/users.entity";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import * as argon2 from "argon2";
+import { message } from "../constants/message.constants";
 
 @Injectable()
 export class UsersService {
@@ -138,7 +139,7 @@ export class UsersService {
       });
 
       if (!user) {
-        throw new NotFoundException(`There is no user under id ${id}`);
+        throw new NotFoundException(message.NOT_FOUND.USER);
       }
 
       return this.userRepository.save(user);
@@ -184,7 +185,7 @@ export class UsersService {
       delete userDto.refreshToken;
       return await this.update(id, userDto);
     } catch (e) {
-      throw new BadRequestException("Email already exists");
+      throw new BadRequestException(message.EXISTED.EMAIL);
     }
   }
 }

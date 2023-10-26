@@ -11,5 +11,6 @@ import { VoteModule } from "../vote/vote.module";
   imports: [DatabaseModule, QuestionModule, VoteModule, CaslModule],
   controllers: [AnswerController],
   providers: [...answerProviders, AnswerService],
+  exports: [AnswerService],
 })
 export class AnswerModule {}

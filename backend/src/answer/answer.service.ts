@@ -13,6 +13,7 @@ import { VoteAnswerDto } from "../vote/dto/vote-answer.dto";
 import { VoteService } from "../vote/vote.service";
 import { VoteType } from "../enums/vote-type.enum";
 import { ApproveAnswerDto } from "./dto/approve-answer.dto";
+import { message } from "../constants/message.constants";
 
 @Injectable()
 export class AnswerService {
@@ -26,16 +27,25 @@ export class AnswerService {
    * Find answers based on questionId and paginate the results.
    *
    * @param questionId - The ID of the question to filter answers.
+   * @param userId
    * @param options - Pagination options.
    * @returns Paginated list of answers.
    */
   async find(
     questionId: string,
+    userId: string,
     options: IPaginationOptions,
   ): Promise<Pagination<Answer>> {
     const queryBuilder = this.answerRepository.createQueryBuilder("answer");
     queryBuilder.innerJoinAndSelect("answer.user", "user");
     queryBuilder.innerJoinAndSelect("answer.question", "question");
+    queryBuilder.leftJoinAndSelect(
+      "answer.vote",
+      "vote",
+      "vote.user_id = :userId AND vote.answer_id = answer.id",
+      { userId },
+    );
+
     queryBuilder.where(
       questionId ? { question: { id: questionId } } : { id: "no_id" },
     );
@@ -58,7 +68,7 @@ export class AnswerService {
     });
 
     if (!answer) {
-      throw new NotFoundException(`There is no answer under id ${id}`);
+      throw new NotFoundException(message.NOT_FOUND.ANSWER);
     }
     return answer;
   }
@@ -138,7 +148,7 @@ export class AnswerService {
     const answer = await this.findOneById(answerVoteDto.answer_id);
 
     if (!answer) {
-      throw new NotFoundException("Question not found");
+      throw new NotFoundException(message.NOT_FOUND.ANSWER);
     }
 
     const createVote = await this.voteService.voteAnswer(userId, answerVoteDto);
