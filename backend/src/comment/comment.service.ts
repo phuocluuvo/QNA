@@ -6,7 +6,6 @@ import {
   paginate,
   Pagination,
 } from "nestjs-typeorm-paginate";
-import { CreateAnswerDto } from "../answer/dto/create-answer.dto";
 import { plainToClass } from "class-transformer";
 import { CreateCommentDto } from "./dto/create-comment.dto";
 import { UpdateAnswerDto } from "../answer/dto/update-answer.dto";
@@ -82,7 +81,7 @@ export class CommentService {
    * @returns The created comment.
    */
   async create(commentDto: CreateCommentDto, userId: string) {
-    const commentTrans = plainToClass(CreateAnswerDto, commentDto, {
+    const commentTrans = plainToClass(CreateCommentDto, commentDto, {
       excludeExtraneousValues: true,
     });
     commentTrans["user"] = userId;

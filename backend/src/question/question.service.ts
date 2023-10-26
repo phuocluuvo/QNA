@@ -12,10 +12,7 @@ import { VoteType } from "../enums/vote-type.enum";
 import { VoteService } from "../vote/vote.service";
 import { VoteQuestionDto } from "../vote/dto/vote-question.dto";
 import { message } from "../constants/message.constants";
-
-export class QuestionWithCount extends Question {
-  countAnswer: number;
-}
+import { TagService } from "../tag/tag.service";
 
 @Injectable()
 export class QuestionService {
@@ -23,6 +20,7 @@ export class QuestionService {
     @Inject("QUESTION_REPOSITORY")
     private questionRepository: Repository<Question>,
     private readonly voteService: VoteService,
+    private readonly tagService: TagService,
   ) {}
 
   /**
@@ -104,6 +102,9 @@ export class QuestionService {
       excludeExtraneousValues: true,
     });
     questionTrans["user"] = userId;
+    questionTrans["tags"] = await this.tagService.checkAndTransTags(
+      questionDto.tag_ids ? questionDto.tag_ids : [],
+    );
     return this.questionRepository.save(questionTrans);
   }
 
@@ -119,6 +120,10 @@ export class QuestionService {
     const questionTrans = plainToClass(UpdateQuestionDto, questionDto, {
       excludeExtraneousValues: true,
     });
+    questionTrans["tags"] = await this.tagService.checkAndTransTags(
+      questionDto.tag_ids ? questionDto.tag_ids : [],
+    );
+
     const question = await this.questionRepository.preload({
       id,
       ...questionTrans,
