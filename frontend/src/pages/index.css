@@ -1,0 +1,40 @@
+.answer-editor-blocker {
+  display: none;
+  position: absolute;
+  opacity: 0;
+  transition: "opacity 0.3s ease-in-out";
+  backdrop-filter: blur(2px);
+}
+
+.answer-editor-blocker.fade-in {
+  transition: "opacity 0.3s ease-in-out";
+  animation: fadein 0.5s both;
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+    background-color: "rgba(0,0,0,0)";
+  }
+  to {
+    opacity: 1;
+    background-color: "rgba(0,0,0,0.1)";
+  }
+}
+
+/* fade out */
+.answer-editor-blocker.fade-out {
+  transition: "opacity 0.3s ease-in-out";
+  animation: fadeout 0.5s both;
+}
+
+@keyframes fadeout {
+  from {
+    background-color: "rgba(0,0,0,0.1)";
+    opacity: 1;
+  }
+  to {
+    background-color: "rgba(0,0,0,0)";
+    opacity: 0;
+  }
+}

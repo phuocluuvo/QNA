@@ -1,20 +1,26 @@
+import { QuestionType } from "./Question.type";
 import { UserType } from "./User.type";
 
 interface Answer {
-  id: string | number;
+  id: string;
   content: string;
   votes: number;
   createdAt: string;
-  updatedDate: string;
+  updatedAt: string;
   status: number;
   user: UserType;
+  question: QuestionType;
+  isApproved: boolean;
 }
 
 interface AnswerList {
-  answerList: Array<AnswerType>;
-  pagination: {
+  items: Array<AnswerType>;
+  meta: {
+    totalItems: number;
+    itemCount: number;
+    itemsPerPage: number;
+    totalPages: number;
     currentPage: number;
-    totalPageNumber: number;
   };
 }
 

@@ -60,8 +60,7 @@ export default function SignIn() {
       let data = await signIn("credentials", {
         username: form.username,
         password: form.password,
-        redirect: false,
-        callbackUrl: `${window.location.origin}`,
+        callbackUrl: router.query.callbackUrl as string,
       });
       console.log("res: ", data);
       if (data?.error) {

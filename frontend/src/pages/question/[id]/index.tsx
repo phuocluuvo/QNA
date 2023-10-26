@@ -2,7 +2,7 @@ import actionGetQuestion from "@/API/redux/actions/question/ActionGetQuestion";
 import { Colors } from "@/assets/constant/Colors";
 import { Pages } from "@/assets/constant/Pages";
 import AnswerEditor from "@/components/AnswerEditor";
-import AnswareItem from "@/components/AnswerItem";
+import AnswerItem from "@/components/AnswerItem";
 import Author from "@/components/Author";
 import ErrorContent from "@/components/Error";
 import LinkButton from "@/components/LinkButton";
@@ -14,6 +14,7 @@ import QuestionDataList from "@/util/mock/QuestionDataList.mock";
 import { QuestionType } from "@/util/type/Question.type";
 import { UserType } from "@/util/type/User.type";
 import { ChatIcon, ViewIcon } from "@chakra-ui/icons";
+import { BiDotsVerticalRounded, BiPencil, BiSolidShare } from "react-icons/bi";
 import {
   Box,
   Button,
@@ -22,6 +23,11 @@ import {
   Flex,
   HStack,
   Heading,
+  Icon,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Spacer,
   Text,
   VStack,
@@ -35,6 +41,12 @@ import { ni18nConfig } from "../../../../ni18n.config";
 import { clientNamespaces, loadTranslations } from "ni18n";
 import { GetStaticProps } from "next";
 import { ActionTypes } from "@/API/constant/ActionTypes.enum";
+import actionGetAnswer from "@/API/redux/actions/answer/actionGetAnswer";
+import { AnswerListType } from "@/util/type/Answer.type";
+import { VOTE } from "@/API/constant/Vote.enum";
+import actionVoteQuestion from "@/API/redux/actions/question/actionVoteQuestion";
+import { FormVote } from "@/API/type/Form.type";
+import { useSession } from "next-auth/react";
 
 function Question() {
   const { getTranslate } = LanguageHelper(Pages.HOME);
@@ -42,6 +54,7 @@ function Question() {
   const router = useRouter();
   const { id } = router.query;
   const [hydrated, setHydrated] = useState(false);
+  const session = useSession();
   const dispatch = useDispatch();
   // @ts-ignore
   const questionsRequesting = useSelector(
@@ -50,14 +63,83 @@ function Question() {
   );
   // @ts-ignore
   let userData: UserType = null;
+  let answerLoadType = useSelector(
+    (state: { answerReducer: { type: ActionTypes } }) =>
+      state.answerReducer.type
+  );
+  const voteQuestion = (voteType: VOTE) => {
+    let form: FormVote = {
+      question_id: id as string,
+      vote_type: voteType,
+    };
+    dispatch<any>(
+      actionVoteQuestion(
+        form,
+        (res) => {
+          // @ts-ignore
+          setState((oldState) => {
+            return helper.mappingState(oldState, {
+              count: res.votes,
+            });
+          });
+        },
+        () => {
+          // @ts-ignore
+          setState((oldState) => {
+            return helper.mappingState(oldState, {
+              count: oldState.count,
+            });
+          });
+        }
+      )
+    );
+  };
+  const fecthAnswer = () => {
+    dispatch<any>(
+      actionGetAnswer(
+        {
+          question_id: id as string,
+          limit: 20,
+          page: 1,
+        },
+        (res) => {
+          // @ts-ignore
+          setState((oldState) => {
+            res.items.sort((a, b) => {
+              return (
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime()
+              );
+            });
+            return helper.mappingState(oldState, {
+              answerList: res,
+            });
+          });
+        },
+        () => {
+          console.log("err");
+        }
+      )
+    );
+  };
+  useEffect(() => {
+    if (answerLoadType === ActionTypes.REQUEST_CREATE_ANSWER) {
+      console.log("request create answer");
+      fecthAnswer();
+    }
+  }, [answerLoadType]);
+
   useEffect(() => {
     if (id) {
       let form = {
         id: id as string,
       };
+      let formAnswer = {
+        question_id: id as string,
+      };
       // @ts-ignore
       userData = localStorage.getItem("userLogin");
-      dispatch(
+      dispatch<any>(
         actionGetQuestion(
           form,
           (data) => {
@@ -68,6 +150,7 @@ function Question() {
                 count: data.votes,
               })
             );
+            fecthAnswer();
           },
           () => {
             console.log("error");
@@ -80,6 +163,7 @@ function Question() {
     count: number;
     question: QuestionType;
     isDarkMode: boolean;
+    answerList: AnswerListType;
   }>({
     count: 0,
     // @ts-ignore
@@ -94,7 +178,12 @@ function Question() {
     // Returns null on first render, so the client and server match
     return null;
   }
-
+  // sort item base on time added
+  function sortAnswerList(answerList: AnswerListType) {
+    state.answerList?.items.sort((a, b) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }
   const parseLines = (value: string) => value.replace(/(\\n)/g, "\n");
   return (
     <>
@@ -119,7 +208,8 @@ function Question() {
             <Heading size={"lg"}>Loading...</Heading>
           </Flex>
         </Box>
-      ) : questionsRequesting === ActionTypes.SUCCESS_GET_QUESTION && state.question ? (
+      ) : questionsRequesting === ActionTypes.SUCCESS_GET_QUESTION &&
+        state.question ? (
         <>
           <Head>
             <title>{state.question.title}</title>
@@ -147,14 +237,7 @@ function Question() {
                     <VoteButton
                       isDarkMode={isDarkMode}
                       type="up"
-                      onClick={() =>
-                        // @ts-ignore
-                        setState((oldState) =>
-                          helper.mappingState(oldState, {
-                            count: state.count + 1,
-                          })
-                        )
-                      }
+                      onClick={() => voteQuestion(VOTE.UPVOTE)}
                     />
                     <Heading size={"md"}>
                       {helper.numberFormat(state.count)}
@@ -162,23 +245,18 @@ function Question() {
                     <VoteButton
                       isDarkMode={isDarkMode}
                       type="down"
-                      onClick={() =>
-                        // @ts-ignore
-                        setState((oldState) =>
-                          helper.mappingState(oldState, {
-                            count: state.count - 1,
-                          })
-                        )
-                      }
+                      onClick={() => voteQuestion(VOTE.DOWNVOTE)}
                     />
                     <VStack py={5}>
                       <ChatIcon />
-                      <Text>{state.question.answerNumber}</Text>
+                      <Text>
+                        {state.answerList && state.answerList.meta.totalItems}
+                      </Text>
                       <ViewIcon />
                       <Text>{state.question.views}</Text>
                     </VStack>
                   </VStack>
-                  <Box>
+                  <Box width={"full"}>
                     <Box>
                       <LinkButton
                         text={getTranslate("GOBACK")}
@@ -193,9 +271,38 @@ function Question() {
                         }}
                         onClick={() => router.back()}
                       />
-                      <Flex direction={"column"} mb={"10"}>
-                        <Box>
-                          <Heading>{state.question.title}</Heading>
+                      <Flex w={"full"} direction={"column"} mb={"10"}>
+                        <Box width={"full"}>
+                          <HStack
+                            pos={"relative"}
+                            alignItems={"start"}
+                            justifyContent={"space-between"}
+                            width={"full"}
+                            // bg={Colors(isDarkMode).PRIMARY_BG}
+                          >
+                            <Heading flex={1} maxW={"85%"}>{state.question.title}</Heading>
+                            <Menu>
+                              <MenuButton
+                                pos={"absolute"}
+                                right={0}
+                                top={0}
+                                alignSelf={"center"}
+                                as={Button}
+                                variant="link"
+                                size={"lg"}
+                                leftIcon={<Icon as={BiDotsVerticalRounded} />}
+                                colorScheme={"orange"}
+                              />
+                              <MenuList zIndex={2}>
+                                <MenuItem icon={<Icon as={BiPencil} />}>
+                                  Adjust
+                                </MenuItem>
+                                <MenuItem icon={<Icon as={BiSolidShare} />}>
+                                  Share
+                                </MenuItem>
+                              </MenuList>
+                            </Menu>
+                          </HStack>
                           <HStack>
                             {state.question.tags?.map((tag) => (
                               <TagQuestion key={tag.id} tag={tag} />
@@ -258,14 +365,25 @@ function Question() {
                   </Box>
                 </HStack>
                 {userData ? <Divider mb={5} /> : null}
-                <AnswerEditor />
+                <AnswerEditor
+                  getTranslate={getTranslate}
+                  questionId={state.question.id}
+                  getResult={(res) => {
+                    fecthAnswer();
+                  }}
+                />
                 <Box>
-                  {state.question.answerList &&
-                    state.question.answerList?.answerList.map((answer) => (
-                      <AnswareItem
+                  {state.answerList &&
+                    state.answerList?.items.map((answer) => (
+                      <AnswerItem
                         key={answer.id}
                         answer={answer}
                         getTranslate={getTranslate}
+                        isAuthor={
+                          session?.data?.user?.id.toString() ===
+                          state.question.user.id.toString()
+                        }
+                        dispatch={dispatch}
                       />
                     ))}
                 </Box>

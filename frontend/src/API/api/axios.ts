@@ -46,7 +46,7 @@ async function refreshToken(refreshToken: string): Promise<{
 export async function AuthApi(
   method: "GET" | "POST" | "DELETE" | "UPDATE",
   url: string,
-  data = null
+  data: any = null
 ) {
   const session = await getSession();
   console.log("before: ", session?.user.accessToken);
@@ -69,7 +69,7 @@ export async function AuthApi(
   } catch (error) {
     console.error(error);
     // @ts-ignore
-    if (error.response && (error.response.status == 401 || error.response.status == 400)) {
+    if (error.response &&  (error.response.status == 401 || error.response.status == 400)) {
       if (session) {
         let data = await refreshToken(session?.user.refreshToken ?? "");
         if (data) {

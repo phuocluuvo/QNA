@@ -1,8 +1,12 @@
 import { url } from "./url";
 import {
+  FormApproveAnswer,
+  FormCreateAnswer,
   FormCreateQuestion,
+  FormGetAnswer,
   FormQuestion,
   FormSignUp,
+  FormVote,
   FromUserLogin,
 } from "../type/Form.type";
 import api, { AuthApi } from "./axios";
@@ -28,8 +32,11 @@ const getQuestionList = ({ page, limit }: { page: number; limit: number }) => {
 };
 
 const createQuestion = (form: FormCreateQuestion | null) => {
-  // @ts-ignore
   return AuthApi(REQUEST_METHOD.POST, url.QUESTION, form);
+};
+
+const voteQuestion = (form: FormVote) => {
+  return AuthApi(REQUEST_METHOD.POST, url.VOTE_QUESTION, form);
 };
 
 const requestSignIn = (form: FromUserLogin) => {
@@ -39,6 +46,28 @@ const requestSignIn = (form: FromUserLogin) => {
 const signOut = () => {
   return AuthApi(REQUEST_METHOD.GET, url.SIGN_OUT);
 };
+
+const createAnswer = (form: FormCreateAnswer) => {
+  // @ts-ignore
+  return AuthApi(REQUEST_METHOD.POST, url.ANSWER, form);
+};
+
+const getAnswerList = (form: FormGetAnswer) => {
+  return api.get(
+    url.ANSWER +
+      "?page=" +
+      form.page +
+      "&limit=" +
+      form.limit +
+      "&question_id=" +
+      form.question_id
+  );
+};
+
+const approveAnswer = (form: FormApproveAnswer) => {
+  return AuthApi(REQUEST_METHOD.POST, url.APPROVE_ANSWER, form);
+};
+
 export default {
   requestSignUp,
   getQuestion,
@@ -46,4 +75,8 @@ export default {
   createQuestion,
   requestSignIn,
   signOut,
+  createAnswer,
+  getAnswerList,
+  voteQuestion,
+  approveAnswer,
 };

@@ -1,30 +1,71 @@
+import actionCreateAnswer from "@/API/redux/actions/answer/actionCreateAnswer";
+import { FormCreateAnswer } from "@/API/type/Form.type";
 import helper from "@/util/helper";
 import {
+  Box,
   Button,
   FormControl,
   FormErrorMessage,
   FormLabel,
   HStack,
+  Text,
   useColorMode,
+  useMediaQuery,
 } from "@chakra-ui/react";
 import { Field, Form, Formik, FormikHelpers } from "formik";
+import { signIn, useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
-import React from "react";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import LinkButton from "../LinkButton";
+import { Colors } from "@/assets/constant/Colors";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 type State = {
+  id: string;
   content: string;
 };
-function AnswerEditor() {
-  const [state, setState] = React.useState<State>({
-    content: "",
-  });
+const DEFAULT_STATE = { id: "123", content: "" };
+function AnswerEditor({
+  getTranslate,
+  questionId,
+  getResult,
+}: {
+  questionId: string | number;
+  getTranslate: (key: string) => string;
+  getResult: (key: any) => any;
+}) {
+  const sessions = useSession();
+  const [state, setState] = useState(DEFAULT_STATE);
   const { colorMode } = useColorMode();
-
+  const dispatch = useDispatch();
   const handleChangeAnswer = (value: string) => {
     // @ts-ignore
     setState((oldState) => helper.mappingState(oldState, { content: value }));
   };
+  const [isMobile] = useMediaQuery("(max-width: 768px)");
+  const [isMouseIn, setIsMouseIn] = useState(false);
   function submitAnswer(values: State, actions: FormikHelpers<State>) {
+    let form: FormCreateAnswer = {
+      question_id: questionId,
+      content: state.content,
+    };
+    dispatch(
+      actionCreateAnswer(
+        form,
+        (res) => {
+          console.log("answer created: ", res);
+          getResult(res);
+          // @ts-ignore
+          setState((oldState) =>
+            helper.mappingState(oldState, { content: "" })
+          );
+          actions.setSubmitting(false);
+        },
+        () => {
+          console.log("err create answer");
+        }
+      )
+    );
     console.log("values: ", values);
     console.log("actions: ", actions);
   }
@@ -39,10 +80,46 @@ function AnswerEditor() {
         <Form>
           <Field name="content">
             {({ field, form }: any) => (
-              <FormControl isInvalid={form.errors.body && form.touched.body}>
+              <FormControl
+                isInvalid={form.errors.content && form.touched.content}
+              >
                 <FormLabel>
-                  <h3>Answer</h3>
+                  <h3>{getTranslate("ANSWER")}</h3>
                 </FormLabel>
+                {sessions.data?.user?.id ? null : (
+                  <Box
+                    onMouseLeave={() => setIsMouseIn(false)}
+                    onMouseEnter={() => setIsMouseIn(true)}
+                    className={
+                      "answer-editor-blocker " +
+                      (!isMobile
+                        ? isMouseIn
+                          ? "fade-in"
+                          : "fade-out"
+                        : "fade-in")
+                    }
+                    style={{
+                      position: "absolute",
+                      zIndex: 2,
+                      fontSize: "12px",
+                      width: "100%",
+                      height: "75%",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      padding: "10px",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <LinkButton
+                      style={{ paddingX: 0 }}
+                      href="/auth/signin"
+                      onClick={signIn}
+                      text={getTranslate("LOGIN")}
+                    />
+                    <Text>{getTranslate("LOGIN_TO_ANSWER")}</Text>
+                  </Box>
+                )}
                 <ReactQuill
                   id="content"
                   theme="snow"
@@ -84,10 +161,13 @@ function AnswerEditor() {
                     "clean",
                   ]}
                   bounds={".app"}
-                  placeholder={"Enter your Answer here"}
+                  i18nIsDynamicList={false}
+                  readOnly={!sessions.data?.user?.id}
+                  placeholder={getTranslate("ANSWER_PLACEHOLDER")}
                   tabIndex={1}
                 />
-                <FormErrorMessage>{form.errors.body}</FormErrorMessage>
+
+                <FormErrorMessage>{form.errors.content}</FormErrorMessage>
               </FormControl>
             )}
           </Field>
@@ -98,8 +178,9 @@ function AnswerEditor() {
               background={colorMode === "light" ? "gray.100" : "gray.700"}
               border={"none"}
               isLoading={props.isSubmitting}
+              isDisabled={!sessions.data?.user?.id}
             >
-              Submit
+              {getTranslate("ANSWER")}
             </Button>
           </HStack>
         </Form>

@@ -35,5 +35,15 @@
   "ALREADY_HAVE_ACCOUNT": "Already have an account?",
   "ASKED_AT": "Asked at {0}",
   "ANSWERED_AT": "Answered at {0}",
-  "INTRODUCTION": "Ask questions, get answers! Welcome to the ultimate Q&amp;A platform for developers and programmers."
+  "INTRODUCTION": "Ask questions, get answers! Welcome to the ultimate Q&amp;A platform for developers and programmers.",
+  "ANSWER_PLACEHOLDER": "Enter your answer",
+  "SUBMIT": "Submit",
+  "LOGIN_TO_ANSWER": "Login to answer",
+  "APPROVE": "Approve",
+  "APPROVE_TOOLTIP": "This answer is approved by the author of the question",
+  "APPROVE_ANSWER": "Approve this answer?",
+  "APPROVE_CONFIRM_TITLE": "Are you sure you want to approve this answer?",
+  "UNAPPROVE": "Unapprove",
+  "UNAPPROVE_CONFIRM_TITLE": "Are you sure you want to unapprove this answer?",
+  "CANCEL": "Cancel"
 }
