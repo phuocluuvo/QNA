@@ -9,7 +9,7 @@ export class Tag {
   @Column({ nullable: false, unique: true })
   name: string;
 
-  @Column({ nullable: false })
+  @Column("text")
   content: string;
 
   // This is the foreign key column for the relationship entities.
