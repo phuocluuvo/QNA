@@ -51,8 +51,7 @@ export class QuestionService {
       ])
       .innerJoin("question.user", "user")
       .leftJoin("question.answers", "answer")
-      .groupBy("question.id, user.id")
-      .orderBy("question.updatedAt", "DESC");
+      .groupBy("question.id, user.id");
 
     const [pagination, rawResults] = await paginateRawAndEntities<Question>(
       queryBuilder,
@@ -61,7 +60,7 @@ export class QuestionService {
     pagination.items.map((item, index) => {
       const check = rawResults.find((raw: any) => raw.question_id === item.id);
       if (check) {
-        item["countAnswer"] = rawResults[index]["countAnswer"];
+        item["answersNumber"] = rawResults[index]["countAnswer"];
       }
     });
 
