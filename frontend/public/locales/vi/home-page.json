@@ -45,5 +45,9 @@
   "APPROVE_CONFIRM_TITLE": "Bạn có chắc muốn phê duyệt câu trả lời này?",
   "UNAPPROVE": "Bỏ phê duyệt",
   "UNAPPROVE_CONFIRM_TITLE": "Bạn có chắc muốn bỏ phê duyệt câu trả lời này?",
-  "CANCEL": "Hủy"
+  "CANCEL": "Hủy",
+  "VOTES": "Đánh giá",
+  "VISITS": "Lượt xem",
+  "ANSWERS": "Câu trả lời",
+  "COMMENT": "Bình luận"
 }

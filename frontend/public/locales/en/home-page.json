@@ -45,5 +45,9 @@
   "APPROVE_CONFIRM_TITLE": "Are you sure you want to approve this answer?",
   "UNAPPROVE": "Unapprove",
   "UNAPPROVE_CONFIRM_TITLE": "Are you sure you want to unapprove this answer?",
-  "CANCEL": "Cancel"
+  "CANCEL": "Cancel",
+  "VOTES": "Votes",
+  "VISITS": "Visits",
+  "ANSWERS": "Answers",
+  "COMMENT": "Comment"
 }
