@@ -1,13 +1,15 @@
 import { Status } from "./Status.type";
 
 interface User {
-  id: number;
-  fullname?: string;
+  id: string;
+  fullname: string;
   email: string;
   dob?: string;
   status?: Status;
   avatar?: string;
-  password: string;
+  updateAt?: string;
+  createAt?: string;
+  username: string;
 }
 
 export type UserType = User;

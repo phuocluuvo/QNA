@@ -12,7 +12,8 @@ const mappingState = (oldState: object, updateObject: object) => {
   return newState;
 };
 
-const numberFormat = (number: number) => {
+const numberFormat = (number: number | string) => {
+  if (typeof number === "string") number = parseInt(number);
   if (number < 1000) return number;
   if (number >= 1000 && number < 1000000)
     return (number / 1000).toFixed(1) + "K";

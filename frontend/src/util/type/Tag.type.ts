@@ -4,7 +4,7 @@ interface Tag {
   id: string | number;
   name?: string;
   totalQuestion?: number;
-  detail?: string;
+  content?: string;
   status?: Status;
 }
 
