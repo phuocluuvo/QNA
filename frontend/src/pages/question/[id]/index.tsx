@@ -10,7 +10,6 @@ import TagQuestion from "@/components/TagQuestion";
 import VoteButton from "@/components/VoteButton";
 import { LanguageHelper } from "@/util/Language/Language.util";
 import helper from "@/util/helper";
-import QuestionDataList from "@/util/mock/QuestionDataList.mock";
 import { QuestionType } from "@/util/type/Question.type";
 import { UserType } from "@/util/type/User.type";
 import { ChatIcon, ViewIcon } from "@chakra-ui/icons";
@@ -47,6 +46,8 @@ import { VOTE } from "@/API/constant/Vote.enum";
 import actionVoteQuestion from "@/API/redux/actions/question/actionVoteQuestion";
 import { FormVote } from "@/API/type/Form.type";
 import { useSession } from "next-auth/react";
+import useStateWithCallback from "@/hooks/useStateWithCallback";
+import answerList from "@/util/mock/AnswareDataList.mock";
 
 function Question() {
   const { getTranslate } = LanguageHelper(Pages.HOME);
@@ -61,12 +62,45 @@ function Question() {
     (state: { questionReducer: { type: ActionTypes } }) =>
       state.questionReducer.type
   );
+
+  const answerList = useSelector(
+    (state: { answerReducer: { answerList: AnswerListType } }) =>
+      state.answerReducer.answerList
+  );
   // @ts-ignore
   let userData: UserType = null;
   let answerLoadType = useSelector(
     (state: { answerReducer: { type: ActionTypes } }) =>
       state.answerReducer.type
   );
+  useEffect(() => {
+    if (answerList)
+      setState(
+        // @ts-ignore
+        (oldState) => helper.mappingState(oldState, { answerList: answerList })
+      );
+    // call update vote each 30s
+    const interval = setInterval(() => {
+      if (id)
+        dispatch<any>(
+          actionGetQuestion(
+            { id: id as string },
+            (data) => {
+              // @ts-ignore
+              setState((oldState) =>
+                helper.mappingState(oldState, {
+                  count: data.votes,
+                })
+              );
+            },
+            () => {
+              console.log("error");
+            }
+          )
+        );
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
   const voteQuestion = (voteType: VOTE) => {
     let form: FormVote = {
       question_id: id as string,
@@ -76,12 +110,15 @@ function Question() {
       actionVoteQuestion(
         form,
         (res) => {
-          // @ts-ignore
-          setState((oldState) => {
-            return helper.mappingState(oldState, {
-              count: res.votes,
-            });
-          });
+          setState(
+            // @ts-ignore
+            (oldState) => {
+              return helper.mappingState(oldState, {
+                count: res.votes,
+              });
+            }
+          );
+          fecthQuestionData(id);
         },
         () => {
           // @ts-ignore
@@ -90,6 +127,29 @@ function Question() {
               count: oldState.count,
             });
           });
+        }
+      )
+    );
+  };
+  const fecthQuestionData = (id: any) => {
+    let form = {
+      id: id as string,
+    };
+    dispatch<any>(
+      actionGetQuestion(
+        form,
+        (data) => {
+          // @ts-ignore
+          setState((oldState) =>
+            helper.mappingState(oldState, {
+              question: data,
+              count: data.votes,
+            })
+          );
+          fecthAnswer();
+        },
+        () => {
+          console.log("error");
         }
       )
     );
@@ -105,12 +165,6 @@ function Question() {
         (res) => {
           // @ts-ignore
           setState((oldState) => {
-            res.items.sort((a, b) => {
-              return (
-                new Date(b.createdAt).getTime() -
-                new Date(a.createdAt).getTime()
-              );
-            });
             return helper.mappingState(oldState, {
               answerList: res,
             });
@@ -123,43 +177,30 @@ function Question() {
     );
   };
   useEffect(() => {
-    if (answerLoadType === ActionTypes.REQUEST_CREATE_ANSWER) {
+    if (
+      answerLoadType === ActionTypes.REQUEST_CREATE_ANSWER ||
+      answerLoadType === ActionTypes.REQUEST_GET_ANSWER_LIST
+    ) {
       console.log("request create answer");
-      fecthAnswer();
+      // fecthAnswer();
+      setState(
+        // @ts-ignore
+        (oldState) =>
+          helper.mappingState(oldState, {
+            answerList: answerList,
+          })
+      );
     }
   }, [answerLoadType]);
 
   useEffect(() => {
     if (id) {
-      let form = {
-        id: id as string,
-      };
-      let formAnswer = {
-        question_id: id as string,
-      };
       // @ts-ignore
       userData = localStorage.getItem("userLogin");
-      dispatch<any>(
-        actionGetQuestion(
-          form,
-          (data) => {
-            // @ts-ignore
-            setState((oldState) =>
-              helper.mappingState(oldState, {
-                question: data,
-                count: data.votes,
-              })
-            );
-            fecthAnswer();
-          },
-          () => {
-            console.log("error");
-          }
-        )
-      );
+      fecthQuestionData(id);
     }
   }, [id]);
-  const [state, setState] = useState<{
+  const [state, setState] = useStateWithCallback<{
     count: number;
     question: QuestionType;
     isDarkMode: boolean;
@@ -178,38 +219,10 @@ function Question() {
     // Returns null on first render, so the client and server match
     return null;
   }
-  // sort item base on time added
-  function sortAnswerList(answerList: AnswerListType) {
-    state.answerList?.items.sort((a, b) => {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
-  }
   const parseLines = (value: string) => value.replace(/(\\n)/g, "\n");
   return (
     <>
-      {questionsRequesting === ActionTypes.REQUEST_GET_QUESTION ? (
-        <Box
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: Colors(isDarkMode).PRIMARY_BG,
-            zIndex: 1000,
-          }}
-        >
-          <Flex
-            w={"full"}
-            h={"full"}
-            alignItems={"center"}
-            justifyContent={"center"}
-          >
-            <Heading size={"lg"}>Loading...</Heading>
-          </Flex>
-        </Box>
-      ) : questionsRequesting === ActionTypes.SUCCESS_GET_QUESTION &&
-        state.question ? (
+      {state.question ? (
         <>
           <Head>
             <title>{state.question.title}</title>
@@ -235,6 +248,10 @@ function Question() {
                   >
                     {/* up vote */}
                     <VoteButton
+                      isVoted={
+                        state.question.vote?.length > 0 &&
+                        state.question.vote.at(0)?.voteType === VOTE.UPVOTE
+                      }
                       isDarkMode={isDarkMode}
                       type="up"
                       onClick={() => voteQuestion(VOTE.UPVOTE)}
@@ -243,6 +260,10 @@ function Question() {
                       {helper.numberFormat(state.count)}
                     </Heading>
                     <VoteButton
+                      isVoted={
+                        state.question.vote?.length > 0 &&
+                        state.question.vote.at(0)?.voteType === VOTE.DOWNVOTE
+                      }
                       isDarkMode={isDarkMode}
                       type="down"
                       onClick={() => voteQuestion(VOTE.DOWNVOTE)}
@@ -250,7 +271,7 @@ function Question() {
                     <VStack py={5}>
                       <ChatIcon />
                       <Text>
-                        {state.answerList && state.answerList.meta.totalItems}
+                        {state.answerList && state.answerList.meta?.totalItems}
                       </Text>
                       <ViewIcon />
                       <Text>{state.question.views}</Text>
@@ -280,7 +301,9 @@ function Question() {
                             width={"full"}
                             // bg={Colors(isDarkMode).PRIMARY_BG}
                           >
-                            <Heading flex={1} maxW={"85%"}>{state.question.title}</Heading>
+                            <Heading flex={1} maxW={"85%"}>
+                              {state.question.title}
+                            </Heading>
                             <Menu>
                               <MenuButton
                                 pos={"absolute"}
@@ -374,7 +397,7 @@ function Question() {
                 />
                 <Box>
                   {state.answerList &&
-                    state.answerList?.items.map((answer) => (
+                    state.answerList?.items?.map((answer) => (
                       <AnswerItem
                         key={answer.id}
                         answer={answer}
@@ -383,6 +406,7 @@ function Question() {
                           session?.data?.user?.id.toString() ===
                           state.question.user.id.toString()
                         }
+                        fecthAnswer={fecthAnswer}
                         dispatch={dispatch}
                       />
                     ))}
@@ -398,10 +422,14 @@ function Question() {
                   padding: "10px",
                   zIndex: 1,
                 }}
+                width={{
+                  lg: "300px",
+                  md: "200px",
+                }}
                 bg={Colors(colorMode === "dark").PRIMARY_BG}
               >
                 <Heading size={"sm"}>Related questions</Heading>
-                {QuestionDataList.items.map(
+                {/* {QuestionDataList.items.map(
                   (question, index) =>
                     index < 5 && (
                       <Box
@@ -444,17 +472,33 @@ function Question() {
                         </HStack>
                       </Box>
                     )
-                )}
+                )} */}
               </Box>
             </Flex>
           </Container>
         </>
-      ) : questionsRequesting === ActionTypes.FAILURE_GET_QUESTION ? (
-        <ErrorContent
-          errorTitle={getTranslate("ERROR_TITLE")}
-          errorMessage={getTranslate("ERROR_MESSAGE")}
-        />
-      ) : null}
+      ) : (
+        <Box
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: Colors(isDarkMode).PRIMARY_BG,
+            zIndex: 1000,
+          }}
+        >
+          <Flex
+            w={"full"}
+            h={"full"}
+            alignItems={"center"}
+            justifyContent={"center"}
+          >
+            <Heading size={"lg"}>Loading...</Heading>
+          </Flex>
+        </Box>
+      )}
     </>
   );
 }
