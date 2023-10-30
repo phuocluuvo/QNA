@@ -1,12 +1,29 @@
 import { Select, SelectProps } from "@chakra-ui/react";
 import React from "react";
-
+const defaultOptions = [
+  {
+    label: "Newest",
+    value: "newest",
+  },
+  {
+    label: "Oldest",
+    value: "oldest",
+  },
+  {
+    label: "Most voted",
+    value: "most-voted",
+  },
+  {
+    label: "Least voted",
+    value: "least-voted",
+  },
+];
 type SelectOptionsProps = {
   /**
    * @description array of options
    * @example [{value: "1", label: "1"}, {value: "2", label: "2"}]
    */
-  data: {
+  data?: {
     value: string;
     label: string;
   }[];
@@ -24,7 +41,7 @@ type SelectOptionsProps = {
 };
 
 const SelectOptions = ({
-  data,
+  data = defaultOptions,
   defaultIndex = 0,
   containerStyle = {},
   optionStyle = {},

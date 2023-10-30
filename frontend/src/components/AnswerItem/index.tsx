@@ -2,10 +2,13 @@ import { AnswerType } from "@/util/type/Answer.type";
 import {
   Box,
   Button,
+  Collapse,
   Divider,
   Flex,
   HStack,
   Heading,
+  Input,
+  Spacer,
   Tooltip,
   VStack,
 } from "@chakra-ui/react";
@@ -15,27 +18,64 @@ import helper from "@/util/helper";
 import Author from "../Author";
 import { CheckIcon } from "@chakra-ui/icons";
 import actionApproveAnswer from "@/API/redux/actions/answer/actionApproveAnswer";
-import { FormApproveAnswer } from "@/API/type/Form.type";
+import { FormApproveAnswer, FormVoteAnswer } from "@/API/type/Form.type";
 import CustomAlertDialog from "../AlertDialog";
+import useStateWithCallback from "@/hooks/useStateWithCallback";
+import { VOTE } from "@/API/constant/Vote.enum";
+import actionVoteAnswer from "@/API/redux/actions/answer/actionVoteAnswer";
 
 function AnswerItem({
   answer,
   getTranslate,
   isAuthor,
   dispatch,
+  fecthAnswer,
 }: {
   answer: AnswerType;
   getTranslate: (key: string) => string;
   isAuthor: boolean;
   dispatch: (action: any) => void;
+  fecthAnswer: () => void;
 }) {
-  const [state, setState] = React.useState({
+  const [state, setState] = useStateWithCallback({
     // @ts-ignore
     count: answer.votes ?? 0,
     isDarkMode: false,
     isApproved: answer.isApproved,
     isShowConfirm: false,
+    isShowComment: false,
   });
+
+  React.useEffect(() => {
+    // @ts-ignore
+    setState((oldState) =>
+      helper.mappingState(oldState, {
+        isApproved: answer.isApproved,
+      })
+    );
+  }, [answer]);
+  const voteHandler = (type: VOTE) => {
+    const form: FormVoteAnswer = {
+      answer_id: answer.id,
+      vote_type: type,
+    };
+    dispatch(
+      actionVoteAnswer(
+        form,
+        (res: AnswerType) => {
+          setState(
+            // @ts-ignore
+            (oldState) =>
+              helper.mappingState(oldState, {
+                count: res.votes,
+              }),
+            () => fecthAnswer()
+          );
+        },
+        () => {}
+      )
+    );
+  };
   const approveHandler = () => {
     let form: FormApproveAnswer = {
       answer_id: answer.id,
@@ -45,11 +85,13 @@ function AnswerItem({
       actionApproveAnswer(
         form,
         (res: any) => {
-          // @ts-ignore
-          setState((oldState) =>
-            helper.mappingState(oldState, {
-              isApproved: !oldState.isApproved,
-            })
+          setState(
+            // @ts-ignore
+            (oldState) =>
+              helper.mappingState(oldState, {
+                isApproved: !oldState.isApproved,
+              }),
+            () => fecthAnswer()
           );
         },
         () => {}
@@ -60,7 +102,7 @@ function AnswerItem({
     <>
       <Divider />
       <Box key={answer.id} my={5}>
-        <HStack alignItems={"start"}>
+        <HStack alignItems={"stretch"} height={"full"}>
           <Flex
             direction={{ base: "column", md: "row" }}
             pos={{ base: "sticky" }}
@@ -77,14 +119,7 @@ function AnswerItem({
                 isDarkMode={state.isDarkMode}
                 type="up"
                 size={20}
-                onClick={() =>
-                  // @ts-ignore
-                  setState((oldState) =>
-                    helper.mappingState(oldState, {
-                      count: state.count + 1,
-                    })
-                  )
-                }
+                onClick={() => voteHandler(VOTE.UPVOTE)}
               />
               <Heading size={"sm"}>{helper.numberFormat(state.count)}</Heading>
               <VoteButton
@@ -93,11 +128,7 @@ function AnswerItem({
                 size={20}
                 onClick={() =>
                   // @ts-ignore
-                  setState((oldState) =>
-                    helper.mappingState(oldState, {
-                      count: state.count - 1,
-                    })
-                  )
+                  voteHandler(VOTE.DOWNVOTE)
                 }
               />
               {/* approve button */}
@@ -131,7 +162,11 @@ function AnswerItem({
               )}
             </VStack>
           </Flex>
-          <VStack>
+          <VStack
+            alignItems={"flex-start"}
+            justifyContent={"space-between"}
+            flex={1}
+          >
             {/* display raw text */}
             <Box
               dangerouslySetInnerHTML={{
@@ -139,8 +174,17 @@ function AnswerItem({
               }}
               fontSize={"sm"}
               w={"full"}
+              h={"full"}
+              flex={1}
             />
-            <HStack w={"full"} mb={"1"} mr={2} alignItems={"flex-start"}>
+            <VStack
+              w={"full"}
+              justifyContent={"space-between"}
+              mb={"1"}
+              mr={2}
+              flex={1}
+              alignItems={"flex-start"}
+            >
               <Author
                 user={answer.user}
                 nameStyle={{
@@ -158,6 +202,53 @@ function AnswerItem({
                   )
                 )}
               />
+            </VStack>
+            <Collapse
+              in={state.isShowComment}
+              animateOpacity
+              style={{ width: "100%" }}
+            >
+              <Input placeholder={getTranslate("COMMENT")} size={"sm"} />
+            </Collapse>
+            {/* comment button */}
+            <HStack>
+              <Button
+                type="button"
+                variant={state.isShowComment ? "solid" : "link"}
+                colorScheme="facebook"
+                size="xs"
+                onClick={() =>
+                  state.isShowComment
+                    ? null
+                    : // @ts-ignore
+                      setState((oldState) =>
+                        helper.mappingState(oldState, {
+                          isShowComment: true,
+                        })
+                      )
+                }
+              >
+                {state.isShowComment
+                  ? getTranslate("COMMENT")
+                  : getTranslate("SUBMIT")}
+              </Button>
+              <Button
+                type="button"
+                variant={"ghost"}
+                colorScheme="facebook"
+                size="xs"
+                display={state.isShowComment ? "block" : "none"}
+                onClick={() =>
+                  // @ts-ignore
+                  setState((oldState) =>
+                    helper.mappingState(oldState, {
+                      isShowComment: !oldState.isShowComment,
+                    })
+                  )
+                }
+              >
+                {getTranslate("CANCEL")}
+              </Button>
             </HStack>
           </VStack>
         </HStack>
@@ -191,7 +282,9 @@ function AnswerItem({
           colorScheme: "gray",
         }}
         confirmText={
-          !state.isApproved ? getTranslate("APPROVE") : getTranslate("UNAPPROVE")
+          !state.isApproved
+            ? getTranslate("APPROVE")
+            : getTranslate("UNAPPROVE")
         }
         cancelText={getTranslate("CANCEL")}
         confirmAction={approveHandler}

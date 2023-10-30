@@ -34,6 +34,7 @@ function Navigator({ getTranslate, isMobile }) {
         .then((res) => {
           console.log("logout success", res);
           localStorage.removeItem("userLogin");
+          sessionStorage.removeItem("next-auth.session-token");
           Toast({
             title: "Logout success",
             status: "success",
@@ -49,7 +50,9 @@ function Navigator({ getTranslate, isMobile }) {
         console.log("logout failed:", err);
       };
   };
-  const DashboardHandle = () => {};
+  const DashboardHandle = () => {
+    routes.push("/user/profile");
+  };
   return isMobile ? (
     <Flex
       as="nav"

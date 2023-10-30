@@ -12,14 +12,14 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import React from "react";
-import VoteButton from "../VoteButton";
 import helper from "@/util/helper";
 import { QuestionType } from "@/util/type/Question.type";
 import { useRouter } from "next/router";
-import { ChatIcon, ViewIcon } from "@chakra-ui/icons";
 import Author from "../Author";
 import TagQuestion from "../TagQuestion";
 import moment from "moment";
+import { LanguageHelper } from "@/util/Language/Language.util";
+import { Pages } from "@/assets/constant/Pages";
 function QuestionItem({
   question,
   isDarkMode,
@@ -32,6 +32,7 @@ function QuestionItem({
   isLast?: boolean;
 }) {
   const [count, setCount] = React.useState(question.votes);
+  const { getTranslate } = LanguageHelper(Pages.HOME);
   const router = useRouter();
   const hasImage = /<img.*?src="(.*?)"/.test(question.content);
   let contentSource = question.content;
@@ -62,19 +63,27 @@ function QuestionItem({
       p={3}
       bg={Colors(isDarkMode).PRIMARY_BG}
     >
-      <VStack spacing={0}>
+      <VStack
+        spacing={0}
+        style={{
+          borderRight: "1px solid " + Colors(isDarkMode).BORDER,
+          paddingRight: "10px",
+          marginRight: "10px",
+        }}
+      >
         {/* up vote */}
-        <VoteButton
-          isDarkMode={isDarkMode}
-          type="up"
-          onClick={() => setCount(count + 1)}
-        />
+        <Text fontSize={"xs"} opacity={0.8}>
+          {getTranslate("VOTES")}
+        </Text>
         <Heading size={"md"}>{helper.numberFormat(count)}</Heading>
-        <VoteButton
-          isDarkMode={isDarkMode}
-          type="down"
-          onClick={() => setCount(count - 1)}
-        />
+        <Text fontSize={"xs"} opacity={0.8}>
+          {getTranslate("ANSWERS")}
+        </Text>
+        <Text>{helper.numberFormat(question.countAnswer || 0)}</Text>
+        <Text fontSize={"xs"} opacity={0.8}>
+          {getTranslate("VISITS")}
+        </Text>
+        <Text>{helper.numberFormat(question.views ? question.views : 0)}</Text>
       </VStack>
       {imageSource ? (
         <Image
@@ -98,6 +107,7 @@ function QuestionItem({
         spacing={1}
         flex={1}
         alignItems={"flex-start"}
+        height={"100%"}
         onClick={() => {
           onClick
             ? onClick
@@ -123,17 +133,15 @@ function QuestionItem({
           fontSize={"sm"}
           maxW={"full"}
           noOfLines={2}
-        >
-          {/* {question.content} */}
-        </Box>
+        />
         <HStack>
           {question.tags?.map((tag) => (
             <TagQuestion tag={tag} key={tag.id} />
           ))}
         </HStack>
-        <Spacer />
         <HStack w={"full"}>
           <VStack spacing={0} alignItems={"flex-start"}>
+            <Spacer />
             <Author
               user={question.user}
               nameStyle={{
@@ -144,6 +152,14 @@ function QuestionItem({
                   textDecoration: "underline",
                 },
               }}
+              headingText={getTranslate("ANSWERED_AT").replace(
+                "{0}",
+                helper.formatDate(
+                  question.createdAt,
+                  false,
+                  "H:mm A - ddd, DD/MM/YYYY"
+                )
+              )}
               bottomText={helper.formatDate(question.createdAt, true)}
               bottomTextStyle={{
                 color: "gray.500",
@@ -153,34 +169,6 @@ function QuestionItem({
             />
           </VStack>
           <Spacer />
-          <HStack flex={1} alignItems="flex-end" justifyContent={"end"}>
-            <Text
-              display={{ base: "flex", md: "inline" }}
-              style={{
-                alignItems: "center",
-                justifyContent: "center",
-                flexDirection: "column",
-                marginRight: "10px",
-              }}
-            >
-              {helper.numberFormat(
-                question.answerNumber ? question.answerNumber : 0
-              )}{" "}
-              <ChatIcon />
-            </Text>
-            <Text
-              display={{ base: "flex", md: "inline" }}
-              style={{
-                alignItems: "center",
-                justifyContent: "center",
-                flexDirection: "column",
-                marginRight: "10px",
-              }}
-            >
-              {helper.numberFormat(question.views ? question.views : 0)}{" "}
-              <ViewIcon />
-            </Text>
-          </HStack>
         </HStack>
       </VStack>
     </HStack>

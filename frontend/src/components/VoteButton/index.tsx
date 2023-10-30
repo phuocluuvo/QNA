@@ -8,6 +8,7 @@ type VoteButtonProps = {
   isDarkMode?: boolean;
   onClick?: () => void;
   size?: string | number;
+  isVoted?: boolean;
 };
 function VoteButton(props: VoteButtonProps) {
   const session = useSession();
@@ -47,7 +48,7 @@ function VoteButton(props: VoteButtonProps) {
             />
           )
         }
-        variant="ghost"
+        variant={!props.isVoted ? "ghost" : "solid"}
         rounded={"full"}
         color={Colors(props.isDarkMode).PRIMARY}
         transition="all 0.5s"

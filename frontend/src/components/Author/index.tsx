@@ -43,10 +43,11 @@ function Author({
       rounded={"md"}
       py={1}
       {...containerStyle}
-      cursor={"pointer"}
-      onClick={() => {
-        onClick ? onClick() : router.push(`/user/${user.id}`);
+      style={{
+        transition: "all 0.2s ease-in-out",
+        paddingInline: 10,
       }}
+      cursor={"pointer"}
     >
       <Avatar size={"sm"} name={user.fullname} src={user.avatar} />
       <VStack alignItems={"start"} spacing={0}>
