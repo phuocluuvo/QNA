@@ -5,6 +5,7 @@ const initialState = {
   requesting: false,
   error: null,
   type: "",
+  answerList: [],
 };
 
 const answerSlice = createSlice({
@@ -24,10 +25,31 @@ const answerSlice = createSlice({
       state.error = actions.payload.error;
       state.type = ActionTypes.FAILURE_CREATE_ANSWER;
     },
+    requestGetAnswerList: (state) => {
+      state.requesting = true;
+      state.type = ActionTypes.REQUEST_GET_ANSWER_LIST;
+    },
+    sucessGetAnswerList: (state, actions) => {
+      state.requesting = false;
+      state.error = null;
+      state.answerList = actions.payload;
+      state.type = ActionTypes.SUCCESS_GET_ANSWER;
+    },
+    failureGetAnswerList: (state, actions) => {
+      state.requesting = false;
+      state.error = actions.payload.error;
+      state.type = ActionTypes.FAILURE_GET_ANSWER;
+    },
   },
 });
 
-export const { requestCreateAnswer, successCreateAnswer, failureCreateAnswer } =
-  answerSlice.actions;
+export const {
+  requestCreateAnswer,
+  successCreateAnswer,
+  failureCreateAnswer,
+  sucessGetAnswerList,
+  requestGetAnswerList,
+  failureGetAnswerList,
+} = answerSlice.actions;
 
 export default answerSlice.reducer;

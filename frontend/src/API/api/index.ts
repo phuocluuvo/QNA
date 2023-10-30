@@ -7,6 +7,7 @@ import {
   FormQuestion,
   FormSignUp,
   FormVote,
+  FormVoteAnswer,
   FromUserLogin,
 } from "../type/Form.type";
 import api, { AuthApi } from "./axios";
@@ -24,11 +25,13 @@ const removeEmpty = (obj: { [x: string]: any }) => {
 };
 
 const getQuestion = (form: FormQuestion) => {
-  return api.get(url.QUESTION + "/" + form.id.toString());
+  return AuthApi(REQUEST_METHOD.GET, url.QUESTION + "/" + form.id.toString());
 };
 
 const getQuestionList = ({ page, limit }: { page: number; limit: number }) => {
-  return api.get(url.QUESTION_LIST + "?page=" + page + "&limit=" + limit);
+  return api.get(url.QUESTION_LIST, {
+    params: { page: page, limit: limit },
+  });
 };
 
 const createQuestion = (form: FormCreateQuestion | null) => {
@@ -53,21 +56,30 @@ const createAnswer = (form: FormCreateAnswer) => {
 };
 
 const getAnswerList = (form: FormGetAnswer) => {
-  return api.get(
-    url.ANSWER +
-      "?page=" +
-      form.page +
-      "&limit=" +
-      form.limit +
-      "&question_id=" +
-      form.question_id
-  );
+  return api.get(url.ANSWER, {
+    params: {
+      page: form.page,
+      limit: form.limit,
+      question_id: form.question_id,
+    },
+  });
 };
 
 const approveAnswer = (form: FormApproveAnswer) => {
   return AuthApi(REQUEST_METHOD.POST, url.APPROVE_ANSWER, form);
 };
 
+const getTagByName = (name: string) => {
+  return api.get(url.TAG.replace("{name}", name));
+};
+
+const getUserDashBoard = () => {
+  return AuthApi(REQUEST_METHOD.GET, url.USER_PROFILE);
+};
+
+const voteAnswer = (form: FormVoteAnswer) => {
+  return AuthApi(REQUEST_METHOD.POST, url.VOTE_ANSWER, form);
+};
 export default {
   requestSignUp,
   getQuestion,
@@ -79,4 +91,7 @@ export default {
   getAnswerList,
   voteQuestion,
   approveAnswer,
+  getTagByName,
+  getUserDashBoard,
+  voteAnswer,
 };

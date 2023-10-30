@@ -7,7 +7,6 @@ import {
 import { FormQuestion } from "@/API/type/Form.type";
 import { responseHandler } from "../ResponseHandler";
 import { finishedRequest, requesting } from "../../reducers/GlobalSlice";
-import questionDataList from "@/util/mock/QuestionDataList.mock";
 import { QuestionType } from "@/util/type/Question.type";
 import { AnyAction, Dispatch } from "@reduxjs/toolkit";
 

@@ -39,3 +39,8 @@ export type FormApproveAnswer = {
   question_id: string;
   answer_id: string;
 };
+
+export type FormVoteAnswer = {
+  answer_id: string;
+  vote_type: VOTE;
+};
