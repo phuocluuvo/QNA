@@ -19,24 +19,7 @@ import { useRouter } from "next/router";
 import { Colors } from "@/assets/constant/Colors";
 import SelectOptions from "@/components/SelectOptions";
 const limitations = [5, 10, 15, 20];
-const sortOptions = [
-  {
-    label: "Newest",
-    value: "newest",
-  },
-  {
-    label: "Oldest",
-    value: "oldest",
-  },
-  {
-    label: "Most voted",
-    value: "most-voted",
-  },
-  {
-    label: "Least voted",
-    value: "least-voted",
-  },
-];
+
 export default function Home() {
   const dispatch = useDispatch();
   const { colorMode } = useColorMode();
@@ -104,7 +87,6 @@ export default function Home() {
               variant: "filled",
               w: "fit-content",
             }}
-            data={sortOptions}
             onSelect={(e) => {
               router.push({
                 pathname: router.pathname,
