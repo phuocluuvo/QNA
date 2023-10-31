@@ -15,7 +15,7 @@ export class Comment {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column({ length: 500 })
+  @Column("text")
   content: string;
 
   @ManyToOne(() => Answer, (answer) => answer.comments, {

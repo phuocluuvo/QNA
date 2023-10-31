@@ -9,11 +9,13 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  VirtualColumn,
 } from "typeorm";
 import { User } from "../../users/entity/users.entity";
 import { Answer } from "../../answer/entity/answer.entity";
 import { Vote } from "../../vote/entity/vote.entity";
 import { Tag } from "../../tag/entity/tag.entity";
+import { QuestionTypeEnum } from "../../enums/question-type.enum";
 
 @Entity()
 export class Question {
@@ -37,6 +39,28 @@ export class Question {
 
   @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
+
+  // This is the virtual column for the relationship entities.
+
+  @VirtualColumn({
+    query: (alias) =>
+      `SELECT COUNT(*) FROM answer WHERE answer.question_id = ${alias}.id`,
+  })
+  answersNumber: number;
+
+  @VirtualColumn({
+    query: (alias) =>
+      `SELECT 
+        CASE
+          WHEN EXISTS (SELECT 1 FROM QNA_database.answer WHERE question_id = ${alias}.id) THEN
+            CASE
+              WHEN EXISTS (SELECT 1 FROM QNA_database.answer WHERE question_id = ${alias}.id AND is_approved = 1) THEN 'normal'
+              ELSE 'no_approved'
+            END
+          ELSE 'no_answer'
+        END AS result`,
+  })
+  type: QuestionTypeEnum;
 
   // This is the foreign key column for the relationship entities.
 

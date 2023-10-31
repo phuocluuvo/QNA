@@ -1,16 +1,13 @@
 import {
   Body,
   Controller,
-  DefaultValuePipe,
   Delete,
   ForbiddenException,
   Get,
   NotFoundException,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
-  Query,
   Req,
   UseGuards,
 } from "@nestjs/common";
@@ -26,6 +23,13 @@ import { CaslAbilityFactory } from "../casl/casl-ability.factory";
 import { VoteQuestionDto } from "../vote/dto/vote-question.dto";
 import { PublicGuard } from "../auth/guards/public.guard";
 import { message } from "../constants/message.constants";
+import {
+  ApiOkPaginatedResponse,
+  ApiPaginationQuery,
+  Paginate,
+  PaginateQuery,
+} from "nestjs-paginate";
+import { questionPaginateConfig } from "../config/pagination/question-pagination.config";
 
 @ApiTags("question")
 @Controller("question")
@@ -38,24 +42,15 @@ export class QuestionController {
   /**
    * Search and paginate questions.
    *
-   * @param page The page number for pagination (default: 1).
-   * @param limit The maximum number of items per page (default: 10, max: 100).
    * @returns Promise<Pagination<Question>> Paginated list of questions.
+   * @param query
    */
-  @ApiOperation({
-    summary: "search paginate questions",
-  })
+  @ApiOkPaginatedResponse(Question, questionPaginateConfig)
+  @ApiPaginationQuery(questionPaginateConfig)
   @Get()
   @UseGuards()
-  find(
-    @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
-    @Query("limit", new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
-  ): Promise<any> {
-    limit = limit > 100 ? 100 : limit;
-    return this.questionService.find({
-      page,
-      limit,
-    });
+  find(@Paginate() query: PaginateQuery) {
+    return this.questionService.find(query);
   }
 
   /**

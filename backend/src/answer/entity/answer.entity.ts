@@ -18,7 +18,7 @@ export class Answer {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column({ length: 300 })
+  @Column("text")
   content: string;
 
   @Column({ default: 0 })

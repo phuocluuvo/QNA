@@ -15,7 +15,6 @@ export class CreateTagDto {
   @Expose()
   @IsNotEmpty()
   @IsString()
-  @MinLength(20)
-  @MaxLength(300)
+  @MaxLength(900)
   content: string;
 }

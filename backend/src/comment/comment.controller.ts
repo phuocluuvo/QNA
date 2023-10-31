@@ -1,13 +1,11 @@
 import {
   Body,
   Controller,
-  DefaultValuePipe,
   Delete,
   ForbiddenException,
   Get,
   NotFoundException,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -17,13 +15,22 @@ import {
 import { AnswerService } from "../answer/answer.service";
 import { CaslAbilityFactory } from "../casl/casl-ability.factory";
 import { CommentService } from "./comment.service";
-import { ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { AccessTokenGuard } from "../auth/guards/accessToken.guard";
 import { CreateCommentDto } from "./dto/create-comment.dto";
 import { Action } from "../enums/action.enum";
 import { UpdateCommentDto } from "./dto/update-comment.dto";
 import { message } from "../constants/message.constants";
+import {
+  ApiOkPaginatedResponse,
+  ApiPaginationQuery,
+  Paginate,
+  PaginateQuery,
+} from "nestjs-paginate";
+import { Question } from "../question/entity/question.entity";
+import { commentPaginateConfig } from "../config/pagination/comment-pagination";
 
+@ApiTags("comment")
 @Controller("comment")
 export class CommentController {
   constructor(
@@ -36,25 +43,15 @@ export class CommentController {
    * Get paginated answers based on the provided answerId.
    *
    * @param answerId - The ID of the question to filter comment.
-   * @param page - The page number for pagination.
-   * @param limit - The limit of items per page for pagination.
+   * @param query
    * @returns Paginated list of comment.
    */
-  @ApiOperation({
-    summary: "get paginate comment",
-  })
+  @ApiOkPaginatedResponse(Question, commentPaginateConfig)
+  @ApiPaginationQuery(commentPaginateConfig)
   @Get()
   @UseGuards()
-  find(
-    @Query("answer_id") answerId: string,
-    @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
-    @Query("limit", new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
-  ) {
-    limit = limit > 100 ? 100 : limit;
-    return this.commentService.find(answerId, {
-      page,
-      limit,
-    });
+  find(@Query("answer_id") answerId: string, @Paginate() query: PaginateQuery) {
+    return this.commentService.find(answerId, query);
   }
 
   /**
