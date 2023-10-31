@@ -15,6 +15,7 @@ import { User } from "../../users/entity/users.entity";
 import { Answer } from "../../answer/entity/answer.entity";
 import { Vote } from "../../vote/entity/vote.entity";
 import { Tag } from "../../tag/entity/tag.entity";
+import { QuestionTypeEnum } from "../../enums/question-type.enum";
 
 @Entity()
 export class Question {
@@ -59,7 +60,7 @@ export class Question {
           ELSE 'no_answer'
         END AS result`,
   })
-  type: string;
+  type: QuestionTypeEnum;
 
   // This is the foreign key column for the relationship entities.
 
