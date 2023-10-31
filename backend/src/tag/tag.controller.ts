@@ -2,24 +2,30 @@ import {
   BadRequestException,
   Body,
   Controller,
-  DefaultValuePipe,
   Delete,
   Get,
   NotFoundException,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
-  Query,
   UseGuards,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { AccessTokenGuard } from "../auth/guards/accessToken.guard";
 import { UpdateCommentDto } from "../comment/dto/update-comment.dto";
 import { message } from "../constants/message.constants";
 import { TagService } from "./tag.service";
 import { CreateTagDto } from "./dto/create-tag.dto";
+import {
+  ApiOkPaginatedResponse,
+  ApiPaginationQuery,
+  Paginate,
+  PaginateQuery,
+} from "nestjs-paginate";
+import { Question } from "../question/entity/question.entity";
+import { tagPaginateConfig } from "../config/pagination/tag-pagination.config";
 
+@ApiTags("tag")
 @Controller("tag")
 export class TagController {
   constructor(private readonly tagService: TagService) {}
@@ -27,24 +33,15 @@ export class TagController {
   /**
    * Get paginated tag.
    *
-   * @param page - The page number for pagination.
-   * @param limit - The limit of items per page for pagination.
    * @returns Paginated list of tag.
+   * @param query
    */
-  @ApiOperation({
-    summary: "get paginate tag",
-  })
+  @ApiOkPaginatedResponse(Question, tagPaginateConfig)
+  @ApiPaginationQuery(tagPaginateConfig)
   @Get()
   @UseGuards()
-  find(
-    @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
-    @Query("limit", new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
-  ) {
-    limit = limit > 100 ? 100 : limit;
-    return this.tagService.find({
-      page,
-      limit,
-    });
+  find(@Paginate() query: PaginateQuery) {
+    return this.tagService.find(query);
   }
 
   /**

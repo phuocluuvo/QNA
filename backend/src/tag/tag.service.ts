@@ -1,15 +1,12 @@
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { Tag } from "./entity/tag.entity";
-import {
-  IPaginationOptions,
-  paginateRawAndEntities,
-  Pagination,
-} from "nestjs-typeorm-paginate";
 import { message } from "../constants/message.constants";
 import { CreateTagDto } from "./dto/create-tag.dto";
 import { plainToClass } from "class-transformer";
 import { UpdateTagDto } from "./dto/update-tag.dto";
+import { paginate, PaginateQuery } from "nestjs-paginate";
+import { tagPaginateConfig } from "../config/pagination/tag-pagination.config";
 
 @Injectable()
 export class TagService {
@@ -21,34 +18,20 @@ export class TagService {
   /**
    * List tag.
    *
-   * @param options - Pagination options.
    * @returns Paginated list of tag.
+   * @param query
    */
-  async find(options: IPaginationOptions): Promise<Pagination<Tag>> {
+  async find(query: PaginateQuery) {
     const queryBuilder = this.tagRepository.createQueryBuilder("tag");
     queryBuilder.select([
       "tag.id",
       "tag.name",
       "tag.content",
-      "COUNT(question.id) as countQuestion",
+      "tag.questionsNumber",
     ]);
     queryBuilder.leftJoin("tag.questions", "question");
-    queryBuilder.groupBy("question.id, tag.id");
-    queryBuilder.orderBy("tag.name", "ASC");
 
-    const [pagination, rawResults] = await paginateRawAndEntities<Tag>(
-      queryBuilder,
-      options,
-    );
-
-    pagination.items.map((item, index) => {
-      const check = rawResults.find((raw: any) => raw.tag_id === item.id);
-      if (check) {
-        item["countQuestion"] = rawResults[index]["countQuestion"];
-      }
-    });
-
-    return pagination;
+    return await paginate<Tag>(query, queryBuilder, tagPaginateConfig);
   }
 
   /**

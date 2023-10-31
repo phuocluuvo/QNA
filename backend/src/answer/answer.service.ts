@@ -4,16 +4,13 @@ import { Answer } from "./entity/answer.entity";
 import { CreateAnswerDto } from "./dto/create-answer.dto";
 import { plainToClass } from "class-transformer";
 import { UpdateAnswerDto } from "./dto/update-answer.dto";
-import {
-  IPaginationOptions,
-  paginate,
-  Pagination,
-} from "nestjs-typeorm-paginate";
+import { paginate, PaginateQuery } from "nestjs-paginate";
 import { VoteAnswerDto } from "../vote/dto/vote-answer.dto";
 import { VoteService } from "../vote/vote.service";
 import { VoteType } from "../enums/vote-type.enum";
 import { ApproveAnswerDto } from "./dto/approve-answer.dto";
 import { message } from "../constants/message.constants";
+import { answerPaginateConfig } from "../config/pagination/answer-pagination.config";
 
 @Injectable()
 export class AnswerService {
@@ -28,14 +25,10 @@ export class AnswerService {
    *
    * @param questionId - The ID of the question to filter answers.
    * @param userId
-   * @param options - Pagination options.
+   * @param query
    * @returns Paginated list of answers.
    */
-  async find(
-    questionId: string,
-    userId: string,
-    options: IPaginationOptions,
-  ): Promise<Pagination<Answer>> {
+  async find(questionId: string, userId: string, query: PaginateQuery) {
     const queryBuilder = this.answerRepository.createQueryBuilder("answer");
     queryBuilder.innerJoinAndSelect("answer.user", "user");
     queryBuilder.innerJoinAndSelect("answer.question", "question");
@@ -45,13 +38,11 @@ export class AnswerService {
       "vote.user_id = :userId AND vote.answer_id = answer.id",
       { userId },
     );
-
     queryBuilder.where(
       questionId ? { question: { id: questionId } } : { id: "no_id" },
     );
-    queryBuilder.orderBy("answer.isApproved", "DESC");
 
-    return paginate<Answer>(queryBuilder, options);
+    return paginate<Answer>(query, queryBuilder, answerPaginateConfig);
   }
 
   /**

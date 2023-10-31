@@ -2,10 +2,7 @@ import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { Question } from "./entity/question.entity";
 import { CreateQuestionDto } from "./dto/create-question.dto";
-import {
-  IPaginationOptions,
-  paginateRawAndEntities,
-} from "nestjs-typeorm-paginate";
+import { paginate, PaginateQuery } from "nestjs-paginate";
 import { UpdateQuestionDto } from "./dto/update-question.dto";
 import { plainToClass } from "class-transformer";
 import { VoteType } from "../enums/vote-type.enum";
@@ -13,6 +10,7 @@ import { VoteService } from "../vote/vote.service";
 import { VoteQuestionDto } from "../vote/dto/vote-question.dto";
 import { message } from "../constants/message.constants";
 import { TagService } from "../tag/tag.service";
+import { questionPaginateConfig } from "../config/pagination/question-pagination.config";
 
 @Injectable()
 export class QuestionService {
@@ -26,45 +24,17 @@ export class QuestionService {
   /**
    * Find questions based on pagination options.
    *
-   * @param options - Pagination options.
+   * @param query - Pagination options.
    * @returns A paginated list of questions.
    */
-  async find(options: IPaginationOptions) {
+  async find(query: PaginateQuery) {
     const queryBuilder = this.questionRepository.createQueryBuilder("question");
-    queryBuilder
-      .select([
-        "question.id",
-        "question.title",
-        "question.content",
-        "question.views",
-        "question.votes",
-        "question.createdAt",
-        "question.updatedAt",
-        "user.id",
-        "user.username",
-        "user.fullname",
-        "user.avatar",
-        "user.dob",
-        "user.email",
-        "user.role",
-        "COUNT(answer.id) as countAnswer",
-      ])
-      .innerJoin("question.user", "user")
-      .leftJoin("question.answers", "answer")
-      .groupBy("question.id, user.id");
 
-    const [pagination, rawResults] = await paginateRawAndEntities<Question>(
+    return await paginate<Question>(
+      query,
       queryBuilder,
-      options,
+      questionPaginateConfig,
     );
-    pagination.items.map((item, index) => {
-      const check = rawResults.find((raw: any) => raw.question_id === item.id);
-      if (check) {
-        item["answersNumber"] = rawResults[index]["countAnswer"];
-      }
-    });
-
-    return pagination;
   }
 
   /**

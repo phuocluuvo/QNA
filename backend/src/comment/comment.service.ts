@@ -1,16 +1,13 @@
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { Comment } from "./entity/comment.entity";
-import {
-  IPaginationOptions,
-  paginate,
-  Pagination,
-} from "nestjs-typeorm-paginate";
+import { paginate, PaginateQuery } from "nestjs-paginate";
 import { plainToClass } from "class-transformer";
 import { CreateCommentDto } from "./dto/create-comment.dto";
 import { UpdateAnswerDto } from "../answer/dto/update-answer.dto";
 import { UpdateCommentDto } from "./dto/update-comment.dto";
 import { message } from "../constants/message.constants";
+import { commentPaginateConfig } from "../config/pagination/comment-pagination";
 
 @Injectable()
 export class CommentService {
@@ -23,21 +20,17 @@ export class CommentService {
    * Find comment based on answerId and paginate the results.
    *
    * @param answerId - The ID of the question to filter comment.
-   * @param options - Pagination options.
+   * @param query
    * @returns Paginated list of comment.
    */
-  async find(
-    answerId: string,
-    options: IPaginationOptions,
-  ): Promise<Pagination<Comment>> {
+  async find(answerId: string, query: PaginateQuery) {
     const queryBuilder = this.commentRepository.createQueryBuilder("comment");
     queryBuilder.innerJoinAndSelect("comment.user", "user");
     queryBuilder.where(
       answerId ? { answer: { id: answerId } } : { id: "no_id" },
     );
-    queryBuilder.orderBy("comment.createdAt", "ASC");
 
-    return paginate<Comment>(queryBuilder, options);
+    return paginate<Comment>(query, queryBuilder, commentPaginateConfig);
   }
 
   /**
