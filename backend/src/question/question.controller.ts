@@ -67,7 +67,7 @@ export class QuestionController {
   @UseGuards(PublicGuard)
   async findOneById(@Param("id") id: string, @Req() req: Request) {
     const userId = req.user["sub"];
-    return this.questionService.getAndIncreaseViewCount(id, userId);
+    return this.questionService.getQuestionAndIncreaseViewCount(id, userId);
   }
 
   /**

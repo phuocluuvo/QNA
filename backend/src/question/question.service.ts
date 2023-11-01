@@ -29,7 +29,6 @@ export class QuestionService {
    */
   async find(query: PaginateQuery) {
     const queryBuilder = this.questionRepository.createQueryBuilder("question");
-
     return await paginate<Question>(
       query,
       queryBuilder,
@@ -120,34 +119,29 @@ export class QuestionService {
    * @returns The question with an increased view count.
    * @throws NotFoundException if the question does not exist.
    */
-  async getAndIncreaseViewCount(
+  async getQuestionAndIncreaseViewCount(
     questionId: string,
     userId: string,
   ): Promise<Question> {
-    const question = await this.questionRepository.findOne({
-      where: { id: questionId },
-      relations: ["user"],
-    });
-
-    if (!question) {
-      throw new NotFoundException(message.NOT_FOUND.QUESTION);
-    }
-
-    question.views += 1;
-    const result = await this.questionRepository.save(question);
-    result.vote = [];
-
-    if (userId) {
-      const voteInfo = await this.voteService.getVote({
-        user: { id: userId },
-        question: { id: questionId },
+    try {
+      const question = await this.questionRepository.findOne({
+        where: { id: questionId },
+        relations: ["user", "tags"],
       });
-
-      if (voteInfo) {
-        result.vote.push(voteInfo);
+      if (!question) {
+        throw new NotFoundException(message.NOT_FOUND.QUESTION);
       }
+      return await this.increaseViewCount(question, userId);
+    } catch (error) {
+      const question = await this.questionRepository.findOne({
+        where: { id: questionId },
+        relations: ["user"],
+      });
+      if (!question) {
+        throw new NotFoundException(message.NOT_FOUND.QUESTION);
+      }
+      return await this.increaseViewCount(question, userId);
     }
-    return result;
   }
 
   /**
@@ -184,5 +178,23 @@ export class QuestionService {
     } catch (error) {
       throw new Error("Error updating vote");
     }
+  }
+
+  private async increaseViewCount(question: Question, userId: string) {
+    question.views += 1;
+    const result = await this.questionRepository.save(question);
+    result.vote = [];
+
+    if (userId) {
+      const voteInfo = await this.voteService.getVote({
+        user: { id: userId },
+        question: { id: question.id },
+      });
+
+      if (voteInfo) {
+        result.vote.push(voteInfo);
+      }
+    }
+    return result;
   }
 }
