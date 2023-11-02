@@ -27,8 +27,23 @@ export class QuestionService {
    * @param query - Pagination options.
    * @returns A paginated list of questions.
    */
-  async find(query: PaginateQuery) {
+  async find(query: PaginateQuery, tagNames: string) {
+    const tags = tagNames ? tagNames.split(",") : [];
     const queryBuilder = this.questionRepository.createQueryBuilder("question");
+
+    const subQuery = `
+    COALESCE(
+        (SELECT JSON_ARRAYAGG(t.name)
+         FROM tag AS t
+         JOIN question_tag AS qt ON t.id = qt.tag_id
+         WHERE qt.question_id = question.id),
+        JSON_ARRAY()
+      )
+      `;
+    queryBuilder.where(`JSON_CONTAINS( ${subQuery}, :tags)`, {
+      tags: JSON.stringify(tags),
+    });
+
     return await paginate<Question>(
       query,
       queryBuilder,
@@ -88,14 +103,18 @@ export class QuestionService {
     const questionTrans = plainToClass(UpdateQuestionDto, questionDto, {
       excludeExtraneousValues: true,
     });
-    questionTrans["tags"] = await this.tagService.checkAndTransTags(
-      questionDto.tag_ids ? questionDto.tag_ids : [],
-    );
+
+    if (questionDto.tag_ids) {
+      questionTrans["tags"] = await this.tagService.checkAndTransTags(
+        questionDto.tag_ids ? questionDto.tag_ids : [],
+      );
+    }
 
     const question = await this.questionRepository.preload({
-      id,
+      id: id,
       ...questionTrans,
     });
+    delete question.tagNames;
 
     return this.questionRepository.save(question);
   }

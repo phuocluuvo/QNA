@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from "@nestjs/common";
@@ -44,13 +45,17 @@ export class QuestionController {
    *
    * @returns Promise<Pagination<Question>> Paginated list of questions.
    * @param query
+   * @param tagNames
    */
   @ApiOkPaginatedResponse(Question, questionPaginateConfig)
   @ApiPaginationQuery(questionPaginateConfig)
   @Get()
   @UseGuards()
-  find(@Paginate() query: PaginateQuery) {
-    return this.questionService.find(query);
+  find(
+    @Paginate() query: PaginateQuery,
+    @Query("filter.tags") tagNames: string,
+  ) {
+    return this.questionService.find(query, tagNames);
   }
 
   /**
