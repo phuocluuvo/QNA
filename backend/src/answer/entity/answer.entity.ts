@@ -7,6 +7,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  VirtualColumn,
 } from "typeorm";
 import { User } from "../../users/entity/users.entity";
 import { Question } from "../../question/entity/question.entity";
@@ -27,6 +28,14 @@ export class Answer {
   @Column({ name: "is_approved", default: false })
   isApproved: boolean;
 
+  @CreateDateColumn({ name: "created_at" })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: "updated_at" })
+  updatedAt: Date;
+
+  // Relations
+
   @ManyToOne(() => Question, (question) => question.answers, {
     onDelete: "CASCADE",
   })
@@ -45,9 +54,11 @@ export class Answer {
   @OneToMany(() => Comment, (comment) => comment.answer)
   comments: Comment[];
 
-  @CreateDateColumn({ name: "created_at" })
-  createdAt: Date;
+  //Virtual Columns
 
-  @UpdateDateColumn({ name: "updated_at" })
-  updatedAt: Date;
+  @VirtualColumn({
+    query: (alias) =>
+      `SELECT COUNT(*) FROM comment WHERE comment.answer_id = ${alias}.id`,
+  })
+  commentsNumber: number;
 }

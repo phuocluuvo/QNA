@@ -30,18 +30,18 @@ export class AnswerService {
    */
   async find(questionId: string, userId: string, query: PaginateQuery) {
     const queryBuilder = this.answerRepository.createQueryBuilder("answer");
-    queryBuilder.innerJoinAndSelect("answer.user", "user");
-    queryBuilder.innerJoinAndSelect("answer.question", "question");
+    queryBuilder.leftJoinAndSelect("answer.user", "user");
+    queryBuilder.leftJoinAndSelect("answer.question", "question");
     queryBuilder.leftJoinAndSelect(
       "answer.vote",
       "vote",
       "vote.user_id = :userId AND vote.answer_id = answer.id",
       { userId },
     );
+    queryBuilder.leftJoinAndSelect("answer.comments", "comment");
     queryBuilder.where(
       questionId ? { question: { id: questionId } } : { id: "no_id" },
     );
-
     return paginate<Answer>(query, queryBuilder, answerPaginateConfig);
   }
 
