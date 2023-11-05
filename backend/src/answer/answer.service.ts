@@ -39,6 +39,8 @@ export class AnswerService {
       { userId },
     );
     queryBuilder.leftJoinAndSelect("answer.comments", "comment");
+    queryBuilder.leftJoinAndSelect("comment.user", "commentUser");
+
     queryBuilder.where(
       questionId ? { question: { id: questionId } } : { id: "no_id" },
     );
