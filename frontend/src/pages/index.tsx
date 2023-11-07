@@ -2,13 +2,18 @@ import Head from "next/head";
 import { Fragment, useEffect, useState } from "react";
 import { clientNamespaces } from "ni18n";
 import {
+  Box,
   Button,
+  Collapse,
   Flex,
   HStack,
-  Select,
+  Heading,
+  IconButton,
   Spacer,
+  Text,
   VStack,
   useColorMode,
+  useDisclosure,
 } from "@chakra-ui/react";
 import QuestionItem from "@/components/QuestionItem";
 import TabsQuestion from "@/components/TabsQuestion";
@@ -18,6 +23,18 @@ import { QuestionListType } from "@/util/type/Question.type";
 import { useRouter } from "next/router";
 import { Colors } from "@/assets/constant/Colors";
 import SelectOptions from "@/components/SelectOptions";
+import { LanguageHelper } from "@/util/Language/Language.util";
+import { Pages } from "@/assets/constant/Pages";
+import FilterColumn from "@/components/FilterColumn";
+import { BiFilter, BiFilterAlt } from "react-icons/bi";
+import { GetQuesionParams } from "@/API/type/params/Question.params";
+import {
+  SORT_DATA_EN,
+  SORT_DATA_VI,
+  SORT_ORDER_DATA_EN,
+  SORT_ORDER_DATA_VI,
+} from "@/assets/constant/Filter.data";
+import TagList from "@/components/TagList";
 const limitations = [5, 10, 15, 20];
 
 export default function Home() {
@@ -30,36 +47,79 @@ export default function Home() {
   const router = useRouter();
   const query = router.query;
   const pageNumber = Number(query.page);
+  const filter = query.select;
   const limit = Number(query.limit)
     ? Number(query.limit)
     : (questionList?.meta.itemsPerPage as number);
   const numberOfPages: number[] = [...Array(questionList?.meta.totalPages)];
+
+  const { getTranslate, getCurrentLanguage } = LanguageHelper(Pages.HOME);
+  const [valueSort, setValueSort] = useState("title");
+  const [isDecending, setIsDecending] = useState("ASC");
+  const { isOpen, onToggle } = useDisclosure();
   useEffect(() => {
+    const defaultLimit = 10;
+    const defaultPage = 1;
+    const defaultSortBy = "title";
+    const defaultOrderBy = "ASC";
+
+    const queryParams: GetQuesionParams = {
+      limit: limit || defaultLimit,
+      page: pageNumber || defaultPage,
+      ...(router.query.select && {
+        "filter.type": `$eq:${router.query.select}`,
+      }),
+      sortBy: router.query.sortBy
+        ? `${router.query.sortBy}:${router.query.orderBy || defaultOrderBy}`
+        : `${defaultSortBy}:${defaultOrderBy}`,
+    };
+
+    setValueSort((router.query.sortBy as string) ?? "title");
+    setIsDecending((router.query.orderBy as string) ?? "ASC");
+
     dispatch(
       // @ts-ignore
       actionGetQuestionList(
-        {
-          limit: limit ? limit : 10,
-          page: pageNumber ? pageNumber : 1,
-        },
+        queryParams,
         (res: QuestionListType) => {
           setQuestionList(res);
+        },
+        () => {
+          console.log("error");
         }
       )
     );
-  }, [router.query.limit, router.query.page]);
+  }, [router.query]);
   useEffect(() => {
     setHydrated(true);
   }, []);
   if (!hydrated) {
-    // Returns null on first render, so the client and server match
     return null;
   }
-
+  const QuestionNumberTitle = () => {
+    return (
+      questionList?.meta &&
+      (questionList.meta.totalItems > 0
+        ? getTranslate("THERE_ARE_QUESTIONS").replace(
+            "{0}",
+            questionList.meta.totalItems.toString() ?? "0"
+          )
+        : getTranslate("THERE_IS_QUESTION").replace(
+            "{0}",
+            questionList.meta.totalItems.toString() ?? "0"
+          ))
+    );
+  };
   const pageNumClick = (pageNumber: number, limit: number) => {
     router.push({
       pathname: router.pathname,
       query: { ...router.query, limit: limit, page: pageNumber },
+    });
+  };
+  const applyFilter = () => {
+    router.push({
+      pathname: router.pathname,
+      query: { ...router.query, sortBy: valueSort, orderBy: isDecending },
     });
   };
   return (
@@ -72,33 +132,109 @@ export default function Home() {
         />
         <link rel="icon" href="/images/favicon.ico" sizes="any" />
       </Head>
-      <HStack
-        spacing={3}
-        px={{ base: 0, md: 10 }}
+      <Flex
+        gap={3}
+        px={{ base: 5, md: 10 }}
         height={"full"}
         w={"full"}
+        direction={{ base: "column", md: "row" }}
         alignItems={"flex-start"}
         justifyContent={"flex-start"}
       >
         <VStack alignItems={"end"} flex={{ base: 1, md: 0.8 }}>
-          <SelectOptions
-            containerStyle={{
-              fontSize: "xs",
-              variant: "filled",
-              w: "fit-content",
-            }}
-            onSelect={(e) => {
-              router.push({
-                pathname: router.pathname,
-                query: { ...router.query, sort: e.target.value },
-              });
-            }}
-          />
-          <Flex alignItems={"start"} justifyContent={"start"} wrap={"wrap"}>
+          <HStack
+            w={"full"}
+            justifyContent={"space-between"}
+            alignItems={"flex-start"}
+          >
+            <VStack alignItems={"start"}>
+              <Heading size={"lg"} fontWeight={"medium"}>
+                {getTranslate("ALL_QUESTION")}
+              </Heading>
+              <Text>{QuestionNumberTitle()}</Text>
+            </VStack>
+            <VStack flex={1} alignItems={"flex-end"}>
+              <HStack>
+                <SelectOptions
+                  getTranslate={getTranslate}
+                  containerStyle={{
+                    fontSize: "xs",
+                    variant: "filled",
+                    w: "fit-content",
+                  }}
+                  onSelect={(e) => {
+                    router.push({
+                      pathname: router.pathname,
+                      query: { ...router.query, select: e.target.value },
+                    });
+                  }}
+                />
+                <Button
+                  aria-label="Search database"
+                  leftIcon={<BiFilterAlt />}
+                  onClick={onToggle}
+                >
+                  {getTranslate("FILTER")}
+                </Button>
+              </HStack>
+            </VStack>
+          </HStack>
+          <Collapse in={isOpen} animateOpacity>
+            <VStack w={"full"} alignItems={"flex-end"}>
+              <HStack
+                spacing={10}
+                p="20px 40px"
+                color="white"
+                w={"full"}
+                bg={Colors(colorMode === "dark").PRIMARY_BG}
+                rounded="md"
+                shadow="md"
+                justifyContent={"start"}
+                alignItems={"start"}
+              >
+                <FilterColumn
+                  title={getTranslate("ORDER_BY")}
+                  value={isDecending}
+                  setValue={setIsDecending}
+                  defaultValue={(router.query.orderBy as string) ?? "ASC"}
+                  dataList={
+                    getCurrentLanguage().code === "en"
+                      ? SORT_ORDER_DATA_EN
+                      : SORT_ORDER_DATA_VI
+                  }
+                />
+
+                <FilterColumn
+                  title={getTranslate("SORT_BY")}
+                  value={valueSort}
+                  defaultValue={(router.query.sortBy as string) ?? "title"}
+                  setValue={setValueSort}
+                  dataList={
+                    getCurrentLanguage().code === "en"
+                      ? SORT_DATA_EN
+                      : SORT_DATA_VI
+                  }
+                />
+              </HStack>
+              <Button
+                size={"sm"}
+                variant={"main_button"}
+                onClick={() => applyFilter()}
+              >
+                {"APPLY"}
+              </Button>
+            </VStack>
+          </Collapse>
+          <Flex
+            alignItems={"start"}
+            w={"full"}
+            justifyContent={"start"}
+            wrap={"wrap"}
+          >
             <Flex
               alignItems={"center"}
               justifyContent={"center"}
-              mb={10}
+              mb={{ base: 3, md: 10 }}
               w={"full"}
             >
               <HStack spacing={3}>
@@ -107,8 +243,7 @@ export default function Home() {
                     numberOfPages.map((_, index) => (
                       <Button
                         key={index}
-                        w={10}
-                        h={10}
+                        size={"xs"}
                         variant={"outline"}
                         bg={
                           pageNumber
@@ -140,6 +275,7 @@ export default function Home() {
                 {limitations.map((_limit, index) => (
                   <Button
                     key={index}
+                    size={"xs"}
                     alignItems={"center"}
                     justifyContent={"center"}
                     _hover={{
@@ -158,11 +294,11 @@ export default function Home() {
                 ))}
               </HStack>
             </Flex>
-            {questionList?.items.map((question, index) => (
+            {questionList?.data.map((question, index) => (
               <QuestionItem
                 key={index}
                 question={question}
-                isLast={index === questionList?.items.length - 1}
+                isLast={index === questionList?.data.length - 1}
                 isDarkMode={colorMode === "dark"}
               />
             ))}
@@ -179,8 +315,7 @@ export default function Home() {
                     numberOfPages.map((_, index) => (
                       <Button
                         key={index}
-                        w={10}
-                        h={10}
+                        size={"xs"}
                         variant={"outline"}
                         bg={
                           pageNumber
@@ -217,6 +352,7 @@ export default function Home() {
                     _hover={{
                       color: Colors(colorMode === "dark").PRIMARY,
                     }}
+                    size={"xs"}
                     color={
                       limit === _limit
                         ? Colors(colorMode === "dark").PRIMARY
@@ -232,16 +368,34 @@ export default function Home() {
             </Flex>
           </Flex>
         </VStack>
-
-        <TabsQuestion
-          containerStyles={{
-            pos: "sticky",
+        <VStack
+          flex={{ base: 1, md: 0.2 }}
+          w={"full"}
+          style={{
+            position: "sticky",
             top: "11%",
-            flex: { base: 0, md: 0.2 },
-            display: { base: "none", md: "flex" },
           }}
-        />
-      </HStack>
+          p={0}
+          m={0}
+        >
+          <TabsQuestion
+            router={router}
+            getTranslate={getTranslate}
+            containerStyles={{
+              flex: 1,
+            }}
+          />
+          <TagList
+            router={router}
+            getTranslate={getTranslate}
+            containerStyles={{
+              flex: 1,
+              w: "full",
+              my: 5,
+            }}
+          />
+        </VStack>
+      </Flex>
     </Fragment>
   );
 }

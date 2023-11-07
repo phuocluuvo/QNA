@@ -1,15 +1,29 @@
 import React from "react";
 import {
+  Box,
   Button,
+  Collapse,
   Container,
   FormControl,
   FormErrorMessage,
   FormLabel,
   HStack,
+  IconButton,
   Input,
   InputGroup,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Tag,
   Text,
+  Tooltip,
+  VStack,
   useColorMode,
+  useDisclosure,
 } from "@chakra-ui/react";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import dynamic from "next/dynamic";
@@ -21,17 +35,41 @@ import actionCreateQuestion from "@/API/redux/actions/question/ActionCreateQuest
 import useAxiosAuth from "@/hooks/useAxiosAuth";
 import { url } from "@/API/api/url";
 import { useRouter } from "next/router";
+import { TagType } from "@/util/type/Tag.type";
+import actionSearchTags from "@/API/redux/actions/tags/ActionSearchTag";
+import _ from "lodash";
+import { CloseIcon } from "@chakra-ui/icons";
+import { LanguageHelper } from "@/util/Language/Language.util";
+import { Pages } from "@/assets/constant/Pages";
+import { FormCreateQuestion } from "@/API/type/Form.type";
+import actionCreateTag from "@/API/redux/actions/tags/ActionCreateTag";
+import actionGetQuestion from "@/API/redux/actions/question/ActionGetQuestion";
+import actionUpdateQuestion from "@/API/redux/actions/question/ActionUpdateQuesiton";
+import { signIn, useSession } from "next-auth/react";
 type State = {
   title: string;
   bodyQuestion: string;
+  resultsTagIds: Set<TagType>;
+  searchTagId: string;
+  selectedTags?: Set<TagType>;
+  tagName?: string;
+  tagContent?: string;
 };
 function CreateQuestion() {
   const [state, setState] = useStateWithCallback<State>({
     title: "",
     bodyQuestion: "",
+    searchTagId: "",
+    resultsTagIds: new Set(),
+    selectedTags: new Set(),
+    tagName: "",
+    tagContent: "",
   });
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const finalRef = React.useRef(null);
   const route = useRouter();
   const axiosAuth = useAxiosAuth();
+  const session = useSession();
   const { colorMode } = useColorMode();
   const dispacth = useDispatch();
   const handleChangeBodyQuestion = (value: string) => {
@@ -41,6 +79,7 @@ function CreateQuestion() {
     );
   };
 
+  const { getTranslate } = LanguageHelper(Pages.HOME);
   const validateTitle = (value: string) => {
     let error;
     if (!value) {
@@ -52,36 +91,168 @@ function CreateQuestion() {
     }
     return error;
   };
-
-  const createQuestionHandle = (
-    values: State,
-    actions: FormikHelpers<State>
-  ) => {
-    let form = {
-      title: values.title,
-      content: state.bodyQuestion,
-    };
-    setTimeout(async () => {
-      // const res = await axiosAuth.post(url.QUESTION, form);
-      // console.log("actionCreateQuestion: ", res.data);
+  React.useEffect(() => {
+    if (route.query.questionId) {
       dispacth(
-        actionCreateQuestion(
-          form,
+        actionGetQuestion(
+          { id: route.query.questionId as string },
           (res) => {
-            console.log("actionCreateQuestion: ", res);
-            route.push(`/question/${res.id}`);
+            console.log("actionGetQuestion", res);
+            setState(
+              // @ts-ignore
+              (oldState) =>
+                helper.mappingState(oldState, {
+                  selectedTags: new Set(res.tags),
+                  title: res.title,
+                  bodyQuestion: res.content,
+                }),
+              ({ selectedTags }) => console.log("selectedTags", selectedTags)
+            );
           },
           () => {}
         )
       );
+    }
+  }, []);
+  const searchTag = (value: string) => {
+    if (value) {
+      dispacth(
+        actionSearchTags(
+          value,
+          (res: { data: TagType[] }) => {
+            setState(
+              // @ts-ignore
+              (oldState) =>
+                helper.mappingState(oldState, {
+                  resultsTagIds: new Set(res.data),
+                }),
+              ({ resultsTagIds }) => console.log("resultsTagIds", resultsTagIds)
+            );
+          },
+          () => {}
+        )
+      );
+    }
+  };
+  const debouncedSearchTag = _.debounce((value) => {
+    searchTag(value);
+  }, 500);
+  const addTagHandle = (tag: TagType) => {
+    setState(
+      // @ts-ignore
+      (oldState) =>
+        helper.mappingState(oldState, {
+          selectedTags: oldState.selectedTags?.add(tag),
+        }),
+      ({ selectedTags }) => console.log("selectedTags", selectedTags)
+    );
+  };
+  const removeTagHandle = (tag: TagType) => {
+    setState(
+      // @ts-ignore
+      (oldState) =>
+        helper.mappingState(oldState, {
+          selectedTags: new Set(
+            // @ts-ignore
+            Array.from(oldState.selectedTags).filter(
+              (item) => item.id !== tag.id
+            )
+          ),
+        }),
+      ({ selectedTags }) => console.log("selectedTags", selectedTags)
+    );
+  };
+  const searchTagHandle = (value: string) => {
+    // @ts-ignore
+    setState((oldState) =>
+      helper.mappingState(oldState, { searchTagId: value })
+    );
+
+    // Use the debounced function
+    debouncedSearchTag(value);
+  };
+  const createTagHandle = () => {
+    let form = {
+      name: state.tagName ?? "unknown",
+      content: state.tagContent ?? "no-content",
+    };
+    dispacth(
+      actionCreateTag(
+        form,
+        (res) => {
+          console.log("createTagHandle", res);
+          setState(
+            // @ts-ignore
+            (oldState) =>
+              helper.mappingState(oldState, {
+                selectedTags: oldState.selectedTags?.add(res.data),
+              }),
+            ({ selectedTags }) => {
+              console.log("selectedTags", selectedTags);
+              onClose();
+            }
+          );
+        },
+        () => {
+          onClose();
+        }
+      )
+    );
+  };
+  const createQuestionHandle = (
+    values: State,
+    actions: FormikHelpers<State>
+  ) => {
+    let selectedTags = new Array<string>();
+
+    state.selectedTags?.forEach((tag) => {
+      selectedTags.push(tag.id as string);
+    });
+
+    let form: FormCreateQuestion = {
+      title: values.title,
+      content: state.bodyQuestion,
+      tag_ids: selectedTags,
+    };
+    setTimeout(async () => {
+      console.log("form", form);
+      if (route.query.questionId)
+        dispacth(
+          actionUpdateQuestion(
+            form,
+            route.query.questionId as string,
+            (res) => {
+              console.log("action updateQuestion: ", res);
+              route.push(`/question/${res.id}`);
+            },
+            () => {}
+          )
+        );
+      else
+        dispacth(
+          actionCreateQuestion(
+            form,
+            (res) => {
+              console.log("actionCreateQuestion: ", res);
+              route.push(`/question/${res.id}`);
+            },
+            () => {}
+          )
+        );
+
       actions.setSubmitting(false);
     }, 1000);
   };
   return (
     <Container my={0} minW={{ lg: "70%", base: "90%" }} maxH={"30vh"}>
       <Formik
-        initialValues={{ title: "", bodyQuestion: "" }}
+        initialValues={{
+          title: state.title,
+          bodyQuestion: state.bodyQuestion,
+          resultsTagIds: [],
+        }}
         onSubmit={(values, actions) => {
+          // @ts-ignore
           createQuestionHandle(values, actions);
         }}
       >
@@ -100,15 +271,163 @@ function CreateQuestion() {
                         another person
                       </Text>
                     </FormLabel>
-
                     <Input
                       {...field}
                       id="title"
                       placeholder="title"
                       type="text"
                       required
+                      value={state.title}
+                      onChange={(e) => {
+                        // @ts-ignore
+                        setState((oldState) =>
+                          helper.mappingState(oldState, {
+                            title: e.target.value,
+                          })
+                        );
+                      }}
                     />
                     <FormErrorMessage>{form.errors.title}</FormErrorMessage>
+                  </FormControl>
+                )}
+              </Field>
+              <Field name="resultsTagIds">
+                {({ field, form }: any) => (
+                  <FormControl
+                    isInvalid={
+                      form.errors.resultsTagIds && form.touched.resultsTagIds
+                    }
+                  >
+                    <FormLabel>
+                      Tags*
+                      <Text fontSize="sm" color="gray.500">
+                        Add up to 5 tags to describe what your question is about
+                      </Text>
+                    </FormLabel>
+                    <HStack
+                      style={{
+                        border: "2px solid",
+                        borderColor:
+                          state.selectedTags && state.selectedTags.size > 0
+                            ? "lightgray"
+                            : "tomato",
+                        borderRadius: "7px",
+                        padding: "6px 15px",
+                        transition: "all 0.2s ease-in-out",
+                      }}
+                    >
+                      {state.selectedTags && state.selectedTags.size > 0
+                        ? Array.from(state.selectedTags).map((tag) => (
+                            <Tag
+                              size={"md"}
+                              variant="solid"
+                              colorScheme="orange"
+                              cursor={"pointer"}
+                              display={"flex"}
+                            >
+                              <Text
+                                minW={"fit-content"}
+                                fontSize={"xs"}
+                                flex={"1"}
+                                noOfLines={1}
+                              >
+                                {tag.name}
+                              </Text>
+                              <IconButton
+                                variant={"ghost"}
+                                colorScheme="orange"
+                                _hover={{
+                                  bg: "transparent",
+                                  color: "whiteAlpha.700",
+                                }}
+                                aria-label="delete"
+                                size="xs"
+                                onClick={() => {
+                                  removeTagHandle(tag);
+                                }}
+                                icon={<CloseIcon />}
+                              />
+                            </Tag>
+                          ))
+                        : null}
+                      <Input
+                        {...field}
+                        variant={"unstyled"}
+                        id="resultsTagIds"
+                        placeholder="Search a tag"
+                        type="text"
+                        value={state.searchTagId}
+                        onChange={(e) => {
+                          searchTagHandle(e.target.value);
+                        }}
+                      />
+                    </HStack>
+                    {/* resutl search */}
+                    <Collapse in={state.searchTagId.length > 0} animateOpacity>
+                      <Box
+                        overflowY={"auto"}
+                        overflowX={"hidden"}
+                        mt={"2"}
+                        maxHeight={450}
+                        w={"full"}
+                        border={"1px solid"}
+                        borderColor={
+                          colorMode === "light" ? "gray.200" : "gray.700"
+                        }
+                        borderRadius={"5px"}
+                        p={"2"}
+                      >
+                        {state.resultsTagIds && state.resultsTagIds.size > 0 ? (
+                          Array.from(state.resultsTagIds).map((tag) => (
+                            <Tooltip
+                              key={tag.id}
+                              label={
+                                tag.content ||
+                                "No content yet. Need update later"
+                              }
+                              hasArrow
+                              arrowPadding={5}
+                            >
+                              <Tag
+                                size={"md"}
+                                variant="solid"
+                                colorScheme="orange"
+                                cursor={"pointer"}
+                                onClick={() => {
+                                  addTagHandle(tag);
+                                }}
+                              >
+                                {tag.name}
+                              </Tag>
+                            </Tooltip>
+                          ))
+                        ) : (
+                          <Text fontSize={"sm"} color={"gray.500"}>
+                            No results found. Do you want to create a '
+                            {state.searchTagId}' tag?{" "}
+                            <Button
+                              variant={"link"}
+                              colorScheme={"orange"}
+                              onClick={() => {
+                                setState(
+                                  // @ts-ignore
+                                  (oldState) =>
+                                    helper.mappingState(oldState, {
+                                      tagName: state.searchTagId,
+                                    }),
+                                  () => onOpen()
+                                );
+                              }}
+                            >
+                              Create new tag
+                            </Button>
+                          </Text>
+                        )}
+                      </Box>
+                    </Collapse>
+                    <FormErrorMessage>
+                      {form.errors.resultsTagIds}
+                    </FormErrorMessage>
                   </FormControl>
                 )}
               </Field>
@@ -175,12 +494,6 @@ function CreateQuestion() {
                       tabIndex={1}
                     />
                     <FormErrorMessage>{form.errors.body}</FormErrorMessage>
-                    {/* <Box
-                        className="product-des"
-                        dangerouslySetInnerHTML={{
-                          __html: state.bodyQuestion,
-                        }}
-                      ></Box> */}
                   </FormControl>
                 )}
               </Field>
@@ -193,12 +506,69 @@ function CreateQuestion() {
                 border={"none"}
                 isLoading={props.isSubmitting}
               >
-                Submit
+                {route.query.questionId
+                  ? getTranslate("UPDATE")
+                  : getTranslate("CREATE")}
               </Button>
             </HStack>
           </Form>
         )}
       </Formik>
+      <Modal finalFocusRef={finalRef} isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Create a tag</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text fontSize={"sm"} color={"gray.500"}>
+              Please enter a tag name.
+            </Text>
+            <Input
+              id="name-tag"
+              placeholder="Enter name"
+              type="text"
+              value={state.tagName}
+              onChange={(e) => {
+                // @ts-ignore
+                setState((oldState) =>
+                  helper.mappingState(oldState, { tagName: e.target.value })
+                );
+              }}
+              required
+            />
+            <Text fontSize={"sm"} color={"gray.500"}>
+              Please enter a tag description
+            </Text>
+            <Input
+              id="content-tag"
+              placeholder="Enter content"
+              type="text"
+              value={state.tagContent}
+              onChange={(e) => {
+                // @ts-ignore
+                setState((oldState) =>
+                  helper.mappingState(oldState, { tagContent: e.target.value })
+                );
+              }}
+              required
+            />
+          </ModalBody>
+
+          <ModalFooter>
+            <Button variant={"ghost"} mr={3} onClick={onClose}>
+              Close
+            </Button>
+            <Button
+              colorScheme="orange"
+              onClick={() => {
+                createTagHandle();
+              }}
+            >
+              Create
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Container>
   );
 }

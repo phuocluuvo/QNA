@@ -4,7 +4,6 @@ import { Pages } from "@/assets/constant/Pages";
 import AnswerEditor from "@/components/AnswerEditor";
 import AnswerItem from "@/components/AnswerItem";
 import Author from "@/components/Author";
-import ErrorContent from "@/components/Error";
 import LinkButton from "@/components/LinkButton";
 import TagQuestion from "@/components/TagQuestion";
 import VoteButton from "@/components/VoteButton";
@@ -28,17 +27,16 @@ import {
   MenuItem,
   MenuList,
   Spacer,
+  Spinner,
   Text,
   VStack,
   useColorMode,
+  useDisclosure,
 } from "@chakra-ui/react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ni18nConfig } from "../../../../ni18n.config";
-import { clientNamespaces, loadTranslations } from "ni18n";
-import { GetStaticProps } from "next";
 import { ActionTypes } from "@/API/constant/ActionTypes.enum";
 import actionGetAnswer from "@/API/redux/actions/answer/actionGetAnswer";
 import { AnswerListType } from "@/util/type/Answer.type";
@@ -47,11 +45,11 @@ import actionVoteQuestion from "@/API/redux/actions/question/actionVoteQuestion"
 import { FormVote } from "@/API/type/Form.type";
 import { useSession } from "next-auth/react";
 import useStateWithCallback from "@/hooks/useStateWithCallback";
-import answerList from "@/util/mock/AnswareDataList.mock";
 
 function Question() {
   const { getTranslate } = LanguageHelper(Pages.HOME);
   const { colorMode } = useColorMode();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
   const { id } = router.query;
   const [hydrated, setHydrated] = useState(false);
@@ -68,7 +66,7 @@ function Question() {
       state.answerReducer.answerList
   );
   // @ts-ignore
-  let userData: UserType = null;
+  let userData: UserType = session.data?.user;
   let answerLoadType = useSelector(
     (state: { answerReducer: { type: ActionTypes } }) =>
       state.answerReducer.type
@@ -110,15 +108,30 @@ function Question() {
       actionVoteQuestion(
         form,
         (res) => {
-          setState(
-            // @ts-ignore
-            (oldState) => {
-              return helper.mappingState(oldState, {
-                count: res.votes,
-              });
-            }
-          );
-          fecthQuestionData(id);
+          console.log("vote question", res);
+          // unvoted
+          if (state.voteType === voteType) {
+            setState(
+              // @ts-ignore
+              (oldState) => {
+                return helper.mappingState(oldState, {
+                  count: res.votes,
+                  isVoted: false,
+                });
+              }
+            );
+          } else
+            setState(
+              // @ts-ignore
+              (oldState) => {
+                return helper.mappingState(oldState, {
+                  count: res.votes,
+                  isVoted: true,
+                  voteType: voteType,
+                });
+              }
+            );
+          // fecthQuestionData(id);
         },
         () => {
           // @ts-ignore
@@ -144,6 +157,8 @@ function Question() {
             helper.mappingState(oldState, {
               question: data,
               count: data.votes,
+              voteType: (data.vote.length > 0 && data.vote[0].voteType) || null,
+              isVoted: data.vote.length > 0,
             })
           );
           fecthAnswer();
@@ -195,8 +210,6 @@ function Question() {
 
   useEffect(() => {
     if (id) {
-      // @ts-ignore
-      userData = localStorage.getItem("userLogin");
       fecthQuestionData(id);
     }
   }, [id]);
@@ -205,11 +218,21 @@ function Question() {
     question: QuestionType;
     isDarkMode: boolean;
     answerList: AnswerListType;
+    voteType: VOTE;
+    isVoted: boolean;
   }>({
     count: 0,
     // @ts-ignore
     question: null,
     isDarkMode: colorMode === "dark",
+    isVoted: false,
+    voteType: VOTE.UPVOTE,
+  });
+  // @ts-ignore
+  const [editQuestion, setEditQuestion] = useState<QuestionType>({
+    title: "",
+    content: "",
+    tagNames: [""],
   });
   const isDarkMode = colorMode === "dark";
   useEffect(() => {
@@ -248,10 +271,7 @@ function Question() {
                   >
                     {/* up vote */}
                     <VoteButton
-                      isVoted={
-                        state.question.vote?.length > 0 &&
-                        state.question.vote.at(0)?.voteType === VOTE.UPVOTE
-                      }
+                      isVoted={state.isVoted && state.voteType === VOTE.UPVOTE}
                       isDarkMode={isDarkMode}
                       type="up"
                       onClick={() => voteQuestion(VOTE.UPVOTE)}
@@ -261,8 +281,7 @@ function Question() {
                     </Heading>
                     <VoteButton
                       isVoted={
-                        state.question.vote?.length > 0 &&
-                        state.question.vote.at(0)?.voteType === VOTE.DOWNVOTE
+                        state.isVoted && state.voteType === VOTE.DOWNVOTE
                       }
                       isDarkMode={isDarkMode}
                       type="down"
@@ -372,6 +391,22 @@ function Question() {
                             colorScheme="orange"
                             size={"sm"}
                             variant="link"
+                            onClick={() => {
+                              router.push(
+                                router.basePath +
+                                  `/question/create?questionId=${state.question.id}`
+                              );
+                              // setEditQuestion(
+                              //   // @ts-ignore
+                              //   (oldState) =>
+                              //     helper.mappingState(oldState, {
+                              //       title: state.question.title,
+                              //       content: parseLines(state.question.content),
+                              //       tagNames: state.question.tagNames,
+                              //     })
+                              // );
+                              // onOpen();
+                            }}
                           >
                             Edit
                           </Button>
@@ -397,7 +432,7 @@ function Question() {
                 />
                 <Box>
                   {state.answerList &&
-                    state.answerList?.items?.map((answer) => (
+                    state.answerList?.data?.map((answer) => (
                       <AnswerItem
                         key={answer.id}
                         answer={answer}
@@ -429,50 +464,6 @@ function Question() {
                 bg={Colors(colorMode === "dark").PRIMARY_BG}
               >
                 <Heading size={"sm"}>Related questions</Heading>
-                {/* {QuestionDataList.items.map(
-                  (question, index) =>
-                    index < 5 && (
-                      <Box
-                        key={index}
-                        style={{
-                          margin: "10px",
-                          marginBlock: "20px",
-                        }}
-                        width={{ base: "full", md: "300px" }}
-                      >
-                        <HStack alignItems={"center"}>
-                          <Box
-                            my={"auto"}
-                            p={2}
-                            rounded="5px"
-                            flex={0.2}
-                            backgroundColor={Colors(isDarkMode).PRIMARY}
-                          >
-                            <Text color={"white"}>{question.votes}</Text>
-                          </Box>
-                          <LinkButton
-                            text={question.title}
-                            href={`/question/${question.id}`}
-                            style={{
-                              width: "fit-content",
-                              mx: 0,
-                              px: 0,
-                              flex: 1,
-                            }}
-                            textStyle={{
-                              noOfLines: 2,
-                              textAlign: "left",
-                              maxW: "full",
-                              fontWeight: "normal",
-                            }}
-                            onClick={() =>
-                              router.push(`/question/${question.id}`)
-                            }
-                          />
-                        </HStack>
-                      </Box>
-                    )
-                )} */}
               </Box>
             </Flex>
           </Container>
@@ -493,8 +484,10 @@ function Question() {
             w={"full"}
             h={"full"}
             alignItems={"center"}
+            direction={"column"}
             justifyContent={"center"}
           >
+            <Spinner size={"xl"} />
             <Heading size={"lg"}>Loading...</Heading>
           </Flex>
         </Box>
