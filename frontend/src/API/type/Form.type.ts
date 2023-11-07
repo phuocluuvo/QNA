@@ -7,6 +7,7 @@ export type FormQuestion = {
 export type FormCreateQuestion = {
   title: string;
   content: string;
+  tag_ids: Array<string>;
 };
 export type FromUserLogin = {
   username: string;
@@ -43,4 +44,14 @@ export type FormApproveAnswer = {
 export type FormVoteAnswer = {
   answer_id: string;
   vote_type: VOTE;
+};
+
+export type FormCommentAnswer = {
+  answer_id: string;
+  content: string;
+};
+
+export type FormCreateTag = {
+  name: string;
+  content: string;
 };

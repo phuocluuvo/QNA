@@ -1,8 +1,10 @@
 import { url } from "./url";
 import {
   FormApproveAnswer,
+  FormCommentAnswer,
   FormCreateAnswer,
   FormCreateQuestion,
+  FormCreateTag,
   FormGetAnswer,
   FormQuestion,
   FormSignUp,
@@ -12,6 +14,9 @@ import {
 } from "../type/Form.type";
 import api, { AuthApi } from "./axios";
 import { REQUEST_METHOD } from "../type/Request.type";
+import { GetQuesionParams } from "../type/params/Question.params";
+import { GetCommentAnswerParams } from "../type/params/Comment.params";
+import { CommonParams } from "../type/params/Common.params";
 
 const requestSignUp = (form: FormSignUp) => {
   return api.post(url.SIGN_UP, form);
@@ -28,9 +33,9 @@ const getQuestion = (form: FormQuestion) => {
   return AuthApi(REQUEST_METHOD.GET, url.QUESTION + "/" + form.id.toString());
 };
 
-const getQuestionList = ({ page, limit }: { page: number; limit: number }) => {
+const getQuestionList = (params: GetQuesionParams) => {
   return api.get(url.QUESTION_LIST, {
-    params: { page: page, limit: limit },
+    params: params,
   });
 };
 
@@ -68,9 +73,28 @@ const getAnswerList = (form: FormGetAnswer) => {
 const approveAnswer = (form: FormApproveAnswer) => {
   return AuthApi(REQUEST_METHOD.POST, url.APPROVE_ANSWER, form);
 };
+const searchTags = (name: string) => {
+  return api.get(url.TAG, {
+    params: {
+      search: name,
+      searchBy: "name",
+      sortBy: "name",
+    },
+  });
+};
 
 const getTagByName = (name: string) => {
-  return api.get(url.TAG.replace("{name}", name));
+  return api.get(url.TAG.concat("/" + name));
+};
+
+const getTags = (form: CommonParams) => {
+  return api.get(url.TAG, {
+    params: form,
+  });
+};
+
+const createTag = (form: FormCreateTag) => {
+  return AuthApi(REQUEST_METHOD.POST, url.TAG, form);
 };
 
 const getUserDashBoard = () => {
@@ -80,6 +104,27 @@ const getUserDashBoard = () => {
 const voteAnswer = (form: FormVoteAnswer) => {
   return AuthApi(REQUEST_METHOD.POST, url.VOTE_ANSWER, form);
 };
+
+const createCommentAnswer = (form: FormCommentAnswer) => {
+  return AuthApi(REQUEST_METHOD.POST, url.COMMENT, form);
+};
+
+const getCommentAnswer = (params: GetCommentAnswerParams) => {
+  return AuthApi(REQUEST_METHOD.GET, url.COMMENT, params);
+};
+
+const updateQuestion = (form: FormCreateQuestion, questionId: string) => {
+  return AuthApi(
+    REQUEST_METHOD.PATCH,
+    url.QUESTION.concat("/" + questionId),
+    form
+  );
+};
+
+const getTag = (nameTag: string) => {
+  return api.get(url.TAG.concat("/" + nameTag));
+};
+
 export default {
   requestSignUp,
   getQuestion,
@@ -94,4 +139,11 @@ export default {
   getTagByName,
   getUserDashBoard,
   voteAnswer,
+  searchTags,
+  createCommentAnswer,
+  getCommentAnswer,
+  createTag,
+  getTags,
+  updateQuestion,
+  getTag,
 };

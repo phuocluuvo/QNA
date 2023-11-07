@@ -14,7 +14,8 @@ export const url = {
   SIGN_OUT: "/api/auth/logout",
   ANSWER: "/api/answer",
   APPROVE_ANSWER: "/api/answer/approve",
-  TAG: "/api/tag/{name}",
+  TAG: "/api/tag",
   USER_PROFILE: "/api/user/profile",
   VOTE_ANSWER: "/api/answer/vote",
+  COMMENT: "/api/comment",
 };

@@ -1,20 +1,17 @@
 import api from "@/API/api";
-import { requesting } from "../../reducers/GlobalSlice";
+import { CommonParams } from "@/API/type/params/Common.params";
 import { responseHandler } from "../ResponseHandler";
+import { requesting } from "../../reducers/GlobalSlice";
 
-export default function actionSearchTags(
-    /**
-     * name of the tag
-     */
-  name: string,
+export default function actionGetTagList(
+  form: CommonParams,
   callbackSuccess: (res: any) => void,
   callbackError: () => void
 ): any {
   return (dispatch: any) => {
     dispatch(requesting());
-    api.searchTags(name).then((res: any) => {
-      console.log("searchTags:", res);
-      dispatch(requesting());
+    api.getTags(form).then((res: any) => {
+      console.log("actionGetTagList:", res);
       dispatch(
         responseHandler(res, callbackSuccess, callbackError, false, null, null)
       );
