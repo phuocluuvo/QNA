@@ -23,6 +23,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/pages/about/index.jsx", "src/pages/[lang]/[country]/_app.jsx", "src/pages/index.tsx", "src/components/Header/ChangeLanguageButton/index.jsx", "src/pages/404.js", "src/pages/auth/signin/index.tsx", "src/pages/question/[id]/index.jsx", "src/pages/question/create/index.jsx", "src/components/Header/Navigator/index.jsx", "src/middleware.js", "src/pages/auth/error/index.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/pages/about/index.jsx", "src/pages/[lang]/[country]/_app.jsx", "src/pages/index.tsx", "src/components/Header/ChangeLanguageButton/index.jsx", "src/pages/404.js", "src/pages/auth/signin/index.tsx", "src/pages/question/[id]/index.jsx", "src/pages/question/create/index.jsx", "src/components/Header/Navigator/index.jsx", "src/middleware.js", "src/pages/auth/error/index.jsx", "src/components/TagList/index.tsxx"],
   "exclude": ["node_modules"]
 }
