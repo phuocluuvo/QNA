@@ -1,9 +1,14 @@
+import { Dimensions } from "@/assets/constant/Dimensions";
 import { CloseIcon, Search2Icon } from "@chakra-ui/icons";
 import {
+  Box,
   Button,
   HStack,
   IconButton,
   Input,
+  Spacer,
+  Text,
+  Tooltip,
   useColorMode,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
@@ -13,19 +18,26 @@ function SearchBar(props) {
   const [search, setSearch] = React.useState("");
   const { colorMode } = useColorMode();
   const router = useRouter();
+
   function handleSearch() {
-    if (!search) return;
-    else
+    if (!search) {
+      router.push({
+        pathname: "/",
+      });
+    } else {
       router.push({
         pathname: "/search",
         query: { q: search },
       });
+      setIsFocused(false);
+    }
   }
 
   return (
     <HStack
       display="flex"
       justifyContent="center"
+      pos={"relative"}
       alignItems="center"
       border={"1px solid"}
       borderColor={
@@ -55,6 +67,11 @@ function SearchBar(props) {
         width="100%"
         height={{ base: "30px", md: "30px" }}
         display="flex"
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            handleSearch();
+          }
+        }}
         justifyContent="center"
         alignItems="center"
         placeholder={props.getTranslate("SEARCH")}
@@ -81,6 +98,25 @@ function SearchBar(props) {
       >
         {props.getTranslate("SEARCH")}
       </Button>
+      {/* result box */}
+      <Box
+        width={{ base: "90vw", md: "100%" }}
+        style={{
+          position: "absolute",
+          zIndex: 999,
+          top: "120%",
+          left: "0",
+          height: "auto",
+          maxHeight: "100px",
+          zIndex: "999",
+          background: "white",
+          borderRadius: "5px",
+          boxShadow: "0px 0px 10px 0px rgba(0,0,0,0.3)",
+          display: isFocused ? "block" : "none",
+        }}
+      >
+        <Text></Text>
+      </Box>
     </HStack>
   );
 }

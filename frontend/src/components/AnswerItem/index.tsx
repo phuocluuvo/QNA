@@ -18,11 +18,16 @@ import helper from "@/util/helper";
 import Author from "../Author";
 import { CheckIcon } from "@chakra-ui/icons";
 import actionApproveAnswer from "@/API/redux/actions/answer/actionApproveAnswer";
-import { FormApproveAnswer, FormVoteAnswer } from "@/API/type/Form.type";
+import {
+  FormApproveAnswer,
+  FormCommentAnswer,
+  FormVoteAnswer,
+} from "@/API/type/Form.type";
 import CustomAlertDialog from "../AlertDialog";
 import useStateWithCallback from "@/hooks/useStateWithCallback";
 import { VOTE } from "@/API/constant/Vote.enum";
 import actionVoteAnswer from "@/API/redux/actions/answer/actionVoteAnswer";
+import actionCreateCommentAnswer from "@/API/redux/actions/answer/actionCreateCommentAnswer";
 
 function AnswerItem({
   answer,
@@ -44,6 +49,7 @@ function AnswerItem({
     isApproved: answer.isApproved,
     isShowConfirm: false,
     isShowComment: false,
+    comment: "",
   });
 
   React.useEffect(() => {
@@ -76,6 +82,22 @@ function AnswerItem({
       )
     );
   };
+  const createComment = () => {
+    const form: FormCommentAnswer = {
+      answer_id: answer.id,
+      content: state.comment,
+    };
+    dispatch(
+      actionCreateCommentAnswer(
+        form,
+        (res: any) => {
+          console.log("comment:::", res);
+        },
+        () => {}
+      )
+    );
+  };
+
   const approveHandler = () => {
     let form: FormApproveAnswer = {
       answer_id: answer.id,
@@ -208,7 +230,17 @@ function AnswerItem({
               animateOpacity
               style={{ width: "100%" }}
             >
-              <Input placeholder={getTranslate("COMMENT")} size={"sm"} />
+              <Input
+                placeholder={getTranslate("COMMENT")}
+                onChange={(e) =>
+                  // @ts-ignore
+                  setState((oldState) =>
+                    helper.mappingState(oldState, { comment: e.target.value })
+                  )
+                }
+                value={state.comment}
+                size={"sm"}
+              />
             </Collapse>
             {/* comment button */}
             <HStack>
@@ -219,7 +251,7 @@ function AnswerItem({
                 size="xs"
                 onClick={() =>
                   state.isShowComment
-                    ? null
+                    ? createComment()
                     : // @ts-ignore
                       setState((oldState) =>
                         helper.mappingState(oldState, {
@@ -228,7 +260,7 @@ function AnswerItem({
                       )
                 }
               >
-                {state.isShowComment
+                {!state.isShowComment
                   ? getTranslate("COMMENT")
                   : getTranslate("SUBMIT")}
               </Button>

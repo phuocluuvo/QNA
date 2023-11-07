@@ -73,11 +73,12 @@ function Header() {
           >
             <SearchBar getTranslate={getTranslate} />
             <Button
-              as={Link}
               variant="main_button"
               display={routes.pathname === "/question/create" ? "none" : "flex"}
               color={"white"}
-              href={"/question/create"}
+              onClick={() => {
+                routes.push("/question/create");
+              }}
             >
               {getTranslate("CREATE")}
             </Button>
@@ -95,10 +96,7 @@ function Header() {
             color="current"
             p={0}
           />
-          <Navigator
-            getTranslate={getTranslate}
-            isMobile={isMobile}
-          />
+          <Navigator getTranslate={getTranslate} isMobile={isMobile} />
         </HStack>
       </VStack>
       <Box height={32} />

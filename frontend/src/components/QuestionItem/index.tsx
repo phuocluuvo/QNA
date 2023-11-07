@@ -6,6 +6,7 @@ import {
   HStack,
   Heading,
   Image,
+  Link,
   Spacer,
   Tag,
   Text,
@@ -31,7 +32,6 @@ function QuestionItem({
   onClick?: () => void;
   isLast?: boolean;
 }) {
-  const [count, setCount] = React.useState(question.votes);
   const { getTranslate } = LanguageHelper(Pages.HOME);
   const router = useRouter();
   const hasImage = /<img.*?src="(.*?)"/.test(question.content);
@@ -48,19 +48,19 @@ function QuestionItem({
   }
   return (
     <HStack
-      mx={{ base: 2, md: 1 }}
+      mx={{ base: 0, md: 1 }}
       rounded={"md"}
       minW={{ base: "80%", md: "fit-content" }}
       _hover={{
         boxShadow: "0 0 0 1px " + Colors(isDarkMode).BORDER,
       }}
-      height={170}
+      height={{ base: 190, md: 170 }}
       w={{ base: "80%", md: "fit-content" }}
       mb={2}
       // flex={{ base: 1, lg: isLast ? "none" : 1 }}
       flex={1}
       transition={"ease-in-out 0.2s"}
-      p={3}
+      p={{ base: 2, md: 3 }}
       bg={Colors(isDarkMode).PRIMARY_BG}
     >
       <VStack
@@ -72,15 +72,15 @@ function QuestionItem({
         }}
       >
         {/* up vote */}
-        <Text fontSize={"xs"} opacity={0.8}>
+        <Text fontSize={"xs"} opacity={0.4}>
           {getTranslate("VOTES")}
         </Text>
-        <Heading size={"md"}>{helper.numberFormat(count)}</Heading>
-        <Text fontSize={"xs"} opacity={0.8}>
+        <Heading size={"md"}>{helper.numberFormat(question.votes)}</Heading>
+        <Text fontSize={"xs"} opacity={0.4}>
           {getTranslate("ANSWERS")}
         </Text>
-        <Text>{helper.numberFormat(question.countAnswer || 0)}</Text>
-        <Text fontSize={"xs"} opacity={0.8}>
+        <Text>{helper.numberFormat(question.answersNumber || 0)}</Text>
+        <Text fontSize={"xs"} opacity={0.4}>
           {getTranslate("VISITS")}
         </Text>
         <Text>{helper.numberFormat(question.views ? question.views : 0)}</Text>
@@ -108,24 +108,25 @@ function QuestionItem({
         flex={1}
         alignItems={"flex-start"}
         height={"100%"}
-        onClick={() => {
-          onClick
-            ? onClick
-            : // @ts-ignore
-              router.push(router.basePath + `/question/${question.id}`);
-        }}
-        cursor={"pointer"}
       >
-        <Text fontWeight={"bold"} maxW={"full"} noOfLines={1}>
+        <Link
+          onClick={() => {
+            onClick
+              ? onClick
+              : // @ts-ignore
+                router.push(router.basePath + `/question/${question.id}`);
+          }}
+          fontWeight={"bold"}
+          maxW={"full"}
+          noOfLines={1}
+        >
           {moment(question.createdAt).isAfter(moment().subtract(3, "days")) ? (
-            <Tag mr="3">
-              <Text fontSize={"xs"}>New</Text>
-            </Tag>
+            <Tag mr="3">New</Tag>
           ) : (
             ""
           )}
           {question.title}
-        </Text>
+        </Link>
         <Box
           dangerouslySetInnerHTML={{
             __html: question.content.replace(/<img.*?>/g, ""),
@@ -135,8 +136,8 @@ function QuestionItem({
           noOfLines={2}
         />
         <HStack>
-          {question.tags?.map((tag) => (
-            <TagQuestion tag={tag} key={tag.id} />
+          {question.tagNames?.map((tag) => (
+            <TagQuestion tag={tag} key={tag} />
           ))}
         </HStack>
         <HStack w={"full"}>
