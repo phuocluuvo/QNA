@@ -14,7 +14,7 @@ interface Answer {
 }
 
 interface AnswerList {
-  items: Array<AnswerType>;
+  data: Array<AnswerType>;
   meta: {
     totalItems: number;
     itemCount: number;

@@ -15,7 +15,7 @@ interface Post {
   title: string;
   content: string;
   votes: number;
-  countAnswer: number | string;
+  answersNumber: number | string;
   views: number;
   images?: { url: string }[];
   createdAt: string;
@@ -23,11 +23,15 @@ interface Post {
   status: number;
   user: UserType;
   tags?: Array<TagType>;
+  /**
+   * tag names use for question list only, ortherwise its not exist
+   */
+  tagNames?: Array<string>;
   vote: VoteType;
 }
 
 interface QuestionList {
-  items: Array<QuestionType>;
+  data: Array<QuestionType>;
   meta: {
     currentPage: number;
     itemCount: number;
@@ -35,6 +39,16 @@ interface QuestionList {
     totalItems: number;
     totalPages: number;
   };
+  links: {
+    current: string;
+    last: string;
+    next: string;
+  };
+}
+export enum QUESTION_SORT_BY {
+  NO_ANSWER = "no_answer",
+  NO_APPROVED = "no_approved",
+  NORMAL = "normal",
 }
 
 export type QuestionType = PartialBy<Post, "tags" | "images">;
