@@ -49,5 +49,17 @@
   "VOTES": "Đánh giá",
   "VISITS": "Lượt xem",
   "ANSWERS": "Câu trả lời",
-  "COMMENT": "Bình luận"
+  "COMMENT": "Bình luận",
+  "ALL_QUESTION": "Tất cả câu hỏi",
+  "FILTER": "Lọc",
+  "UNANSWERED": "Chưa trả lời",
+  "UNAPPROVED": "Chưa phê duyệt",
+  "NEWEST": "Mới",
+  "SORT_BY": "Sắp xếp theo",
+  "FILTER_BY": "Lọc theo",
+  "ORDER_BY": "Thứ tự",
+  "RELATED_TAGS": "Thẻ liên quan",
+  "THERE_IS_QUESTION": "Có {0} câu hỏi",
+  "THERE_ARE_QUESTIONS": "Có {0} câu hỏi",
+  "UPDATE": "Cập nhật"
 }

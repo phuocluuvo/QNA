@@ -49,5 +49,17 @@
   "VOTES": "Votes",
   "VISITS": "Visits",
   "ANSWERS": "Answers",
-  "COMMENT": "Comment"
+  "COMMENT": "Comment",
+  "ALL_QUESTION": "All Questions",
+  "FILTER": "Filter",
+  "UNANSWERED": "Unanswered",
+  "UNAPPROVED": "Unapproved",
+  "NEWEST": "Newest",
+  "SORT_BY": "Sort By",
+  "ORDER_BY": "Order By",
+  "FILTER_BY": "Filter By",
+  "RELATED_TAGS": "Related Tags",
+  "THERE_IS_QUESTION": "There is {0} question",
+  "THERE_ARE_QUESTIONS": "There are {0} questions",
+  "UPDATE": "Update"
 }
