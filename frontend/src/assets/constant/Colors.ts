@@ -7,7 +7,7 @@ const _Colors = (isDarkMode = false) => {
     DOWN_VOTE_RED: "#db2828",
     DOWN_VOTE_RED_HOVER: "#f9a3a3",
     LIGHT_WHITE: "#f9f9f9",
-    BORDER: isDarkMode ? "#f9f9f9" : "darkgray",
+    BORDER: isDarkMode ? "lightgray" : "darkgray",
   };
 };
 
