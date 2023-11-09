@@ -7,9 +7,17 @@ import { UsersModule } from "../users/users.module";
 import { CaslModule } from "../casl/casl.module";
 import { VoteModule } from "../vote/vote.module";
 import { TagModule } from "../tag/tag.module";
+import { ReputationModule } from "../reputation/reputation.module";
 
 @Module({
-  imports: [DatabaseModule, UsersModule, VoteModule, TagModule, CaslModule],
+  imports: [
+    DatabaseModule,
+    UsersModule,
+    VoteModule,
+    TagModule,
+    CaslModule,
+    ReputationModule,
+  ],
   controllers: [QuestionController],
   providers: [...questionProviders, QuestionService],
   exports: [QuestionService],

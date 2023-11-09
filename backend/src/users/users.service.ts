@@ -188,4 +188,22 @@ export class UsersService {
       throw new BadRequestException(message.EXISTED.EMAIL);
     }
   }
+
+  /**
+   * Update user information, only auth use.
+   *
+   * @param id
+   * @param pointChange
+   * @returns Promise<User> The updated user.
+   * @throws Error if there's an error during the update process.
+   */
+  async updateReputationPoint(id: string, pointChange: number) {
+    return this.userRepository
+      .createQueryBuilder("user")
+      .createQueryBuilder()
+      .update(User)
+      .set({ reputationPoint: () => `reputation_point + ${pointChange}` })
+      .where("id = :id", { id })
+      .execute();
+  }
 }

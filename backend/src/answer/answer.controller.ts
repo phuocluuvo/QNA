@@ -99,7 +99,7 @@ export class AnswerController {
       answerDto.question_id,
     );
     if (question) {
-      return this.answerService.create(answerDto, userId);
+      return this.answerService.createWithReputation(answerDto, userId);
     }
   }
 
@@ -158,7 +158,7 @@ export class AnswerController {
     }
 
     if (ability.can(Action.Delete, answer)) {
-      return this.answerService.remove(answer);
+      return this.answerService.removeWithReputation(answer, req.user["sub"]);
     } else {
       throw new ForbiddenException(message.NOT_AUTHOR.ANSWER);
     }
@@ -200,7 +200,7 @@ export class AnswerController {
     @Req() req: Request,
   ): Promise<Answer> {
     const ability = this.caslAbilityFactory.createForUser(req.user);
-
+    //Check answer exist
     const answer = await this.answerService.findOneById(
       approveAnswerDto.answer_id,
     );
@@ -208,6 +208,7 @@ export class AnswerController {
       throw new NotFoundException(message.NOT_FOUND.ANSWER);
     }
 
+    //Check question exist
     const question = await this.questionService.findOneById(
       approveAnswerDto.question_id,
     );
@@ -216,7 +217,10 @@ export class AnswerController {
     }
 
     if (ability.can(Action.Update, question)) {
-      return this.answerService.approveAnswer(approveAnswerDto);
+      return this.answerService.approveAnswerWithReputation(
+        approveAnswerDto,
+        answer,
+      );
     } else {
       throw new ForbiddenException(message.NOT_AUTHOR.QUESTION);
     }

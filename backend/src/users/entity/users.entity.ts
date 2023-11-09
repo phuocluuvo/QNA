@@ -10,6 +10,7 @@ import {
 import { Question } from "../../question/entity/question.entity";
 import { Answer } from "../../answer/entity/answer.entity";
 import { Vote } from "../../vote/entity/vote.entity";
+import { Reputation } from "../../reputation/entity/reputation.entity";
 
 @Entity()
 export class User {
@@ -37,6 +38,9 @@ export class User {
   @Column({ type: "enum", enum: Role, default: Role.USER })
   role: Role;
 
+  @Column({ name: "reputation_point", nullable: false, default: 0 })
+  reputationPoint: number;
+
   @Column({ default: null, select: false })
   refreshToken: string;
 
@@ -46,6 +50,8 @@ export class User {
   @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
 
+  // This is the foreign key column for the relationship entities.
+
   @OneToMany(() => Question, (question) => question.user)
   questions: Question[];
 
@@ -54,4 +60,7 @@ export class User {
 
   @OneToMany(() => Vote, (vote) => vote.user)
   votes: Vote[];
+
+  @OneToMany(() => Reputation, (re) => re.user)
+  reputations: Reputation[];
 }

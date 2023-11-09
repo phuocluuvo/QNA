@@ -86,7 +86,7 @@ export class CommentController {
     const userId = req["user"]["sub"];
     const answer = await this.answerService.findOneById(answerDto.answer_id);
     if (answer) {
-      return this.commentService.create(answerDto, userId);
+      return this.commentService.createWithReputation(answerDto, userId);
     }
   }
 
@@ -145,7 +145,10 @@ export class CommentController {
     }
 
     if (ability.can(Action.Delete, comment)) {
-      return this.commentService.remove(comment);
+      return this.commentService.removeWithReputation(
+        comment,
+        req["user"]["sub"],
+      );
     } else {
       throw new ForbiddenException(message.NOT_AUTHOR.COMMENT);
     }

@@ -11,6 +11,12 @@ import { VoteType } from "../enums/vote-type.enum";
 import { ApproveAnswerDto } from "./dto/approve-answer.dto";
 import { message } from "../constants/message.constants";
 import { answerPaginateConfig } from "../config/pagination/answer-pagination.config";
+import { ReputationService } from "../reputation/reputation.service";
+import {
+  ActivityReputationTypeEnum,
+  ObjectReputationTypeEnum,
+} from "../enums/reputation.enum";
+import { Transactional } from "typeorm-transactional";
 
 @Injectable()
 export class AnswerService {
@@ -18,6 +24,7 @@ export class AnswerService {
     @Inject("ANSWER_REPOSITORY")
     private answerRepository: Repository<Answer>,
     private readonly voteService: VoteService,
+    private readonly reputationService: ReputationService,
   ) {}
 
   /**
@@ -134,6 +141,7 @@ export class AnswerService {
    * @returns The question with an increased view count.
    * @throws NotFoundException if the question does not exist.
    */
+  @Transactional()
   async updateVote(
     userId: string,
     answerVoteDto: VoteAnswerDto,
@@ -176,5 +184,49 @@ export class AnswerService {
 
     answerTrans["isApproved"] = true;
     return await this.update(approveAnswerDto.answer_id, answerTrans);
+  }
+
+  @Transactional()
+  async createWithReputation(answerDto: CreateAnswerDto, userId: string) {
+    const answer = await this.create(answerDto, userId);
+    await this.reputationService.create(
+      ActivityReputationTypeEnum.CREATE_ANSWER,
+      ObjectReputationTypeEnum.ANSWER,
+      answer.id,
+      userId,
+    );
+
+    return answer;
+  }
+
+  @Transactional()
+  async removeWithReputation(answer: Answer, userId: string) {
+    await this.reputationService.create(
+      ActivityReputationTypeEnum.DELETE_ANSWER,
+      ObjectReputationTypeEnum.ANSWER,
+      answer.id,
+      userId,
+    );
+    await this.reputationService.syncPointDelete(answer.id, userId);
+    return this.remove(answer);
+  }
+
+  @Transactional()
+  async approveAnswerWithReputation(
+    approveAnswerDto: ApproveAnswerDto,
+    answer: Answer,
+  ) {
+    const answerApprove = await this.approveAnswer(approveAnswerDto);
+
+    await this.reputationService.create(
+      answerApprove.isApproved
+        ? ActivityReputationTypeEnum.ACCEPT_ANSWER
+        : ActivityReputationTypeEnum.UN_ACCEPT_ANSWER,
+      ObjectReputationTypeEnum.ANSWER,
+      answer.id,
+      answer.user.id,
+    );
+
+    return answerApprove;
   }
 }

@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { Repository } from "typeorm";
 import { Question } from "./entity/question.entity";
 import { CreateQuestionDto } from "./dto/create-question.dto";
@@ -11,6 +16,12 @@ import { VoteQuestionDto } from "../vote/dto/vote-question.dto";
 import { message } from "../constants/message.constants";
 import { TagService } from "../tag/tag.service";
 import { questionPaginateConfig } from "../config/pagination/question-pagination.config";
+import { ReputationService } from "../reputation/reputation.service";
+import {
+  ActivityReputationTypeEnum,
+  ObjectReputationTypeEnum,
+} from "../enums/reputation.enum";
+import { Transactional } from "typeorm-transactional";
 
 @Injectable()
 export class QuestionService {
@@ -19,6 +30,7 @@ export class QuestionService {
     private questionRepository: Repository<Question>,
     private readonly voteService: VoteService,
     private readonly tagService: TagService,
+    private readonly reputationService: ReputationService,
   ) {}
 
   /**
@@ -171,6 +183,7 @@ export class QuestionService {
    * @returns The question with an increased view count.
    * @throws NotFoundException if the question does not exist.
    */
+  @Transactional()
   async updateVote(
     userId: string,
     questionVoteDto: VoteQuestionDto,
@@ -199,6 +212,7 @@ export class QuestionService {
     }
   }
 
+  @Transactional()
   private async increaseViewCount(question: Question, userId: string) {
     question.views += 1;
     const result = await this.questionRepository.save(question);
@@ -215,5 +229,34 @@ export class QuestionService {
       }
     }
     return result;
+  }
+
+  @Transactional()
+  async createWithReputation(questionDto: CreateQuestionDto, userId: string) {
+    if (await this.reputationService.checkCreateQuestion(userId)) {
+      const question = await this.create(questionDto, userId);
+      await this.reputationService.create(
+        ActivityReputationTypeEnum.CREATE_QUESTION,
+        ObjectReputationTypeEnum.QUESTION,
+        question.id,
+        userId,
+      );
+
+      return question;
+    } else {
+      throw new BadRequestException(message.INVALID);
+    }
+  }
+
+  @Transactional()
+  async removeWithReputation(question: Question, userId: string) {
+    await this.reputationService.create(
+      ActivityReputationTypeEnum.DELETE_QUESTION,
+      ObjectReputationTypeEnum.QUESTION,
+      question.id,
+      userId,
+    );
+    await this.reputationService.syncPointDelete(question.id, userId);
+    return this.remove(question);
   }
 }

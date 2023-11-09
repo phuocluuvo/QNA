@@ -8,12 +8,19 @@ import { UpdateAnswerDto } from "../answer/dto/update-answer.dto";
 import { UpdateCommentDto } from "./dto/update-comment.dto";
 import { message } from "../constants/message.constants";
 import { commentPaginateConfig } from "../config/pagination/comment-pagination";
+import { Transactional } from "typeorm-transactional";
+import { ReputationService } from "../reputation/reputation.service";
+import {
+  ActivityReputationTypeEnum,
+  ObjectReputationTypeEnum,
+} from "../enums/reputation.enum";
 
 @Injectable()
 export class CommentService {
   constructor(
     @Inject("COMMENT_REPOSITORY")
     private commentRepository: Repository<Comment>,
+    private readonly reputationService: ReputationService,
   ) {}
 
   /**
@@ -108,5 +115,29 @@ export class CommentService {
    */
   async remove(comment: Comment) {
     return this.commentRepository.remove(comment);
+  }
+
+  @Transactional()
+  async createWithReputation(commentDto: CreateCommentDto, userId: string) {
+    const comment = await this.create(commentDto, userId);
+    await this.reputationService.create(
+      ActivityReputationTypeEnum.CREATE_COMMENT,
+      ObjectReputationTypeEnum.COMMENT,
+      comment.id,
+      userId,
+    );
+
+    return comment;
+  }
+
+  @Transactional()
+  async removeWithReputation(comment: Comment, userId: string) {
+    await this.reputationService.create(
+      ActivityReputationTypeEnum.DELETE_COMMENT,
+      ObjectReputationTypeEnum.COMMENT,
+      comment.id,
+      userId,
+    );
+    return this.remove(comment);
   }
 }
