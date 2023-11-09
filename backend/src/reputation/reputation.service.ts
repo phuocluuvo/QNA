@@ -9,6 +9,8 @@ import { User } from "../users/entity/users.entity";
 import { reputationActivityPoint } from "../constants/reputation.constants";
 import { UsersService } from "../users/users.service";
 import { Transactional } from "typeorm-transactional";
+import { paginate, PaginateQuery } from "nestjs-paginate";
+import { reputationPaginateConfig } from "../config/pagination/activity-pagination";
 
 @Injectable()
 export class ReputationService {
@@ -18,8 +20,11 @@ export class ReputationService {
     private readonly usersService: UsersService,
   ) {}
 
-  async findByUserId(id: string): Promise<Reputation[]> {
-    return this.reputationRepository.find({ where: { user: { id } } });
+  async findByUserId(query: PaginateQuery, id: string) {
+    const queryBuilder =
+      this.reputationRepository.createQueryBuilder("reputation");
+    queryBuilder.where({ user: { id } });
+    return paginate<Reputation>(query, queryBuilder, reputationPaginateConfig);
   }
 
   @Transactional()
