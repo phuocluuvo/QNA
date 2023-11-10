@@ -15,7 +15,7 @@ import { message } from "../constants/message.constants";
 export class UsersService {
   constructor(
     @Inject("USERS_REPOSITORY")
-    private userRepository: Repository<User>,
+    private readonly userRepository: Repository<User>,
   ) {}
 
   /**
@@ -187,5 +187,23 @@ export class UsersService {
     } catch (e) {
       throw new BadRequestException(message.EXISTED.EMAIL);
     }
+  }
+
+  /**
+   * Update user information, only auth use.
+   *
+   * @param id
+   * @param pointChange
+   * @returns Promise<User> The updated user.
+   * @throws Error if there's an error during the update process.
+   */
+  async updateActivityPoint(id: string, pointChange: number) {
+    return this.userRepository
+      .createQueryBuilder("user")
+      .createQueryBuilder()
+      .update(User)
+      .set({ activityPoint: () => `activity_point + ${pointChange}` })
+      .where("id = :id", { id })
+      .execute();
   }
 }

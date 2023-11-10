@@ -12,7 +12,7 @@ import { tagPaginateConfig } from "../config/pagination/tag-pagination.config";
 export class TagService {
   constructor(
     @Inject("TAG_REPOSITORY")
-    private tagRepository: Repository<Tag>,
+    private readonly tagRepository: Repository<Tag>,
   ) {}
 
   /**

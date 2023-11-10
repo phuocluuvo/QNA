@@ -11,13 +11,20 @@ import { VoteType } from "../enums/vote-type.enum";
 import { ApproveAnswerDto } from "./dto/approve-answer.dto";
 import { message } from "../constants/message.constants";
 import { answerPaginateConfig } from "../config/pagination/answer-pagination.config";
+import { ActivityService } from "../activity/activity.service";
+import { Transactional } from "typeorm-transactional";
+import {
+  ObjectActivityTypeEnum,
+  ReputationActivityTypeEnum,
+} from "../enums/reputation.enum";
 
 @Injectable()
 export class AnswerService {
   constructor(
     @Inject("ANSWER_REPOSITORY")
-    private answerRepository: Repository<Answer>,
+    private readonly answerRepository: Repository<Answer>,
     private readonly voteService: VoteService,
+    private readonly activityService: ActivityService,
   ) {}
 
   /**
@@ -129,11 +136,12 @@ export class AnswerService {
   /**
    * update vote count.
    *
-   * @param userId
-   * @param answerVoteDto
+   * @param userId - The ID of the user to update.
+   * @param answerVoteDto - The updated data for the answer.
    * @returns The question with an increased view count.
    * @throws NotFoundException if the question does not exist.
    */
+  @Transactional()
   async updateVote(
     userId: string,
     answerVoteDto: VoteAnswerDto,
@@ -159,6 +167,12 @@ export class AnswerService {
     }
   }
 
+  /**
+   * Approve an answer.
+   *
+   * @param approveAnswerDto - The data to approve an answer.
+   * @returns The approved answer.
+   */
   async approveAnswer(approveAnswerDto: ApproveAnswerDto): Promise<Answer> {
     const exitApproved = await this.findOne({
       question: { id: approveAnswerDto.question_id },
@@ -176,5 +190,64 @@ export class AnswerService {
 
     answerTrans["isApproved"] = true;
     return await this.update(approveAnswerDto.answer_id, answerTrans);
+  }
+
+  /**
+   * Create a new answer with activity.
+   * @param answerDto - The data to create a new answer.
+   * @param userId - The ID of the user creating the answer.
+   */
+  @Transactional()
+  async createWithActivity(answerDto: CreateAnswerDto, userId: string) {
+    const answer = await this.create(answerDto, userId);
+    await this.activityService.create(
+      ReputationActivityTypeEnum.CREATE_ANSWER,
+      ObjectActivityTypeEnum.ANSWER,
+      answer.id,
+      userId,
+    );
+
+    return answer;
+  }
+
+  /**
+   * Remove an answer with activity.
+   * @param answer - The answer entity to remove.
+   * @param userId - The ID of the user removing the answer.
+   */
+  @Transactional()
+  async removeWithActivity(answer: Answer, userId: string) {
+    await this.activityService.create(
+      ReputationActivityTypeEnum.DELETE_ANSWER,
+      ObjectActivityTypeEnum.ANSWER,
+      answer.id,
+      userId,
+    );
+    await this.activityService.syncPointDelete(answer.id, userId);
+    return this.remove(answer);
+  }
+
+  /**
+   * Approve an answer with activity.
+   * @param approveAnswerDto - The data to approve an answer.
+   * @param answer - The answer entity to approve.
+   */
+  @Transactional()
+  async approveAnswerWithActivity(
+    approveAnswerDto: ApproveAnswerDto,
+    answer: Answer,
+  ) {
+    const answerApprove = await this.approveAnswer(approveAnswerDto);
+
+    await this.activityService.create(
+      answerApprove.isApproved
+        ? ReputationActivityTypeEnum.ACCEPT_ANSWER
+        : ReputationActivityTypeEnum.UN_ACCEPT_ANSWER,
+      ObjectActivityTypeEnum.ANSWER,
+      answer.id,
+      answer.user.id,
+    );
+
+    return answerApprove;
   }
 }

@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { Repository } from "typeorm";
 import { Question } from "./entity/question.entity";
 import { CreateQuestionDto } from "./dto/create-question.dto";
@@ -11,14 +16,21 @@ import { VoteQuestionDto } from "../vote/dto/vote-question.dto";
 import { message } from "../constants/message.constants";
 import { TagService } from "../tag/tag.service";
 import { questionPaginateConfig } from "../config/pagination/question-pagination.config";
+import { ActivityService } from "../activity/activity.service";
+import {
+  ObjectActivityTypeEnum,
+  ReputationActivityTypeEnum,
+} from "../enums/reputation.enum";
+import { Transactional } from "typeorm-transactional";
 
 @Injectable()
 export class QuestionService {
   constructor(
     @Inject("QUESTION_REPOSITORY")
-    private questionRepository: Repository<Question>,
+    private readonly questionRepository: Repository<Question>,
     private readonly voteService: VoteService,
     private readonly tagService: TagService,
+    private readonly activityService: ActivityService,
   ) {}
 
   /**
@@ -166,11 +178,12 @@ export class QuestionService {
   /**
    * update vote count.
    *
-   * @param userId
-   * @param questionVoteDto
+   * @param userId - The ID of the user.
+   * @param questionVoteDto - The question data to update.
    * @returns The question with an increased view count.
    * @throws NotFoundException if the question does not exist.
    */
+  @Transactional()
   async updateVote(
     userId: string,
     questionVoteDto: VoteQuestionDto,
@@ -199,6 +212,13 @@ export class QuestionService {
     }
   }
 
+  /**
+   * Increase view count of a question.
+   * @param question - The question to increase view count.
+   * @param userId - The ID of the user viewing the question.
+   * @private
+   */
+  @Transactional()
   private async increaseViewCount(question: Question, userId: string) {
     question.views += 1;
     const result = await this.questionRepository.save(question);
@@ -215,5 +235,44 @@ export class QuestionService {
       }
     }
     return result;
+  }
+
+  /**
+   * Create a new question with activity.
+   * @param questionDto - The question data to create.
+   * @param userId - The ID of the user creating the question.
+   */
+  @Transactional()
+  async createWithActivity(questionDto: CreateQuestionDto, userId: string) {
+    if (await this.activityService.checkCreateQuestion(userId)) {
+      const question = await this.create(questionDto, userId);
+      await this.activityService.create(
+        ReputationActivityTypeEnum.CREATE_QUESTION,
+        ObjectActivityTypeEnum.QUESTION,
+        question.id,
+        userId,
+      );
+
+      return question;
+    } else {
+      throw new BadRequestException(message.REPUTATION.NOT_ENOUGH);
+    }
+  }
+
+  /**
+   * Update a question with activity.
+   * @param question - The question to update.
+   * @param userId - The ID of the user updating the question.
+   */
+  @Transactional()
+  async removeWithActivity(question: Question, userId: string) {
+    await this.activityService.create(
+      ReputationActivityTypeEnum.DELETE_QUESTION,
+      ObjectActivityTypeEnum.QUESTION,
+      question.id,
+      userId,
+    );
+    await this.activityService.syncPointDelete(question.id, userId);
+    return this.remove(question);
   }
 }
