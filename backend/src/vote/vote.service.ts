@@ -18,6 +18,11 @@ export class VoteService {
     private readonly reputationService: ReputationService,
   ) {}
 
+  /**
+   * Vote question
+   * @param userId
+   * @param voteDto
+   */
   async voteQuestion(
     userId: string,
     voteDto: VoteQuestionDto,
@@ -33,6 +38,11 @@ export class VoteService {
     return this.handleVote(userId, voteDto, true);
   }
 
+  /**
+   * Vote answer
+   * @param userId
+   * @param voteDto
+   */
   async voteAnswer(userId: string, voteDto: VoteAnswerDto): Promise<number> {
     await this.reputationService.create(
       voteDto.vote_type == VoteType.UPVOTE
@@ -45,6 +55,13 @@ export class VoteService {
     return this.handleVote(userId, voteDto, false);
   }
 
+  /**
+   *  Handle vote
+   * @param userId
+   * @param voteDto
+   * @param isQuestion
+   * @private
+   */
   private async handleVote(
     userId: string,
     voteDto: any,
@@ -73,6 +90,10 @@ export class VoteService {
     }
   }
 
+  /**
+   * Get vote
+   * @param query
+   */
   async getVote(query: any): Promise<Vote> {
     try {
       return this.voteRepository.findOne({
@@ -83,6 +104,10 @@ export class VoteService {
     }
   }
 
+  /**
+   * Save vote
+   * @param vote
+   */
   async saveVote(vote: any): Promise<Vote> {
     try {
       return await this.voteRepository.save(vote);
@@ -91,6 +116,13 @@ export class VoteService {
     }
   }
 
+  /**
+   * Convert to vote
+   * @param userId
+   * @param voteDto
+   * @param isQuestion
+   * @private
+   */
   private convertToVote(userId: string, voteDto: any, isQuestion: boolean) {
     const trans = {};
     trans["voteType"] = voteDto.vote_type;

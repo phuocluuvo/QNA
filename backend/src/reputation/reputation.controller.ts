@@ -16,6 +16,11 @@ import { AccessTokenGuard } from "../auth/guards/accessToken.guard";
 export class ReputationController {
   constructor(private readonly reputationService: ReputationService) {}
 
+  /**
+   * get activity history user
+   * @param query
+   * @param req
+   */
   @ApiOkPaginatedResponse(Reputation, reputationPaginateConfig)
   @ApiPaginationQuery(reputationPaginateConfig)
   @ApiOperation({

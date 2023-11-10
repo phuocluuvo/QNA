@@ -19,7 +19,7 @@ import {
 export class CommentService {
   constructor(
     @Inject("COMMENT_REPOSITORY")
-    private commentRepository: Repository<Comment>,
+    private readonly commentRepository: Repository<Comment>,
     private readonly reputationService: ReputationService,
   ) {}
 
@@ -117,6 +117,11 @@ export class CommentService {
     return this.commentRepository.remove(comment);
   }
 
+  /**
+   *  Create a new comment with reputation.
+   * @param commentDto - The data to create a new comment.
+   * @param userId - The ID of the user creating the comment.
+   */
   @Transactional()
   async createWithReputation(commentDto: CreateCommentDto, userId: string) {
     const comment = await this.create(commentDto, userId);
@@ -130,6 +135,11 @@ export class CommentService {
     return comment;
   }
 
+  /**
+   * Update an existing comment with reputation.
+   * @param comment - The comment entity to update.
+   * @param userId - The ID of the user updating the comment.
+   */
   @Transactional()
   async removeWithReputation(comment: Comment, userId: string) {
     await this.reputationService.create(

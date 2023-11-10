@@ -15,7 +15,7 @@ import { message } from "../constants/message.constants";
 export class UsersService {
   constructor(
     @Inject("USERS_REPOSITORY")
-    private userRepository: Repository<User>,
+    private readonly userRepository: Repository<User>,
   ) {}
 
   /**

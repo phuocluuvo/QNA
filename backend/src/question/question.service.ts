@@ -27,7 +27,7 @@ import { Transactional } from "typeorm-transactional";
 export class QuestionService {
   constructor(
     @Inject("QUESTION_REPOSITORY")
-    private questionRepository: Repository<Question>,
+    private readonly questionRepository: Repository<Question>,
     private readonly voteService: VoteService,
     private readonly tagService: TagService,
     private readonly reputationService: ReputationService,
@@ -178,8 +178,8 @@ export class QuestionService {
   /**
    * update vote count.
    *
-   * @param userId
-   * @param questionVoteDto
+   * @param userId - The ID of the user.
+   * @param questionVoteDto - The question data to update.
    * @returns The question with an increased view count.
    * @throws NotFoundException if the question does not exist.
    */
@@ -212,6 +212,12 @@ export class QuestionService {
     }
   }
 
+  /**
+   * Increase view count of a question.
+   * @param question - The question to increase view count.
+   * @param userId - The ID of the user viewing the question.
+   * @private
+   */
   @Transactional()
   private async increaseViewCount(question: Question, userId: string) {
     question.views += 1;
@@ -231,6 +237,11 @@ export class QuestionService {
     return result;
   }
 
+  /**
+   * Create a new question with reputation.
+   * @param questionDto - The question data to create.
+   * @param userId - The ID of the user creating the question.
+   */
   @Transactional()
   async createWithReputation(questionDto: CreateQuestionDto, userId: string) {
     if (await this.reputationService.checkCreateQuestion(userId)) {
@@ -248,6 +259,11 @@ export class QuestionService {
     }
   }
 
+  /**
+   * Update a question with reputation.
+   * @param question - The question to update.
+   * @param userId - The ID of the user updating the question.
+   */
   @Transactional()
   async removeWithReputation(question: Question, userId: string) {
     await this.reputationService.create(

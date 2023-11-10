@@ -20,6 +20,11 @@ export class ReputationService {
     private readonly usersService: UsersService,
   ) {}
 
+  /**
+   * Find all reputation
+   * @param query
+   * @param id
+   */
   async findByUserId(query: PaginateQuery, id: string) {
     const queryBuilder =
       this.reputationRepository.createQueryBuilder("reputation");
@@ -27,6 +32,13 @@ export class ReputationService {
     return paginate<Reputation>(query, queryBuilder, reputationPaginateConfig);
   }
 
+  /**
+   * Create reputation
+   * @param activityType
+   * @param objectType
+   * @param objectId
+   * @param userId
+   */
   @Transactional()
   async create(
     activityType: ActivityReputationTypeEnum,
@@ -50,6 +62,10 @@ export class ReputationService {
     );
   }
 
+  /**
+   * Check create question
+   * @param userId
+   */
   async checkCreateQuestion(userId: string): Promise<boolean> {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
@@ -74,6 +90,11 @@ export class ReputationService {
     return true;
   }
 
+  /**
+   * Update reputation point for user when delete have votes
+   * @param objectId
+   * @param userId
+   */
   async syncPointDelete(objectId: string, userId: string) {
     const reputations = await this.reputationRepository.find({
       where: {

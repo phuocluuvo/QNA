@@ -22,7 +22,7 @@ import { Transactional } from "typeorm-transactional";
 export class AnswerService {
   constructor(
     @Inject("ANSWER_REPOSITORY")
-    private answerRepository: Repository<Answer>,
+    private readonly answerRepository: Repository<Answer>,
     private readonly voteService: VoteService,
     private readonly reputationService: ReputationService,
   ) {}
@@ -136,8 +136,8 @@ export class AnswerService {
   /**
    * update vote count.
    *
-   * @param userId
-   * @param answerVoteDto
+   * @param userId - The ID of the user to update.
+   * @param answerVoteDto - The updated data for the answer.
    * @returns The question with an increased view count.
    * @throws NotFoundException if the question does not exist.
    */
@@ -167,6 +167,12 @@ export class AnswerService {
     }
   }
 
+  /**
+   * Approve an answer.
+   *
+   * @param approveAnswerDto - The data to approve an answer.
+   * @returns The approved answer.
+   */
   async approveAnswer(approveAnswerDto: ApproveAnswerDto): Promise<Answer> {
     const exitApproved = await this.findOne({
       question: { id: approveAnswerDto.question_id },
@@ -186,6 +192,11 @@ export class AnswerService {
     return await this.update(approveAnswerDto.answer_id, answerTrans);
   }
 
+  /**
+   * Create a new answer with reputation.
+   * @param answerDto - The data to create a new answer.
+   * @param userId - The ID of the user creating the answer.
+   */
   @Transactional()
   async createWithReputation(answerDto: CreateAnswerDto, userId: string) {
     const answer = await this.create(answerDto, userId);
@@ -199,6 +210,11 @@ export class AnswerService {
     return answer;
   }
 
+  /**
+   * Remove an answer with reputation.
+   * @param answer - The answer entity to remove.
+   * @param userId - The ID of the user removing the answer.
+   */
   @Transactional()
   async removeWithReputation(answer: Answer, userId: string) {
     await this.reputationService.create(
@@ -211,6 +227,11 @@ export class AnswerService {
     return this.remove(answer);
   }
 
+  /**
+   * Approve an answer with reputation.
+   * @param approveAnswerDto - The data to approve an answer.
+   * @param answer - The answer entity to approve.
+   */
   @Transactional()
   async approveAnswerWithReputation(
     approveAnswerDto: ApproveAnswerDto,
