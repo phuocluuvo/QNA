@@ -244,7 +244,7 @@ export class QuestionService {
 
       return question;
     } else {
-      throw new BadRequestException(message.INVALID);
+      throw new BadRequestException(message.REPUTATION.NOT_ENOUGH);
     }
   }
 
