@@ -7,7 +7,7 @@ import { UsersModule } from "../users/users.module";
 import { CaslModule } from "../casl/casl.module";
 import { VoteModule } from "../vote/vote.module";
 import { TagModule } from "../tag/tag.module";
-import { ReputationModule } from "../reputation/reputation.module";
+import { ActivityModule } from "../activity/activity.module";
 
 @Module({
   imports: [
@@ -16,7 +16,7 @@ import { ReputationModule } from "../reputation/reputation.module";
     VoteModule,
     TagModule,
     CaslModule,
-    ReputationModule,
+    ActivityModule,
   ],
   controllers: [QuestionController],
   providers: [...questionProviders, QuestionService],

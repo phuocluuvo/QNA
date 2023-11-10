@@ -6,7 +6,7 @@ import { answerProviders } from "./providers/answer.providers";
 import { QuestionModule } from "../question/question.module";
 import { CaslModule } from "../casl/casl.module";
 import { VoteModule } from "../vote/vote.module";
-import { ReputationModule } from "../reputation/reputation.module";
+import { ActivityModule } from "../activity/activity.module";
 
 @Module({
   imports: [
@@ -14,7 +14,7 @@ import { ReputationModule } from "../reputation/reputation.module";
     QuestionModule,
     VoteModule,
     CaslModule,
-    ReputationModule,
+    ActivityModule,
   ],
   controllers: [AnswerController],
   providers: [...answerProviders, AnswerService],

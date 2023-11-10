@@ -5,10 +5,10 @@ import { DatabaseModule } from "../database/database.module";
 import { commentProviders } from "./providers/comment.providers";
 import { CaslModule } from "../casl/casl.module";
 import { AnswerModule } from "../answer/answer.module";
-import { ReputationModule } from "../reputation/reputation.module";
+import { ActivityModule } from "../activity/activity.module";
 
 @Module({
-  imports: [DatabaseModule, CaslModule, AnswerModule, ReputationModule],
+  imports: [DatabaseModule, CaslModule, AnswerModule, ActivityModule],
   controllers: [CommentController],
   providers: [...commentProviders, CommentService],
 })

@@ -10,7 +10,7 @@ import {
 import { Question } from "../../question/entity/question.entity";
 import { Answer } from "../../answer/entity/answer.entity";
 import { Vote } from "../../vote/entity/vote.entity";
-import { Reputation } from "../../reputation/entity/reputation.entity";
+import { Activity } from "../../activity/entity/activity.entity";
 
 @Entity()
 export class User {
@@ -38,8 +38,8 @@ export class User {
   @Column({ type: "enum", enum: Role, default: Role.USER })
   role: Role;
 
-  @Column({ name: "reputation_point", nullable: false, default: 0 })
-  reputationPoint: number;
+  @Column({ name: "activity_point", nullable: false, default: 0 })
+  activityPoint: number;
 
   @Column({ default: null, select: false })
   refreshToken: string;
@@ -61,6 +61,6 @@ export class User {
   @OneToMany(() => Vote, (vote) => vote.user)
   votes: Vote[];
 
-  @OneToMany(() => Reputation, (re) => re.user)
-  reputations: Reputation[];
+  @OneToMany(() => Activity, (re) => re.user)
+  activities: Activity[];
 }

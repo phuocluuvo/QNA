@@ -197,12 +197,12 @@ export class UsersService {
    * @returns Promise<User> The updated user.
    * @throws Error if there's an error during the update process.
    */
-  async updateReputationPoint(id: string, pointChange: number) {
+  async updateActivityPoint(id: string, pointChange: number) {
     return this.userRepository
       .createQueryBuilder("user")
       .createQueryBuilder()
       .update(User)
-      .set({ reputationPoint: () => `reputation_point + ${pointChange}` })
+      .set({ activityPoint: () => `activity_point + ${pointChange}` })
       .where("id = :id", { id })
       .execute();
   }

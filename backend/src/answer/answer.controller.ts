@@ -99,7 +99,7 @@ export class AnswerController {
       answerDto.question_id,
     );
     if (question) {
-      return this.answerService.createWithReputation(answerDto, userId);
+      return this.answerService.createWithActivity(answerDto, userId);
     }
   }
 
@@ -158,7 +158,7 @@ export class AnswerController {
     }
 
     if (ability.can(Action.Delete, answer)) {
-      return this.answerService.removeWithReputation(answer, req.user["sub"]);
+      return this.answerService.removeWithActivity(answer, req.user["sub"]);
     } else {
       throw new ForbiddenException(message.NOT_AUTHOR.ANSWER);
     }
@@ -217,7 +217,7 @@ export class AnswerController {
     }
 
     if (ability.can(Action.Update, question)) {
-      return this.answerService.approveAnswerWithReputation(
+      return this.answerService.approveAnswerWithActivity(
         approveAnswerDto,
         answer,
       );

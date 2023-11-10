@@ -1,15 +1,15 @@
-import { ActivityReputationTypeEnum } from "../enums/reputation.enum";
+import { ReputationActivityTypeEnum } from "../enums/reputation.enum";
 
 export const reputationActivityPoint = {
-  [ActivityReputationTypeEnum.CREATE_QUESTION]: 10,
-  [ActivityReputationTypeEnum.CREATE_ANSWER]: 5,
-  [ActivityReputationTypeEnum.CREATE_COMMENT]: 2,
-  [ActivityReputationTypeEnum.UPVOTE]: 1,
-  [ActivityReputationTypeEnum.ACCEPT_ANSWER]: 20,
+  [ReputationActivityTypeEnum.CREATE_QUESTION]: 10,
+  [ReputationActivityTypeEnum.CREATE_ANSWER]: 5,
+  [ReputationActivityTypeEnum.CREATE_COMMENT]: 2,
+  [ReputationActivityTypeEnum.UPVOTE]: 1,
+  [ReputationActivityTypeEnum.ACCEPT_ANSWER]: 20,
 
-  [ActivityReputationTypeEnum.DELETE_QUESTION]: -10,
-  [ActivityReputationTypeEnum.DELETE_ANSWER]: -5,
-  [ActivityReputationTypeEnum.DELETE_COMMENT]: -2,
-  [ActivityReputationTypeEnum.DOWNVOTE]: -1,
-  [ActivityReputationTypeEnum.UN_ACCEPT_ANSWER]: -20,
+  [ReputationActivityTypeEnum.DELETE_QUESTION]: -10,
+  [ReputationActivityTypeEnum.DELETE_ANSWER]: -5,
+  [ReputationActivityTypeEnum.DELETE_COMMENT]: -2,
+  [ReputationActivityTypeEnum.DOWNVOTE]: -1,
+  [ReputationActivityTypeEnum.UN_ACCEPT_ANSWER]: -20,
 };

@@ -9,10 +9,10 @@ import { UpdateCommentDto } from "./dto/update-comment.dto";
 import { message } from "../constants/message.constants";
 import { commentPaginateConfig } from "../config/pagination/comment-pagination";
 import { Transactional } from "typeorm-transactional";
-import { ReputationService } from "../reputation/reputation.service";
+import { ActivityService } from "../activity/activity.service";
 import {
-  ActivityReputationTypeEnum,
-  ObjectReputationTypeEnum,
+  ReputationActivityTypeEnum,
+  ObjectActivityTypeEnum,
 } from "../enums/reputation.enum";
 
 @Injectable()
@@ -20,7 +20,7 @@ export class CommentService {
   constructor(
     @Inject("COMMENT_REPOSITORY")
     private readonly commentRepository: Repository<Comment>,
-    private readonly reputationService: ReputationService,
+    private readonly activityService: ActivityService,
   ) {}
 
   /**
@@ -118,16 +118,16 @@ export class CommentService {
   }
 
   /**
-   *  Create a new comment with reputation.
+   *  Create a new comment with activity.
    * @param commentDto - The data to create a new comment.
    * @param userId - The ID of the user creating the comment.
    */
   @Transactional()
-  async createWithReputation(commentDto: CreateCommentDto, userId: string) {
+  async createWithActivity(commentDto: CreateCommentDto, userId: string) {
     const comment = await this.create(commentDto, userId);
-    await this.reputationService.create(
-      ActivityReputationTypeEnum.CREATE_COMMENT,
-      ObjectReputationTypeEnum.COMMENT,
+    await this.activityService.create(
+      ReputationActivityTypeEnum.CREATE_COMMENT,
+      ObjectActivityTypeEnum.COMMENT,
       comment.id,
       userId,
     );
@@ -136,15 +136,15 @@ export class CommentService {
   }
 
   /**
-   * Update an existing comment with reputation.
+   * Update an existing comment with activity.
    * @param comment - The comment entity to update.
    * @param userId - The ID of the user updating the comment.
    */
   @Transactional()
-  async removeWithReputation(comment: Comment, userId: string) {
-    await this.reputationService.create(
-      ActivityReputationTypeEnum.DELETE_COMMENT,
-      ObjectReputationTypeEnum.COMMENT,
+  async removeWithActivity(comment: Comment, userId: string) {
+    await this.activityService.create(
+      ReputationActivityTypeEnum.DELETE_COMMENT,
+      ObjectActivityTypeEnum.COMMENT,
       comment.id,
       userId,
     );

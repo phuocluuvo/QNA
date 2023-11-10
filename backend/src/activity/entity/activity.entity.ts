@@ -10,7 +10,7 @@ import {
 import { User } from "../../users/entity/users.entity";
 
 @Entity()
-export class Reputation {
+export class Activity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
@@ -26,9 +26,6 @@ export class Reputation {
   @Column({ name: "object_id" })
   objectId: string;
 
-  @Column({ default: "" })
-  description: string;
-
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
 
@@ -37,7 +34,7 @@ export class Reputation {
 
   // This is the foreign key column for the relationship entities.
 
-  @ManyToOne(() => User, (user) => user.reputations, {
+  @ManyToOne(() => User, (user) => user.activities, {
     onDelete: "CASCADE",
   })
   @JoinColumn({ name: "user_id" })

@@ -10,7 +10,7 @@ import { RedisCacheModule } from "../redis/cache.module";
 import { VoteModule } from "../vote/vote.module";
 import { CommentModule } from "../comment/comment.module";
 import { TagModule } from "../tag/tag.module";
-import { ReputationModule } from "../reputation/reputation.module";
+import { ActivityModule } from "../activity/activity.module";
 
 @Module({
   imports: [
@@ -23,7 +23,7 @@ import { ReputationModule } from "../reputation/reputation.module";
     VoteModule,
     CommentModule,
     TagModule,
-    ReputationModule,
+    ActivityModule,
   ],
   controllers: [AppController],
   providers: [AppService],

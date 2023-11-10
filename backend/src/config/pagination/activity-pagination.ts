@@ -1,7 +1,7 @@
 import { PaginateConfig } from "nestjs-paginate";
-import { Reputation } from "../../reputation/entity/reputation.entity";
+import { Activity } from "../../activity/entity/activity.entity";
 
-export const reputationPaginateConfig: PaginateConfig<Reputation> = {
+export const activityPaginateConfig: PaginateConfig<Activity> = {
   sortableColumns: ["createdAt", "updatedAt"],
   defaultSortBy: [["createdAt", "DESC"]],
 };

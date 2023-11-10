@@ -3,19 +3,19 @@ import { Repository } from "typeorm";
 import { Vote } from "./entity/vote.entity";
 import { VoteQuestionDto } from "./dto/vote-question.dto";
 import { VoteAnswerDto } from "./dto/vote-answer.dto";
-import { ReputationService } from "../reputation/reputation.service";
-import {
-  ActivityReputationTypeEnum,
-  ObjectReputationTypeEnum,
-} from "../enums/reputation.enum";
+import { ActivityService } from "../activity/activity.service";
 import { VoteType } from "../enums/vote-type.enum";
+import {
+  ReputationActivityTypeEnum,
+  ObjectActivityTypeEnum,
+} from "../enums/reputation.enum";
 
 @Injectable()
 export class VoteService {
   constructor(
     @Inject("VOTE_REPOSITORY")
     private readonly voteRepository: Repository<Vote>,
-    private readonly reputationService: ReputationService,
+    private readonly activityService: ActivityService,
   ) {}
 
   /**
@@ -27,11 +27,11 @@ export class VoteService {
     userId: string,
     voteDto: VoteQuestionDto,
   ): Promise<number> {
-    await this.reputationService.create(
+    await this.activityService.create(
       voteDto.vote_type == VoteType.UPVOTE
-        ? ActivityReputationTypeEnum.UPVOTE
-        : ActivityReputationTypeEnum.DOWNVOTE,
-      ObjectReputationTypeEnum.VOTE_QUESTION,
+        ? ReputationActivityTypeEnum.UPVOTE
+        : ReputationActivityTypeEnum.DOWNVOTE,
+      ObjectActivityTypeEnum.VOTE_QUESTION,
       voteDto.question_id,
       userId,
     );
@@ -44,11 +44,11 @@ export class VoteService {
    * @param voteDto
    */
   async voteAnswer(userId: string, voteDto: VoteAnswerDto): Promise<number> {
-    await this.reputationService.create(
+    await this.activityService.create(
       voteDto.vote_type == VoteType.UPVOTE
-        ? ActivityReputationTypeEnum.UPVOTE
-        : ActivityReputationTypeEnum.DOWNVOTE,
-      ObjectReputationTypeEnum.VOTE_ANSWER,
+        ? ReputationActivityTypeEnum.UPVOTE
+        : ReputationActivityTypeEnum.DOWNVOTE,
+      ObjectActivityTypeEnum.VOTE_ANSWER,
       voteDto.answer_id,
       userId,
     );

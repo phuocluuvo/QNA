@@ -16,10 +16,10 @@ import { VoteQuestionDto } from "../vote/dto/vote-question.dto";
 import { message } from "../constants/message.constants";
 import { TagService } from "../tag/tag.service";
 import { questionPaginateConfig } from "../config/pagination/question-pagination.config";
-import { ReputationService } from "../reputation/reputation.service";
+import { ActivityService } from "../activity/activity.service";
 import {
-  ActivityReputationTypeEnum,
-  ObjectReputationTypeEnum,
+  ObjectActivityTypeEnum,
+  ReputationActivityTypeEnum,
 } from "../enums/reputation.enum";
 import { Transactional } from "typeorm-transactional";
 
@@ -30,7 +30,7 @@ export class QuestionService {
     private readonly questionRepository: Repository<Question>,
     private readonly voteService: VoteService,
     private readonly tagService: TagService,
-    private readonly reputationService: ReputationService,
+    private readonly activityService: ActivityService,
   ) {}
 
   /**
@@ -238,17 +238,17 @@ export class QuestionService {
   }
 
   /**
-   * Create a new question with reputation.
+   * Create a new question with activity.
    * @param questionDto - The question data to create.
    * @param userId - The ID of the user creating the question.
    */
   @Transactional()
-  async createWithReputation(questionDto: CreateQuestionDto, userId: string) {
-    if (await this.reputationService.checkCreateQuestion(userId)) {
+  async createWithActivity(questionDto: CreateQuestionDto, userId: string) {
+    if (await this.activityService.checkCreateQuestion(userId)) {
       const question = await this.create(questionDto, userId);
-      await this.reputationService.create(
-        ActivityReputationTypeEnum.CREATE_QUESTION,
-        ObjectReputationTypeEnum.QUESTION,
+      await this.activityService.create(
+        ReputationActivityTypeEnum.CREATE_QUESTION,
+        ObjectActivityTypeEnum.QUESTION,
         question.id,
         userId,
       );
@@ -260,19 +260,19 @@ export class QuestionService {
   }
 
   /**
-   * Update a question with reputation.
+   * Update a question with activity.
    * @param question - The question to update.
    * @param userId - The ID of the user updating the question.
    */
   @Transactional()
-  async removeWithReputation(question: Question, userId: string) {
-    await this.reputationService.create(
-      ActivityReputationTypeEnum.DELETE_QUESTION,
-      ObjectReputationTypeEnum.QUESTION,
+  async removeWithActivity(question: Question, userId: string) {
+    await this.activityService.create(
+      ReputationActivityTypeEnum.DELETE_QUESTION,
+      ObjectActivityTypeEnum.QUESTION,
       question.id,
       userId,
     );
-    await this.reputationService.syncPointDelete(question.id, userId);
+    await this.activityService.syncPointDelete(question.id, userId);
     return this.remove(question);
   }
 }

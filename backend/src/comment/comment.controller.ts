@@ -86,7 +86,7 @@ export class CommentController {
     const userId = req["user"]["sub"];
     const answer = await this.answerService.findOneById(answerDto.answer_id);
     if (answer) {
-      return this.commentService.createWithReputation(answerDto, userId);
+      return this.commentService.createWithActivity(answerDto, userId);
     }
   }
 
@@ -145,7 +145,7 @@ export class CommentController {
     }
 
     if (ability.can(Action.Delete, comment)) {
-      return this.commentService.removeWithReputation(
+      return this.commentService.removeWithActivity(
         comment,
         req["user"]["sub"],
       );

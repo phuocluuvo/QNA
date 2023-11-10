@@ -1,4 +1,4 @@
-export enum ActivityReputationTypeEnum {
+export enum ReputationActivityTypeEnum {
   CREATE_QUESTION = "create_question",
   CREATE_ANSWER = "create_answer",
   CREATE_COMMENT = "create_comment",
@@ -12,7 +12,7 @@ export enum ActivityReputationTypeEnum {
   UN_ACCEPT_ANSWER = "un_accept_answer",
 }
 
-export enum ObjectReputationTypeEnum {
+export enum ObjectActivityTypeEnum {
   QUESTION = "question",
   ANSWER = "answer",
   COMMENT = "comment",

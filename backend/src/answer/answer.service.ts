@@ -11,12 +11,12 @@ import { VoteType } from "../enums/vote-type.enum";
 import { ApproveAnswerDto } from "./dto/approve-answer.dto";
 import { message } from "../constants/message.constants";
 import { answerPaginateConfig } from "../config/pagination/answer-pagination.config";
-import { ReputationService } from "../reputation/reputation.service";
-import {
-  ActivityReputationTypeEnum,
-  ObjectReputationTypeEnum,
-} from "../enums/reputation.enum";
+import { ActivityService } from "../activity/activity.service";
 import { Transactional } from "typeorm-transactional";
+import {
+  ObjectActivityTypeEnum,
+  ReputationActivityTypeEnum,
+} from "../enums/reputation.enum";
 
 @Injectable()
 export class AnswerService {
@@ -24,7 +24,7 @@ export class AnswerService {
     @Inject("ANSWER_REPOSITORY")
     private readonly answerRepository: Repository<Answer>,
     private readonly voteService: VoteService,
-    private readonly reputationService: ReputationService,
+    private readonly activityService: ActivityService,
   ) {}
 
   /**
@@ -193,16 +193,16 @@ export class AnswerService {
   }
 
   /**
-   * Create a new answer with reputation.
+   * Create a new answer with activity.
    * @param answerDto - The data to create a new answer.
    * @param userId - The ID of the user creating the answer.
    */
   @Transactional()
-  async createWithReputation(answerDto: CreateAnswerDto, userId: string) {
+  async createWithActivity(answerDto: CreateAnswerDto, userId: string) {
     const answer = await this.create(answerDto, userId);
-    await this.reputationService.create(
-      ActivityReputationTypeEnum.CREATE_ANSWER,
-      ObjectReputationTypeEnum.ANSWER,
+    await this.activityService.create(
+      ReputationActivityTypeEnum.CREATE_ANSWER,
+      ObjectActivityTypeEnum.ANSWER,
       answer.id,
       userId,
     );
@@ -211,39 +211,39 @@ export class AnswerService {
   }
 
   /**
-   * Remove an answer with reputation.
+   * Remove an answer with activity.
    * @param answer - The answer entity to remove.
    * @param userId - The ID of the user removing the answer.
    */
   @Transactional()
-  async removeWithReputation(answer: Answer, userId: string) {
-    await this.reputationService.create(
-      ActivityReputationTypeEnum.DELETE_ANSWER,
-      ObjectReputationTypeEnum.ANSWER,
+  async removeWithActivity(answer: Answer, userId: string) {
+    await this.activityService.create(
+      ReputationActivityTypeEnum.DELETE_ANSWER,
+      ObjectActivityTypeEnum.ANSWER,
       answer.id,
       userId,
     );
-    await this.reputationService.syncPointDelete(answer.id, userId);
+    await this.activityService.syncPointDelete(answer.id, userId);
     return this.remove(answer);
   }
 
   /**
-   * Approve an answer with reputation.
+   * Approve an answer with activity.
    * @param approveAnswerDto - The data to approve an answer.
    * @param answer - The answer entity to approve.
    */
   @Transactional()
-  async approveAnswerWithReputation(
+  async approveAnswerWithActivity(
     approveAnswerDto: ApproveAnswerDto,
     answer: Answer,
   ) {
     const answerApprove = await this.approveAnswer(approveAnswerDto);
 
-    await this.reputationService.create(
+    await this.activityService.create(
       answerApprove.isApproved
-        ? ActivityReputationTypeEnum.ACCEPT_ANSWER
-        : ActivityReputationTypeEnum.UN_ACCEPT_ANSWER,
-      ObjectReputationTypeEnum.ANSWER,
+        ? ReputationActivityTypeEnum.ACCEPT_ANSWER
+        : ReputationActivityTypeEnum.UN_ACCEPT_ANSWER,
+      ObjectActivityTypeEnum.ANSWER,
       answer.id,
       answer.user.id,
     );
