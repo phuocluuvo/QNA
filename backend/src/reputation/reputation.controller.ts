@@ -8,10 +8,11 @@ import {
 } from "nestjs-paginate";
 import { Reputation } from "./entity/reputation.entity";
 import { reputationPaginateConfig } from "../config/pagination/activity-pagination";
-import { ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { AccessTokenGuard } from "../auth/guards/accessToken.guard";
 
 @Controller("activity")
+@ApiTags("Reputation")
 export class ReputationController {
   constructor(private readonly reputationService: ReputationService) {}
 
