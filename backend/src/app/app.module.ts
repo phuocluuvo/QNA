@@ -11,6 +11,7 @@ import { VoteModule } from "../vote/vote.module";
 import { CommentModule } from "../comment/comment.module";
 import { TagModule } from "../tag/tag.module";
 import { ActivityModule } from "../activity/activity.module";
+import { NotificationModule } from "../notification/notification.module";
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ActivityModule } from "../activity/activity.module";
     CommentModule,
     TagModule,
     ActivityModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
