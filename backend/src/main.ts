@@ -1,5 +1,5 @@
 import { NestFactory, Reflector } from "@nestjs/core";
-import { AppModule } from "./app.module";
+import { AppModule } from "./app/app.module";
 import { ValidationPipe } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { RolesGuard } from "./auth/guards/roles.guard";

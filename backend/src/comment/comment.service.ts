@@ -8,12 +8,19 @@ import { UpdateAnswerDto } from "../answer/dto/update-answer.dto";
 import { UpdateCommentDto } from "./dto/update-comment.dto";
 import { message } from "../constants/message.constants";
 import { commentPaginateConfig } from "../config/pagination/comment-pagination";
+import { Transactional } from "typeorm-transactional";
+import { ActivityService } from "../activity/activity.service";
+import {
+  ReputationActivityTypeEnum,
+  ObjectActivityTypeEnum,
+} from "../enums/reputation.enum";
 
 @Injectable()
 export class CommentService {
   constructor(
     @Inject("COMMENT_REPOSITORY")
-    private commentRepository: Repository<Comment>,
+    private readonly commentRepository: Repository<Comment>,
+    private readonly activityService: ActivityService,
   ) {}
 
   /**
@@ -108,5 +115,39 @@ export class CommentService {
    */
   async remove(comment: Comment) {
     return this.commentRepository.remove(comment);
+  }
+
+  /**
+   *  Create a new comment with activity.
+   * @param commentDto - The data to create a new comment.
+   * @param userId - The ID of the user creating the comment.
+   */
+  @Transactional()
+  async createWithActivity(commentDto: CreateCommentDto, userId: string) {
+    const comment = await this.create(commentDto, userId);
+    await this.activityService.create(
+      ReputationActivityTypeEnum.CREATE_COMMENT,
+      ObjectActivityTypeEnum.COMMENT,
+      comment.id,
+      userId,
+    );
+
+    return comment;
+  }
+
+  /**
+   * Update an existing comment with activity.
+   * @param comment - The comment entity to update.
+   * @param userId - The ID of the user updating the comment.
+   */
+  @Transactional()
+  async removeWithActivity(comment: Comment, userId: string) {
+    await this.activityService.create(
+      ReputationActivityTypeEnum.DELETE_COMMENT,
+      ObjectActivityTypeEnum.COMMENT,
+      comment.id,
+      userId,
+    );
+    return this.remove(comment);
   }
 }

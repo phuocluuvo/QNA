@@ -6,9 +6,16 @@ import { answerProviders } from "./providers/answer.providers";
 import { QuestionModule } from "../question/question.module";
 import { CaslModule } from "../casl/casl.module";
 import { VoteModule } from "../vote/vote.module";
+import { ActivityModule } from "../activity/activity.module";
 
 @Module({
-  imports: [DatabaseModule, QuestionModule, VoteModule, CaslModule],
+  imports: [
+    DatabaseModule,
+    QuestionModule,
+    VoteModule,
+    CaslModule,
+    ActivityModule,
+  ],
   controllers: [AnswerController],
   providers: [...answerProviders, AnswerService],
   exports: [AnswerService],

@@ -93,7 +93,7 @@ export class QuestionController {
     @Req() req: Request,
   ): Promise<Question> {
     const userId = req.user["sub"];
-    return this.questionService.create(questionDto, userId);
+    return this.questionService.createWithActivity(questionDto, userId);
   }
 
   /**
@@ -154,7 +154,7 @@ export class QuestionController {
     }
 
     if (ability.can(Action.Delete, question)) {
-      return this.questionService.remove(question);
+      return this.questionService.removeWithActivity(question, req.user["sub"]);
     } else {
       throw new ForbiddenException(message.NOT_AUTHOR.QUESTION);
     }
