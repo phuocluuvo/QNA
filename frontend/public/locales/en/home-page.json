@@ -1,9 +1,9 @@
 {
   "ABOUT": "About",
   "CREATE_QUESTION": "Create Question",
-  "LOGIN": "Login",
-  "SIGNUP": "Signup",
-  "LOGOUT": "Logout",
+  "LOGIN": "Log In",
+  "SIGNUP": "Sign Up",
+  "LOGOUT": "Log Out",
   "DASHBOARD": "Dashboard",
   "HOME": "Home",
   "PROFILE": "Profile",
@@ -61,5 +61,8 @@
   "RELATED_TAGS": "Related Tags",
   "THERE_IS_QUESTION": "There is {0} question",
   "THERE_ARE_QUESTIONS": "There are {0} questions",
-  "UPDATE": "Update"
+  "UPDATE": "Update",
+  "LOGIN_ERROR": "Invalid username or password",
+  "LOGIN_WITH_GOOGLE": "Sign in with Google",
+  "LOGIN_WITH_GITHUB": "Sign in with Github"
 }

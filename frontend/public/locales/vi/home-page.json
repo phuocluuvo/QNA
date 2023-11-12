@@ -61,5 +61,8 @@
   "RELATED_TAGS": "Thẻ liên quan",
   "THERE_IS_QUESTION": "Có {0} câu hỏi",
   "THERE_ARE_QUESTIONS": "Có {0} câu hỏi",
-  "UPDATE": "Cập nhật"
+  "UPDATE": "Cập nhật",
+  "LOGIN_ERROR": "Tên đăng nhập hoặc mật khẩu không đúng",
+  "LOGIN_WITH_GOOGLE": "Đăng nhập với Google",
+  "LOGIN_WITH_GITHUB": "Đăng nhập với Github"
 }
