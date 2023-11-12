@@ -10,7 +10,9 @@ import {
   IconButton,
   Input,
   Text,
+  VStack,
   useColorMode,
+  useToast,
 } from "@chakra-ui/react";
 import { Field, Form, Formik } from "formik";
 import React from "react";
@@ -20,11 +22,14 @@ import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
 import { getCsrfToken, getSession, signIn } from "next-auth/react";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
+import LoginButton from "@/components/LoginButton";
 export default function SignIn() {
   const { colorMode } = useColorMode();
   const [show, setShow] = React.useState(false);
+  const toast = useToast();
   const router = useRouter();
   const { getTranslate } = LanguageHelper(Pages.HOME);
+  const usernameRef = React.useRef<HTMLInputElement>(null);
   function validatePassword(value = "") {
     let error = "";
     const charLength = 8;
@@ -57,108 +62,166 @@ export default function SignIn() {
       password: values.password,
     };
     setTimeout(async () => {
-      let data = await signIn("credentials", {
+      await signIn("credentials", {
         username: form.username,
         password: form.password,
+        redirect: false,
         callbackUrl: router.query.callbackUrl as string,
+      }).then((response) => {
+        if (response && response.ok) {
+          if (router.query.callbackUrl) {
+            router.push(router.query.callbackUrl as string);
+          } else {
+            router.push("/");
+          }
+        } else {
+          toast({ title: getTranslate("LOGIN_ERROR"), status: "error" });
+          actions.setErrors({ username: getTranslate("LOGIN_ERROR") });
+          usernameRef.current?.focus();
+        }
       });
-      console.log("res: ", data);
-      if (data?.error) {
-        actions.setErrors({ username: data?.error });
-      } else {
-        router.push("/");
-      }
       actions.setSubmitting(false);
     }, 1000);
+  }
+  function LoginGithubHandle(type: "github" | "google") {
+    signIn(type).then((response) => {
+      if (response && response.ok) {
+        if (router.query.callbackUrl) {
+          router.push(router.query.callbackUrl as string);
+        } else {
+          router.push("/");
+        }
+      } else {
+        toast({ title: getTranslate("LOGIN_ERROR"), status: "error" });
+      }
+    });
   }
   return (
     <Container>
       <Box bg={"whiteAlpha.100"} p={10} rounded="md">
-        <Heading>{getTranslate("LOGIN")}</Heading>
-        <Text mb={2} mt={1}>
-          Welcome to QuestionandAnswaredIt
-        </Text>
-        {/* Facebook  */}
-        <Formik
-          initialValues={{
-            username: "vincent12",
-            password: "Voluu113@",
-          }}
-          onSubmit={(values, actions) => {
-            LoginHandle(values, actions);
-          }}
-        >
-          {(props) => (
-            <Form method="post" action="/api/auth/callback/credentials">
-              <Field name="username">
-                {/* @ts-ignore */}
-                {({ field, form }) => (
-                  <FormControl
-                    isInvalid={form.errors.username && form.touched.username}
-                  >
-                    {/* <input
+        <VStack spacing={2}>
+          <Heading>{getTranslate("LOGIN")}</Heading>
+          <Text mb={2} mt={1}>
+            Welcome to QuestionandAnswaredIt
+          </Text>
+          {/* Github */}
+          <LoginButton
+            type="github"
+            getTranslate={getTranslate}
+            style={{
+              border: "none",
+              size: "lg",
+              colorScheme: "gray",
+            }}
+            onLogin={() => LoginGithubHandle("github")}
+          />
+          {/* Google */}
+          <LoginButton
+            style={{
+              border: "none",
+              size: "lg",
+              colorScheme: "orange",
+            }}
+            type="google"
+            getTranslate={getTranslate}
+            onLogin={() => LoginGithubHandle("google")}
+          />
+          <Box mt={5} mb={5} w={"100%"} h={"1px"} bg={"gray.300"}></Box>
+          {/* Facebook  */}
+          <Formik
+            initialValues={{
+              username: "vincent12",
+              password: "Voluu113@",
+            }}
+            onSubmit={(values, actions) => {
+              LoginHandle(values, actions);
+            }}
+          >
+            {(props) => (
+              <Form
+                method="post"
+                action="/api/auth/callback/credentials"
+                style={{
+                  width: "100%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Field name="username">
+                  {/* @ts-ignore */}
+                  {({ field, form }) => (
+                    <FormControl
+                      isInvalid={form.errors.username && form.touched.username}
+                    >
+                      {/* <input
                       name="csrfToken"
                       type="hidden"
                       defaultValue={csrfToken}
                     /> */}
 
-                    <FormLabel>{getTranslate("USERNAME")}</FormLabel>
-                    <Input
-                      {...field}
-                      required
-                      i18nIsDynamicList={false}
-                      // type="username"
-                      placeholder={getTranslate("USERNAME_PLACEHOLDER")}
-                    />
-                    <FormErrorMessage>{form.errors.username}</FormErrorMessage>
-                  </FormControl>
-                )}
-              </Field>
-              <Field name="password" validate={validatePassword}>
-                {/* @ts-ignore */}
-                {({ field, form }) => (
-                  <FormControl
-                    isInvalid={form.errors.password && form.touched.password}
-                  >
-                    <FormLabel>{getTranslate("PASSWORD")}</FormLabel>
-                    <Box pos={"relative"}>
+                      <FormLabel>{getTranslate("USERNAME")}</FormLabel>
                       <Input
-                        required
+                        ref={usernameRef}
                         {...field}
-                        type={show ? "text" : "password"}
-                        placeholder={getTranslate("PASSWORD_PLACEHOLDER")}
+                        required
+                        i18nIsDynamicList={false}
+                        // type="username"
+                        placeholder={getTranslate("USERNAME_PLACEHOLDER")}
                       />
-                      <IconButton
-                        aria-label="Show password"
-                        style={{
-                          position: "absolute",
-                          right: "0px",
-                          top: "0px",
-                        }}
-                        onClick={() => setShow(!show)}
-                        icon={show ? <ViewIcon /> : <ViewOffIcon />}
-                        variant="ghost"
-                      />
-                    </Box>
-                    <FormErrorMessage>{form.errors.password}</FormErrorMessage>
-                  </FormControl>
-                )}
-              </Field>
-              <HStack>
-                <Button
-                  type="submit"
-                  mt={"5"}
-                  background={colorMode === "light" ? "gray.100" : "gray.700"}
-                  border={"none"}
-                  isLoading={props.isSubmitting}
-                >
-                  {getTranslate("LOGIN")}
-                </Button>
-                {/* <Icon as={}/> */}
-              </HStack>
-            </Form>
-          )}
-        </Formik>
+                      <FormErrorMessage>
+                        {form.errors.username}
+                      </FormErrorMessage>
+                    </FormControl>
+                  )}
+                </Field>
+                <Field name="password" validate={validatePassword}>
+                  {/* @ts-ignore */}
+                  {({ field, form }) => (
+                    <FormControl
+                      isInvalid={form.errors.password && form.touched.password}
+                    >
+                      <FormLabel>{getTranslate("PASSWORD")}</FormLabel>
+                      <Box pos={"relative"}>
+                        <Input
+                          required
+                          {...field}
+                          type={show ? "text" : "password"}
+                          placeholder={getTranslate("PASSWORD_PLACEHOLDER")}
+                        />
+                        <IconButton
+                          aria-label="Show password"
+                          style={{
+                            position: "absolute",
+                            right: "0px",
+                            top: "0px",
+                          }}
+                          onClick={() => setShow(!show)}
+                          icon={show ? <ViewIcon /> : <ViewOffIcon />}
+                          variant="ghost"
+                        />
+                      </Box>
+                      <FormErrorMessage>
+                        {form.errors.password}
+                      </FormErrorMessage>
+                    </FormControl>
+                  )}
+                </Field>
+                <HStack>
+                  <Button
+                    type="submit"
+                    mt={"5"}
+                    background={colorMode === "light" ? "gray.100" : "gray.700"}
+                    border={"none"}
+                    isLoading={props.isSubmitting}
+                  >
+                    {getTranslate("LOGIN")}
+                  </Button>
+                  {/* <Icon as={}/> */}
+                </HStack>
+              </Form>
+            )}
+          </Formik>
+        </VStack>
       </Box>
     </Container>
   );

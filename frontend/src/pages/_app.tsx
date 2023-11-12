@@ -17,8 +17,8 @@ import NextNProgress from "nextjs-progressbar";
 import { Provider } from "react-redux";
 import { Colors } from "@/assets/constant/Colors";
 import "./index.css";
-import { CacheProvider } from "@chakra-ui/next-js";
-// @ts-ignore
+  import { CacheProvider } from "@chakra-ui/next-js";
+  // @ts-ignore
 function App({ Component, pageProps: { session, ...pageProps } }) {
   return (
     <SessionProvider session={pageProps.session}>

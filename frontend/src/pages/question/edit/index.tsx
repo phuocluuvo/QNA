@@ -56,7 +56,7 @@ type State = {
   tagName?: string;
   tagContent?: string;
 };
-function CreateQuestion() {
+function EditQuestion() {
   const [state, setState] = useStateWithCallback<State>({
     title: "",
     bodyQuestion: "",
@@ -69,6 +69,8 @@ function CreateQuestion() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const finalRef = React.useRef(null);
   const route = useRouter();
+  const axiosAuth = useAxiosAuth();
+  const session = useSession();
   const { colorMode } = useColorMode();
   const dispacth = useDispatch();
   const handleChangeBodyQuestion = (value: string) => {
@@ -90,6 +92,29 @@ function CreateQuestion() {
     }
     return error;
   };
+  React.useEffect(() => {
+    if (route.query.questionId) {
+      dispacth(
+        actionGetQuestion(
+          { id: route.query.questionId as string },
+          (res) => {
+            console.log("actionGetQuestion", res);
+            setState(
+              // @ts-ignore
+              (oldState) =>
+                helper.mappingState(oldState, {
+                  selectedTags: new Set(res.tags),
+                  title: res.title,
+                  bodyQuestion: res.content,
+                }),
+              ({ selectedTags }) => console.log("selectedTags", selectedTags)
+            );
+          },
+          () => {}
+        )
+      );
+    }
+  }, []);
   const searchTag = (value: string) => {
     if (value) {
       dispacth(
@@ -393,7 +418,7 @@ function CreateQuestion() {
                 )}
               </Field>
               <Field name="bodyQuestion">
-                {({ form }: any) => (
+                {({ field, form }: any) => (
                   <FormControl
                     isInvalid={form.errors.body && form.touched.body}
                   >
@@ -467,7 +492,7 @@ function CreateQuestion() {
                 border={"none"}
                 isLoading={props.isSubmitting}
               >
-                {getTranslate("CREATE")}
+                {getTranslate("UPDATE")}
               </Button>
             </HStack>
           </Form>
@@ -531,4 +556,4 @@ function CreateQuestion() {
   );
 }
 
-export default CreateQuestion;
+export default EditQuestion;

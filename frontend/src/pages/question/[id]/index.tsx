@@ -394,7 +394,7 @@ function Question() {
                             onClick={() => {
                               router.push(
                                 router.basePath +
-                                  `/question/create?questionId=${state.question.id}`
+                                  `/question/edit?questionId=${state.question.id}`
                               );
                               // setEditQuestion(
                               //   // @ts-ignore

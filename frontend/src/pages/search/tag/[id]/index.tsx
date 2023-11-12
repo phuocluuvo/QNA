@@ -19,7 +19,7 @@ import {
 } from "@chakra-ui/react";
 import QuestionItem from "@/components/QuestionItem";
 import TabsQuestion from "@/components/TabsQuestion";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import actionGetQuestionList from "@/API/redux/actions/question/ActionGetQuestionList";
 import { QuestionListType } from "@/util/type/Question.type";
 import { useRouter } from "next/router";
@@ -37,9 +37,10 @@ import {
   SORT_ORDER_DATA_VI,
 } from "@/assets/constant/Filter.data";
 import TagList from "@/components/TagList";
-import { TagType } from "@/util/type/Tag.type";
+import { TagListType, TagType } from "@/util/type/Tag.type";
 import actionSearchTags from "@/API/redux/actions/tags/ActionSearchTag";
 import actionGetTag from "@/API/redux/actions/tags/ActionGetTag";
+import { ActionTypes } from "@/API/constant/ActionTypes.enum";
 const limitations = [5, 10, 15, 20];
 
 export default function TagPage() {
@@ -61,14 +62,16 @@ export default function TagPage() {
   const { getTranslate, getCurrentLanguage } = LanguageHelper(Pages.HOME);
   const [valueSort, setValueSort] = useState("title");
   const [isDecending, setIsDecending] = useState("ASC");
-  const [tagDetail, setTagDetail] = useState<TagType | null>(null);
+  const [tagDetail, setTagDetail] = useState<TagType | undefined>();
   const { isOpen, onToggle } = useDisclosure();
+  const questionLoading = useSelector(
+    (state: any) => state.questionReducer.type
+  );
   useEffect(() => {
     const defaultLimit = 10;
     const defaultPage = 1;
     const defaultSortBy = "title";
     const defaultOrderBy = "ASC";
-    console.log("router.query", router.query);
     const queryParams: GetQuesionParams = {
       limit: limit || defaultLimit,
       page: pageNumber || defaultPage,
@@ -95,12 +98,14 @@ export default function TagPage() {
         }
       )
     );
-
+    // if (questionList?.data.length === 0)
     dispatch(
       actionGetTag(
         router.query.id as string,
-        (res: TagType) => {
-          setTagDetail(res);
+        (res: TagListType) => {
+          if (res.data.length > 0) {
+            setTagDetail(res.data.at(0));
+          }
         },
         () => {
           console.log("error");
@@ -159,10 +164,13 @@ export default function TagPage() {
         alignItems={"flex-start"}
         justifyContent={"flex-start"}
       >
-        <VStack alignItems={"end"} flex={{ base: 1, md: 0.8 }}>
+        <VStack alignItems={"start"} flex={{ base: 1, md: 0.8 }}>
           <VStack alignItems={"start"}>
             <Heading size={"md"} fontWeight={"medium"}>
-              All question from <Tag size={"lg"}>{tagDetail?.name}</Tag>
+              <Text>
+                Questions has tagged{" "}
+                <Tag size={"lg"}>{router.query.id ?? ""}</Tag>
+              </Text>
             </Heading>
             <Text
               style={{
@@ -172,15 +180,23 @@ export default function TagPage() {
                 fontSize: "xs",
               }}
             >
-              {tagDetail?.content}
+              {questionList && questionList?.data.length > 0
+                ? tagDetail?.content
+                : ""}
             </Text>
           </VStack>
           <HStack
             w={"full"}
             justifyContent={"space-between"}
             alignItems={"flex-start"}
+            paddingBottom={2}
+            borderBottom={"1px solid " + Colors(colorMode === "dark").BORDER}
           >
-            <Text>{QuestionNumberTitle()}</Text>
+            <Text>
+              {questionLoading !== ActionTypes.REQUEST_GET_QUESTION_LIST
+                ? QuestionNumberTitle()
+                : ""}
+            </Text>
             <VStack flex={1} alignItems={"flex-end"}>
               <HStack>
                 <SelectOptions
@@ -259,141 +275,151 @@ export default function TagPage() {
             justifyContent={"start"}
             wrap={"wrap"}
           >
-            <Flex
-              alignItems={"center"}
-              justifyContent={"center"}
-              mb={{ base: 3, md: 10 }}
-              w={"full"}
-            >
-              <HStack spacing={3}>
-                {questionList
-                  ? questionList?.meta.totalPages > 0 &&
-                    numberOfPages.map((_, index) => (
-                      <Button
-                        key={index}
-                        size={"xs"}
-                        variant={"outline"}
-                        bg={
-                          pageNumber
-                            ? pageNumber === index + 1
-                              ? "orange.500"
-                              : Colors(colorMode === "dark").PRIMARY_BG
-                            : index == 0
-                            ? "orange.500"
-                            : Colors(colorMode === "dark").PRIMARY_BG
-                        }
-                        color={
-                          pageNumber
-                            ? pageNumber === index + 1
-                              ? "white"
-                              : Colors(colorMode === "dark").BORDER
-                            : index == 0
-                            ? "white"
-                            : Colors(colorMode === "dark").BORDER
-                        }
-                        onClick={() => pageNumClick(index + 1, limit)}
-                      >
-                        {index + 1}
-                      </Button>
-                    ))
-                  : null}
-              </HStack>
-              <Spacer />
-              <HStack spacing={3} ml={5}>
-                {limitations.map((_limit, index) => (
-                  <Button
-                    key={index}
-                    size={"xs"}
+            {questionLoading === ActionTypes.SUCCESS_GET_QUESTION_LIST ? (
+              questionList && questionList.data.length > 0 ? (
+                <>
+                  <Flex
                     alignItems={"center"}
                     justifyContent={"center"}
-                    _hover={{
-                      color: Colors(colorMode === "dark").PRIMARY,
-                    }}
-                    color={
-                      limit === _limit
-                        ? Colors(colorMode === "dark").PRIMARY
-                        : "gray.300"
-                    }
-                    variant={"link"}
-                    onClick={() => pageNumClick(1, _limit)}
+                    mb={{ base: 3, md: 10 }}
+                    w={"full"}
                   >
-                    {_limit}
-                  </Button>
-                ))}
-              </HStack>
-            </Flex>
-            {questionList?.data.map((question, index) => (
-              <QuestionItem
-                key={index}
-                question={question}
-                isLast={index === questionList?.data.length - 1}
-                isDarkMode={colorMode === "dark"}
-              />
-            ))}
-            <Flex
-              alignItems={"center"}
-              justifyContent={"center"}
-              mt={10}
-              mb={10}
-              w={"full"}
-            >
-              <HStack spacing={3}>
-                {questionList
-                  ? questionList?.meta.totalPages > 0 &&
-                    numberOfPages.map((_, index) => (
-                      <Button
-                        key={index}
-                        size={"xs"}
-                        variant={"outline"}
-                        bg={
-                          pageNumber
-                            ? pageNumber === index + 1
-                              ? "orange.500"
-                              : Colors(colorMode === "dark").PRIMARY_BG
-                            : index == 0
-                            ? "orange.500"
-                            : Colors(colorMode === "dark").PRIMARY_BG
-                        }
-                        color={
-                          pageNumber
-                            ? pageNumber === index + 1
-                              ? "white"
-                              : Colors(colorMode === "dark").BORDER
-                            : index == 0
-                            ? "white"
-                            : Colors(colorMode === "dark").BORDER
-                        }
-                        onClick={() => pageNumClick(index + 1, limit)}
-                      >
-                        {index + 1}
-                      </Button>
-                    ))
-                  : null}
-              </HStack>
-              <Spacer />
-              <HStack spacing={3} ml={5}>
-                {limitations.map((_limit, index) => (
-                  <Button
-                    key={index}
+                    <HStack spacing={3}>
+                      {questionList?.meta.totalPages > 0 &&
+                        numberOfPages.map((_, index) => (
+                          <Button
+                            key={index}
+                            size={"xs"}
+                            variant={"outline"}
+                            bg={
+                              pageNumber
+                                ? pageNumber === index + 1
+                                  ? "orange.500"
+                                  : Colors(colorMode === "dark").PRIMARY_BG
+                                : index == 0
+                                ? "orange.500"
+                                : Colors(colorMode === "dark").PRIMARY_BG
+                            }
+                            color={
+                              pageNumber
+                                ? pageNumber === index + 1
+                                  ? "white"
+                                  : Colors(colorMode === "dark").BORDER
+                                : index == 0
+                                ? "white"
+                                : Colors(colorMode === "dark").BORDER
+                            }
+                            onClick={() => pageNumClick(index + 1, limit)}
+                          >
+                            {index + 1}
+                          </Button>
+                        ))}
+                    </HStack>
+                    <Spacer />
+                    <HStack spacing={3} ml={5}>
+                      {limitations.map((_limit, index) => (
+                        <Button
+                          key={index}
+                          size={"xs"}
+                          alignItems={"center"}
+                          justifyContent={"center"}
+                          _hover={{
+                            color: Colors(colorMode === "dark").PRIMARY,
+                          }}
+                          color={
+                            limit === _limit
+                              ? Colors(colorMode === "dark").PRIMARY
+                              : "gray.300"
+                          }
+                          variant={"link"}
+                          onClick={() => pageNumClick(1, _limit)}
+                        >
+                          {_limit}
+                        </Button>
+                      ))}
+                    </HStack>
+                  </Flex>
+
+                  {questionList.data.map((question, index) => (
+                    <QuestionItem
+                      key={index}
+                      question={question}
+                      isLast={index === questionList?.data.length - 1}
+                      isDarkMode={colorMode === "dark"}
+                    />
+                  ))}
+
+                  <Flex
                     alignItems={"center"}
                     justifyContent={"center"}
-                    _hover={{
-                      color: Colors(colorMode === "dark").PRIMARY,
-                    }}
-                    size={"xs"}
-                    color={
-                      limit === _limit
-                        ? Colors(colorMode === "dark").PRIMARY
-                        : "gray.300"
-                    }
-                    variant={"link"}
-                    onClick={() => pageNumClick(1, _limit)}
+                    mt={10}
+                    mb={10}
+                    w={"full"}
                   >
-                    {_limit}
-                  </Button>
-                ))}
-              </HStack>
-            </Flex>
+                    <HStack spacing={3}>
+                      {questionList?.meta.totalPages > 0 &&
+                        numberOfPages.map((_, index) => (
+                          <Button
+                            key={index}
+                            size={"xs"}
+                            variant={"outline"}
+                            bg={
+                              pageNumber
+                                ? pageNumber === index + 1
+                                  ? "orange.500"
+                                  : Colors(colorMode === "dark").PRIMARY_BG
+                                : index == 0
+                                ? "orange.500"
+                                : Colors(colorMode === "dark").PRIMARY_BG
+                            }
+                            color={
+                              pageNumber
+                                ? pageNumber === index + 1
+                                  ? "white"
+                                  : Colors(colorMode === "dark").BORDER
+                                : index == 0
+                                ? "white"
+                                : Colors(colorMode === "dark").BORDER
+                            }
+                            onClick={() => pageNumClick(index + 1, limit)}
+                          >
+                            {index + 1}
+                          </Button>
+                        ))}
+                    </HStack>
+                    <Spacer />
+                    <HStack spacing={3} ml={5}>
+                      {limitations.map((_limit, index) => (
+                        <Button
+                          key={index}
+                          alignItems={"center"}
+                          justifyContent={"center"}
+                          _hover={{
+                            color: Colors(colorMode === "dark").PRIMARY,
+                          }}
+                          size={"xs"}
+                          color={
+                            limit === _limit
+                              ? Colors(colorMode === "dark").PRIMARY
+                              : "gray.300"
+                          }
+                          variant={"link"}
+                          onClick={() => pageNumClick(1, _limit)}
+                        >
+                          {_limit}
+                        </Button>
+                      ))}
+                    </HStack>
+                  </Flex>
+                </>
+              ) : (
+                <Text>
+                  There is no question using <Code>{router.query.id}</Code> tag.
+                </Text>
+              )
+            ) : (
+              <Text>Loading...</Text>
+            )}
           </Flex>
         </VStack>
         <VStack
