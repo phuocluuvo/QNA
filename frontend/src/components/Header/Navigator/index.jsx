@@ -21,6 +21,7 @@ import { useSelector } from "react-redux";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import api from "@/API/api";
+import DrawerMenu from "@/components/DrawerMenu";
 function Navigator({ getTranslate, isMobile }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { colorMode } = useColorMode();
@@ -50,29 +51,16 @@ function Navigator({ getTranslate, isMobile }) {
         console.log("logout failed:", err);
       };
   };
+  React.useEffect(() => {
+    if (isMobile) {
+      onClose();
+    }
+  }, [isMobile]);
   const DashboardHandle = () => {
     routes.push("/user/profile");
   };
   return isMobile ? (
-    <Flex
-      as="nav"
-      align="center"
-      justify="space-between"
-      w={{ base: isOpen ? "full" : "50px", md: "auto" }}
-      height={{ base: isOpen ? "100vh" : "0", md: "auto" }}
-      borderRadius={{ base: isOpen ? "0" : "0px 0px 0px  999px", md: "0" }}
-      position={{ base: "absolute", md: "relative" }}
-      top={{ base: "0", md: "auto" }}
-      right={{ base: "0", md: "auto" }}
-      zIndex="999"
-      bg={
-        colorMode === "dark"
-          ? "rgba(17, 25, 40, 0.75)"
-          : "rgba(255, 255, 255, 0.75)"
-      }
-      backdropFilter="blur(2px) saturate(180%)"
-      transition={"all 0.5s"}
-    >
+    <>
       <Box
         display={{ base: "flex", md: "none" }}
         alignItems="center"
@@ -83,57 +71,44 @@ function Navigator({ getTranslate, isMobile }) {
         top={{ base: "0", md: "auto" }}
         left={{ base: "0", md: "auto" }}
       >
-        <IconButton
-          aria-label="Open menu"
-          icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
-          onClick={handleClick}
-          variant="ghost"
-          color={Colors(colorMode === "dark").PRIMARY}
-          _hover={{ bg: "transparent" }}
-          transition="all 0.5s"
-          transform={isOpen ? "rotate(90deg)" : ""}
-        />
-      </Box>
-      <VStack
-        spacing={4}
-        display={{ base: isOpen ? "flex" : "none", md: "flex" }}
-        opacity={{ base: isOpen ? "1" : "0", md: "1" }}
-        width={{ base: "full", md: "auto" }}
-        alignItems="center"
-        justifyContent={{ base: "center", md: "flex-end" }}
-      >
-        <LinkButton
-          href="/about"
-          text={getTranslate("ABOUT")}
-          onClick={handleClick}
-        />
-        {session?.user ? (
+        <DrawerMenu
+          onCloseButtonClick={handleClick}
+          isOpen={isOpen}
+          onClose={onClose}
+        >
           <LinkButton
-            href="/auth/logout"
-            text={getTranslate("LOGOUT")}
-            onClick={LogoutHandle}
+            href="/about"
+            text={getTranslate("ABOUT")}
+            onClick={handleClick}
           />
-        ) : (
-          <>
-            {/* check if current routes is login */}
-            {routes.pathname === "/auth/signin" ? null : (
+          {session?.user ? (
+            <LinkButton
+              href="/auth/logout"
+              text={getTranslate("LOGOUT")}
+              onClick={LogoutHandle}
+            />
+          ) : (
+            <>
+              {/* check if current routes is login */}
+              {routes.pathname === "/auth/signin" ? null : (
+                <LinkButton
+                  style={{ paddingX: 0 }}
+                  href="/auth/signin"
+                  onClick={signIn}
+                  text={getTranslate("LOGIN")}
+                />
+              )}
               <LinkButton
                 style={{ paddingX: 0 }}
-                href="/auth/signin"
-                onClick={signIn}
-                text={getTranslate("LOGIN")}
+                textStyle={{ color: Colors(colorMode).PRIMARY }}
+                href="/auth/signup"
+                text={getTranslate("SIGNUP")}
               />
-            )}
-            <LinkButton
-              style={{ paddingX: 0 }}
-              textStyle={{ color: Colors(colorMode).PRIMARY }}
-              href="/auth/signup"
-              text={getTranslate("SIGNUP")}
-            />
-          </>
-        )}
-      </VStack>
-    </Flex>
+            </>
+          )}
+        </DrawerMenu>
+      </Box>
+    </>
   ) : session?.user ? (
     <Menu>
       <IconButton

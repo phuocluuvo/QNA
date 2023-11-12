@@ -1,10 +1,19 @@
 import actionGetTagList from "@/API/redux/actions/tags/ActionGetTagList";
 import useStateWithCallback from "@/hooks/useStateWithCallback";
 import { TagListType, TagType } from "@/util/type/Tag.type";
-import { Box, BoxProps, HStack, Heading, Tag, Text } from "@chakra-ui/react";
-import { NextRouter } from "next/router";
+import {
+  Box,
+  BoxProps,
+  HStack,
+  Heading,
+  Tag,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
+import { NextRouter, useRouter } from "next/router";
 import React from "react";
 import { useDispatch } from "react-redux";
+import TagQuestion from "../TagQuestion";
 type Props = {
   tags?: string;
   containerStyles?: BoxProps;
@@ -13,7 +22,8 @@ type Props = {
 };
 function TagList(props: Props) {
   const dispatch = useDispatch();
-  const [tags, setTags] = useStateWithCallback<TagListType | null>([]);
+  const router = useRouter();
+  const [tags, setTags] = useStateWithCallback<TagListType | null>(null);
   function fecthTags() {
     dispatch(
       actionGetTagList(
@@ -22,6 +32,17 @@ function TagList(props: Props) {
           limit: 10,
         },
         (res: TagListType) => {
+          let results = res.data.filter(
+            (tag: TagType) => tag.questionsNumber > 0
+          );
+          // sort results
+          results.sort((a: TagType, b: TagType) => {
+            return b.questionsNumber - a.questionsNumber;
+          });
+          res = {
+            ...res,
+            data: results,
+          };
           // @ts-ignore
           setTags(res);
         },
@@ -37,12 +58,13 @@ function TagList(props: Props) {
       <Heading size={"sm"} mb={2}>
         {props.getTranslate("RELATED_TAGS")}
       </Heading>
-      {tags?.data?.map((tag: TagType) => (
-        <HStack>
-          <Tag key={tag.id}>{tag.name}</Tag>
-          <Text> x {tag.questionsNumber}</Text>
-        </HStack>
-      ))}
+      <VStack spacing={2} align={"flex-start"} mb={2}>
+        {tags?.data.map((tag: TagType) => (
+          <HStack key={tag.id}>
+            <TagQuestion tag={tag} displayQuestionNumber={true} />
+          </HStack>
+        ))}
+      </VStack>
     </Box>
   );
 }

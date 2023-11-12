@@ -8,7 +8,9 @@ import {
   HStack,
   Heading,
   Input,
+  Link,
   Spacer,
+  Text,
   Tooltip,
   VStack,
 } from "@chakra-ui/react";
@@ -28,6 +30,8 @@ import useStateWithCallback from "@/hooks/useStateWithCallback";
 import { VOTE } from "@/API/constant/Vote.enum";
 import actionVoteAnswer from "@/API/redux/actions/answer/actionVoteAnswer";
 import actionCreateCommentAnswer from "@/API/redux/actions/answer/actionCreateCommentAnswer";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 
 function AnswerItem({
   answer,
@@ -42,7 +46,17 @@ function AnswerItem({
   dispatch: (action: any) => void;
   fecthAnswer: () => void;
 }) {
-  const [state, setState] = useStateWithCallback({
+  const session = useSession();
+  const router = useRouter();
+  const [state, setState] = useStateWithCallback<{
+    count: number;
+    isDarkMode: boolean;
+    isApproved: boolean;
+    isShowConfirm: boolean;
+    isShowComment: boolean;
+    comment: string;
+    answer: AnswerType;
+  }>({
     // @ts-ignore
     count: answer.votes ?? 0,
     isDarkMode: false,
@@ -50,6 +64,7 @@ function AnswerItem({
     isShowConfirm: false,
     isShowComment: false,
     comment: "",
+    answer: answer,
   });
 
   React.useEffect(() => {
@@ -57,6 +72,7 @@ function AnswerItem({
     setState((oldState) =>
       helper.mappingState(oldState, {
         isApproved: answer.isApproved,
+        answer: answer,
       })
     );
   }, [answer]);
@@ -91,7 +107,15 @@ function AnswerItem({
       actionCreateCommentAnswer(
         form,
         (res: any) => {
-          console.log("comment:::", res);
+          const comments = [...answer.comments];
+          comments.push(res);
+          // @ts-ignore
+          setState((oldState) =>
+            helper.mappingState(oldState, {
+              comment: "",
+              answer: { comments },
+            })
+          );
         },
         () => {}
       )
@@ -225,19 +249,65 @@ function AnswerItem({
                 )}
               />
             </VStack>
+            {/* comment */}
+            <VStack
+              w={"full"}
+              justifyContent={"space-between"}
+              alignItems={"center"}
+              spacing={0}
+            >
+              {state.answer.comments?.length > 0 &&
+                state.answer.comments.map((comment) => (
+                  <HStack
+                    key={comment.id}
+                    w={"full"}
+                    borderBottom={"1px solid"}
+                    borderColor={"gray.200"}
+                    py={2}
+                    ml={10}
+                    flexWrap={"wrap"}
+                  >
+                    <Text fontSize={"xs"}>{comment.content}</Text>
+                    <Text fontSize={"xs"}>
+                      {helper.formatDate(
+                        comment.createdAt,
+                        false,
+                        "H:mm A - ddd, DD/MM/YYYY"
+                      )}{" "}
+                    </Text>
+                    <Button
+                      variant={"link"}
+                      colorScheme="facebook"
+                      onClick={() =>
+                        router.push(
+                          `/user/${comment.user.id ?? session.data?.user.id}`
+                        )
+                      }
+                      _hover={{
+                        textDecoration: "underline",
+                      }}
+                    >
+                      <Text fontSize={"xs"}>
+                        {comment.user.fullname ?? session.data?.user.fullname}
+                      </Text>
+                    </Button>
+                  </HStack>
+                ))}
+            </VStack>
             <Collapse
               in={state.isShowComment}
               animateOpacity
               style={{ width: "100%" }}
             >
               <Input
+                type="submit"
                 placeholder={getTranslate("COMMENT")}
-                onChange={(e) =>
+                onChange={(e) => {
                   // @ts-ignore
                   setState((oldState) =>
                     helper.mappingState(oldState, { comment: e.target.value })
-                  )
-                }
+                  );
+                }}
                 value={state.comment}
                 size={"sm"}
               />
@@ -246,6 +316,7 @@ function AnswerItem({
             <HStack>
               <Button
                 type="button"
+                isDisabled={!session.data?.user?.id}
                 variant={state.isShowComment ? "solid" : "link"}
                 colorScheme="facebook"
                 size="xs"

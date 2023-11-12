@@ -1,12 +1,15 @@
+import { Colors } from "@/assets/constant/Colors";
 import { Dimensions } from "@/assets/constant/Dimensions";
 import { CloseIcon, Search2Icon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
+  Code,
   HStack,
   IconButton,
   Input,
   Spacer,
+  Tag,
   Text,
   Tooltip,
   useColorMode,
@@ -25,10 +28,18 @@ function SearchBar(props) {
         pathname: "/",
       });
     } else {
-      router.push({
-        pathname: "/search",
-        query: { q: search },
-      });
+      if (search.startsWith("/") && search.endsWith("/")) {
+        // Remove the slashes and use the remaining string as the pathname
+        const pathname = search.slice(1, -1);
+        router.push({
+          pathname: router.basePath + `/search/tag/${pathname}`,
+        });
+      } else {
+        router.push({
+          pathname: "/search",
+          query: { q: search },
+        });
+      }
       setIsFocused(false);
     }
   }
@@ -53,6 +64,7 @@ function SearchBar(props) {
       p={1}
     >
       <Search2Icon color={"gray.500"} />
+
       <Input
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
@@ -115,7 +127,14 @@ function SearchBar(props) {
           display: isFocused ? "block" : "none",
         }}
       >
-        <Text></Text>
+        <HStack
+          w={"full"}
+          padding="10px"
+          bg={Colors(colorMode === "dark").PRIMARY_BG}
+        >
+          <Code>/tag-name/</Code>
+          <Text color={"InfoText"} fontSize={'xs'}> - to search by tag</Text>
+        </HStack>
       </Box>
     </HStack>
   );
