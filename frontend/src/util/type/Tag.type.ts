@@ -2,8 +2,8 @@ import { Status } from "./Status.type";
 
 interface Tag {
   id: string | number;
-  name?: string;
-  questionsNumber?: number;
+  name: string;
+  questionsNumber: number;
   content?: string;
 }
 export type TagListType = {

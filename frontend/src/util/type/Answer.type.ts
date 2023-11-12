@@ -1,3 +1,4 @@
+import { CommentType } from "./Comment.type";
 import { QuestionType } from "./Question.type";
 import { UserType } from "./User.type";
 
@@ -11,6 +12,7 @@ interface Answer {
   user: UserType;
   question: QuestionType;
   isApproved: boolean;
+  comments: Array<CommentType>;
 }
 
 interface AnswerList {
