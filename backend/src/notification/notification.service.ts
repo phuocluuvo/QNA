@@ -14,4 +14,20 @@ export class NotificationService {
       where: { user: { id: userId } },
     });
   }
+
+  async create(notification: Notification) {
+    return this.notificationRepository.save(notification);
+  }
+
+  async update(notification: Notification) {
+    return this.notificationRepository.save(notification);
+  }
+
+  async delete(notification: Notification) {
+    return this.notificationRepository.remove(notification);
+  }
+
+  async createAnnouncement(notification: Notification) {
+    return this.create(notification);
+  }
 }
