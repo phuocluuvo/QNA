@@ -122,7 +122,14 @@ const updateQuestion = (form: FormCreateQuestion, questionId: string) => {
 };
 
 const getTag = (nameTag: string) => {
-  return api.get(url.TAG.concat("/" + nameTag));
+  return api.get(url.TAG, {
+    params: {
+      search: nameTag,
+      searchBy: "name",
+      page: 1,
+      limit: 1,
+    },
+  });
 };
 
 export default {
