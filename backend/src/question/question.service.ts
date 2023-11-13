@@ -37,6 +37,7 @@ export class QuestionService {
    * Find questions based on pagination options.
    *
    * @param query - Pagination options.
+   * @param tagNames - The tag names to filter questions by.
    * @returns A paginated list of questions.
    */
   async find(query: PaginateQuery, tagNames: string) {
@@ -274,5 +275,26 @@ export class QuestionService {
     );
     await this.activityService.syncPointDelete(question.id, userId);
     return this.remove(question);
+  }
+
+  /**
+   * Find questions related by tag based on pagination options.
+   *
+   * @param query - Pagination options.
+   * @param tagNames - The tag names to filter questions by.
+   * @returns A paginated list of questions.
+   */
+  async related(query: PaginateQuery, tagNames: string) {
+    const tags = tagNames ? tagNames.split(",") : [];
+    const queryBuilder = this.questionRepository.createQueryBuilder("question");
+    queryBuilder.leftJoinAndSelect("question.tags", "tag");
+    tags.forEach((tag, index) => {
+      queryBuilder.orWhere("tag.name = :tag" + index, { ["tag" + index]: tag });
+    });
+    return await paginate<Question>(
+      query,
+      queryBuilder,
+      questionPaginateConfig,
+    );
   }
 }
