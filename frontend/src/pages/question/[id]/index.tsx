@@ -45,6 +45,7 @@ import actionVoteQuestion from "@/API/redux/actions/question/actionVoteQuestion"
 import { FormVote } from "@/API/type/Form.type";
 import { useSession } from "next-auth/react";
 import useStateWithCallback from "@/hooks/useStateWithCallback";
+import actionGetQuestionList from "@/API/redux/actions/question/ActionGetQuestionList";
 
 function Question() {
   const { getTranslate } = LanguageHelper(Pages.HOME);
@@ -191,6 +192,29 @@ function Question() {
       )
     );
   };
+  // ------------ get related question ----------
+  const fecthQuestionsWithTag = (tagId: string) => {
+    dispatch<any>(
+      actionGetQuestionList(
+        {
+          "filter.type": `$eq:${router.query.select}`,
+          limit: 20,
+          page: 1,
+        },
+        (res) => {
+          // @ts-ignore
+          setState((oldState) => {
+            return helper.mappingState(oldState, {
+              questionList: res,
+            });
+          });
+        },
+        () => {
+          console.log("err");
+        }
+      )
+    );
+  };
   useEffect(() => {
     if (
       answerLoadType === ActionTypes.REQUEST_CREATE_ANSWER ||
@@ -311,7 +335,7 @@ function Question() {
                         }}
                         onClick={() => router.back()}
                       />
-                      <Flex w={"full"} direction={"column"} mb={"10"}>
+                      <Flex w={"full"} direction={"column"}>
                         <Box width={"full"}>
                           <HStack
                             pos={"relative"}
@@ -356,7 +380,7 @@ function Question() {
                         <HStack rounded={"md"} py={1} height={20}>
                           <Author
                             user={state.question.user}
-                            headingText={getTranslate("ANSWERED_AT").replace(
+                            headingText={getTranslate("ASKED_AT").replace(
                               "{0}",
                               helper.formatDate(
                                 state.question.createdAt,

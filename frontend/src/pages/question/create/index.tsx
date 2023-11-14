@@ -234,7 +234,7 @@ function CreateQuestion() {
                     isInvalid={form.errors.title && form.touched.title}
                   >
                     <FormLabel>
-                      Question Title
+                      {getTranslate("QUESTION_TITLE")}
                       <Text fontSize="sm" color="gray.500">
                         Be specific and imagine you’re asking a question to
                         another person
@@ -259,7 +259,7 @@ function CreateQuestion() {
                     }
                   >
                     <FormLabel>
-                      Tags*
+                      {getTranslate("QUESTION_TAG")}*
                       <Text fontSize="sm" color="gray.500">
                         Add up to 5 tags to describe what your question is about
                       </Text>
@@ -380,7 +380,7 @@ function CreateQuestion() {
                                 );
                               }}
                             >
-                              Create new tag
+                              {getTranslate("CREATE_NEW_TAG")}
                             </Button>
                           </Text>
                         )}
@@ -398,7 +398,7 @@ function CreateQuestion() {
                     isInvalid={form.errors.body && form.touched.body}
                   >
                     <FormLabel>
-                      Content
+                      {getTranslate("QUESTION_CONTENT")}*
                       <Text fontSize="sm" color="gray.500">
                         Your question needs to be as detailed as possible for
                         people to answer it correctly.

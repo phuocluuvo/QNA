@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   Box,
   Button,
@@ -50,19 +50,20 @@ import { signIn, useSession } from "next-auth/react";
 type State = {
   title: string;
   bodyQuestion: string;
-  resultsTagIds: Set<TagType>;
+  selectedTags: Set<TagType>;
   searchTagId: string;
-  selectedTags?: Set<TagType>;
+  resultsTagIds?: Set<TagType>;
   tagName?: string;
   tagContent?: string;
 };
 function EditQuestion() {
+  const formRef = useRef(null);
   const [state, setState] = useStateWithCallback<State>({
     title: "",
     bodyQuestion: "",
     searchTagId: "",
-    resultsTagIds: new Set(),
     selectedTags: new Set(),
+    resultsTagIds: new Set(),
     tagName: "",
     tagContent: "",
   });
@@ -92,6 +93,17 @@ function EditQuestion() {
     }
     return error;
   };
+  const validateTags = (value: Set<any>) => {
+    let error;
+    if (!value) {
+      error = "Tags is required";
+    } else if (value.size < 1) {
+      error = "Tags is required";
+    } else if (value.size > 5) {
+      error = "Tags must be less than 5";
+    }
+    return error;
+  };
   React.useEffect(() => {
     if (route.query.questionId) {
       dispacth(
@@ -114,7 +126,7 @@ function EditQuestion() {
         )
       );
     }
-  }, []);
+  }, [route.query]);
   const searchTag = (value: string) => {
     if (value) {
       dispacth(
@@ -164,6 +176,13 @@ function EditQuestion() {
       ({ selectedTags }) => console.log("selectedTags", selectedTags)
     );
   };
+  function checkTagExist(tag: TagType) {
+    let isExist = false;
+    state.selectedTags?.forEach((item) => {
+      if (item.name === tag.name) isExist = true;
+    });
+    return isExist;
+  }
   const searchTagHandle = (value: string) => {
     // @ts-ignore
     setState((oldState) =>
@@ -239,10 +258,11 @@ function EditQuestion() {
   return (
     <Container my={0} minW={{ lg: "70%", base: "90%" }} maxH={"30vh"}>
       <Formik
+        innerRef={formRef}
         initialValues={{
           title: state.title,
           bodyQuestion: state.bodyQuestion,
-          resultsTagIds: [],
+          selectedTags: state.selectedTags,
         }}
         enableReinitialize={true}
         onSubmit={(values, actions) => {
@@ -259,7 +279,7 @@ function EditQuestion() {
                     isInvalid={form.errors.title && form.touched.title}
                   >
                     <FormLabel>
-                      Question Title
+                      {getTranslate("QUESTION_TITLE")}
                       <Text fontSize="sm" color="gray.500">
                         Be specific and imagine you’re asking a question to
                         another person
@@ -276,15 +296,15 @@ function EditQuestion() {
                   </FormControl>
                 )}
               </Field>
-              <Field name="resultsTagIds">
+              <Field name="selectedTags">
                 {({ field, form }: any) => (
                   <FormControl
                     isInvalid={
-                      form.errors.resultsTagIds && form.touched.resultsTagIds
+                      form.errors.selectedTags && form.touched.selectedTags
                     }
                   >
                     <FormLabel>
-                      Tags*
+                      {getTranslate("QUESTION_TAG")}*
                       <Text fontSize="sm" color="gray.500">
                         Add up to 5 tags to describe what your question is about
                       </Text>
@@ -339,7 +359,7 @@ function EditQuestion() {
                       <Input
                         {...field}
                         variant={"unstyled"}
-                        id="resultsTagIds"
+                        id="selectedTags"
                         placeholder="Search a tag"
                         type="text"
                         value={state.searchTagId}
@@ -362,6 +382,9 @@ function EditQuestion() {
                         }
                         borderRadius={"5px"}
                         p={"2"}
+                        display={"flex"}
+                        flexWrap={"wrap"}
+                        gap={"2"}
                       >
                         {state.resultsTagIds && state.resultsTagIds.size > 0 ? (
                           Array.from(state.resultsTagIds).map((tag) => (
@@ -382,15 +405,28 @@ function EditQuestion() {
                                 onClick={() => {
                                   addTagHandle(tag);
                                 }}
+                                position={"relative"}
+                                style={{
+                                  ...(checkTagExist(tag) && {
+                                    opacity: "0.5",
+                                    cursor: "not-allowed",
+                                  }),
+                                }}
                               >
                                 {tag.name}
                               </Tag>
                             </Tooltip>
                           ))
                         ) : (
-                          <Text fontSize={"sm"} color={"gray.500"}>
-                            No results found. Do you want to create a '
-                            {state.searchTagId}' tag?{" "}
+                          <HStack>
+                            <Box
+                              dangerouslySetInnerHTML={{
+                                __html: getTranslate("NO_TAG_FOUND").replace(
+                                  "{tagname}",
+                                  `${state.searchTagId}`
+                                ),
+                              }}
+                            />
                             <Button
                               variant={"link"}
                               colorScheme={"orange"}
@@ -405,15 +441,26 @@ function EditQuestion() {
                                 );
                               }}
                             >
-                              Create new tag
+                              {getTranslate("CREATE_NEW_TAG")}
                             </Button>
-                          </Text>
+                          </HStack>
                         )}
                       </Box>
                     </Collapse>
-                    <FormErrorMessage>
-                      {form.errors.resultsTagIds}
-                    </FormErrorMessage>
+                    {/* Error */}
+                    <Text
+                      style={{
+                        fontSize: "12px",
+                        color: "tomato",
+                        marginTop: "5px",
+                        textAlign: "left",
+                        fontWeight: "bold",
+                      }}
+                      opacity={validateTags(state.selectedTags) ? 1 : 0}
+                      transition={"all 0.2s ease-in-out"}
+                    >
+                      {validateTags(state.selectedTags)}
+                    </Text>
                   </FormControl>
                 )}
               </Field>
@@ -423,7 +470,7 @@ function EditQuestion() {
                     isInvalid={form.errors.body && form.touched.body}
                   >
                     <FormLabel>
-                      Content
+                     {getTranslate("QUESTION_CONTENT")}
                       <Text fontSize="sm" color="gray.500">
                         Your question needs to be as detailed as possible for
                         people to answer it correctly.
@@ -542,6 +589,11 @@ function EditQuestion() {
               Close
             </Button>
             <Button
+              isDisabled={
+                !state.tagName ||
+                !state.tagContent ||
+                validateTags(state.selectedTags) !== undefined
+              }
               colorScheme="orange"
               onClick={() => {
                 createTagHandle();
