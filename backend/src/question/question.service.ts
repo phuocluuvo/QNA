@@ -22,6 +22,11 @@ import {
   ReputationActivityTypeEnum,
 } from "../enums/reputation.enum";
 import { Transactional } from "typeorm-transactional";
+import { NotificationService } from "../notification/notification.service";
+import {
+  notificationText,
+  notificationTextDesc,
+} from "../constants/notification.constants";
 
 @Injectable()
 export class QuestionService {
@@ -31,12 +36,14 @@ export class QuestionService {
     private readonly voteService: VoteService,
     private readonly tagService: TagService,
     private readonly activityService: ActivityService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   /**
    * Find questions based on pagination options.
    *
    * @param query - Pagination options.
+   * @param tagNames - The tag names to filter questions by.
    * @returns A paginated list of questions.
    */
   async find(query: PaginateQuery, tagNames: string) {
@@ -190,13 +197,10 @@ export class QuestionService {
   ): Promise<Question> {
     const question = await this.findOneById(questionVoteDto.question_id);
 
-    if (!question) {
-      throw new NotFoundException(message.NOT_FOUND.QUESTION);
-    }
-
     const createVote = await this.voteService.voteQuestion(
       userId,
       questionVoteDto,
+      question,
     );
 
     if (questionVoteDto.vote_type === VoteType.UPVOTE) {
@@ -246,17 +250,48 @@ export class QuestionService {
   async createWithActivity(questionDto: CreateQuestionDto, userId: string) {
     if (await this.activityService.checkCreateQuestion(userId)) {
       const question = await this.create(questionDto, userId);
-      await this.activityService.create(
+      const activity = await this.activityService.create(
         ReputationActivityTypeEnum.CREATE_QUESTION,
         ObjectActivityTypeEnum.QUESTION,
         question.id,
         userId,
+        userId,
+      );
+      await this.notificationService.create(
+        notificationText.QUESTION.CREATE,
+        notificationTextDesc.QUESTION.CREATE,
+        userId,
+        activity.id,
       );
 
       return question;
     } else {
       throw new BadRequestException(message.REPUTATION.NOT_ENOUGH);
     }
+  }
+
+  @Transactional()
+  async updateWithActivity(
+    id: string,
+    questionDto: UpdateQuestionDto,
+    oldQuestion: Question,
+    userId: string,
+  ) {
+    const questionUpdate = await this.update(id, questionDto);
+    const activity = await this.activityService.create(
+      ReputationActivityTypeEnum.UPDATE_QUESTION,
+      ObjectActivityTypeEnum.QUESTION,
+      id,
+      userId,
+      oldQuestion.user.id,
+    );
+    await this.notificationService.create(
+      notificationText.QUESTION.UPDATE,
+      notificationTextDesc.QUESTION.UPDATE,
+      oldQuestion.user.id,
+      activity.id,
+    );
+    return questionUpdate;
   }
 
   /**
@@ -266,13 +301,43 @@ export class QuestionService {
    */
   @Transactional()
   async removeWithActivity(question: Question, userId: string) {
-    await this.activityService.create(
+    const questionId = question.id;
+    const questionRemove = this.remove(question);
+    const activity = await this.activityService.create(
       ReputationActivityTypeEnum.DELETE_QUESTION,
       ObjectActivityTypeEnum.QUESTION,
-      question.id,
+      questionId,
       userId,
+      question.user.id,
     );
-    await this.activityService.syncPointDelete(question.id, userId);
-    return this.remove(question);
+    await this.activityService.syncPointDelete(question.id, question.user.id);
+    await this.notificationService.create(
+      notificationText.QUESTION.DELETE,
+      notificationTextDesc.QUESTION.DELETE,
+      question.user.id,
+      activity.id,
+    );
+    return questionRemove;
+  }
+
+  /**
+   * Find questions related by tag based on pagination options.
+   *
+   * @param query - Pagination options.
+   * @param tagNames - The tag names to filter questions by.
+   * @returns A paginated list of questions.
+   */
+  async related(query: PaginateQuery, tagNames: string) {
+    const tags = tagNames ? tagNames.split(",") : [];
+    const queryBuilder = this.questionRepository.createQueryBuilder("question");
+    queryBuilder.leftJoinAndSelect("question.tags", "tag");
+    tags.forEach((tag, index) => {
+      queryBuilder.orWhere("tag.name = :tag" + index, { ["tag" + index]: tag });
+    });
+    return await paginate<Question>(
+      query,
+      queryBuilder,
+      questionPaginateConfig,
+    );
   }
 }

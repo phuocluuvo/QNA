@@ -117,7 +117,12 @@ export class CommentController {
     }
 
     if (ability.can(Action.Update, comment)) {
-      return this.commentService.update(id, commentDto);
+      return this.commentService.updateWithActivity(
+        id,
+        commentDto,
+        comment,
+        req["user"]["sub"],
+      );
     } else {
       throw new ForbiddenException(message.NOT_AUTHOR.COMMENT);
     }

@@ -6,9 +6,16 @@ import { VoteAnswerDto } from "./dto/vote-answer.dto";
 import { ActivityService } from "../activity/activity.service";
 import { VoteType } from "../enums/vote-type.enum";
 import {
-  ReputationActivityTypeEnum,
   ObjectActivityTypeEnum,
+  ReputationActivityTypeEnum,
 } from "../enums/reputation.enum";
+import { NotificationService } from "../notification/notification.service";
+import { Question } from "../question/entity/question.entity";
+import { Answer } from "../answer/entity/answer.entity";
+import {
+  notificationText,
+  notificationTextDesc,
+} from "../constants/notification.constants";
 
 @Injectable()
 export class VoteService {
@@ -16,43 +23,63 @@ export class VoteService {
     @Inject("VOTE_REPOSITORY")
     private readonly voteRepository: Repository<Vote>,
     private readonly activityService: ActivityService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   /**
    * Vote question
    * @param userId
    * @param voteDto
+   * @param question
    */
   async voteQuestion(
     userId: string,
     voteDto: VoteQuestionDto,
+    question: Question,
   ): Promise<number> {
-    await this.activityService.create(
-      voteDto.vote_type == VoteType.UPVOTE
-        ? ReputationActivityTypeEnum.UPVOTE
-        : ReputationActivityTypeEnum.DOWNVOTE,
+    const vote = await this.handleVote(userId, voteDto, true);
+    const activity = await this.activityService.create(
+      this.getReputationType(voteDto, vote),
       ObjectActivityTypeEnum.VOTE_QUESTION,
       voteDto.question_id,
       userId,
+      question.user.id,
     );
-    return this.handleVote(userId, voteDto, true);
+    await this.notificationService.create(
+      this.getSateVote(voteDto, vote, true),
+      this.getSateVote(voteDto, vote, false),
+      question.user.id,
+      activity.id,
+    );
+    return vote;
   }
 
   /**
    * Vote answer
    * @param userId
    * @param voteDto
+   * @param answer
    */
-  async voteAnswer(userId: string, voteDto: VoteAnswerDto): Promise<number> {
-    await this.activityService.create(
-      voteDto.vote_type == VoteType.UPVOTE
-        ? ReputationActivityTypeEnum.UPVOTE
-        : ReputationActivityTypeEnum.DOWNVOTE,
+  async voteAnswer(
+    userId: string,
+    voteDto: VoteAnswerDto,
+    answer: Answer,
+  ): Promise<number> {
+    const vote = await this.handleVote(userId, voteDto, false);
+    const activity = await this.activityService.create(
+      this.getReputationType(voteDto, vote),
       ObjectActivityTypeEnum.VOTE_ANSWER,
       voteDto.answer_id,
       userId,
+      answer.user.id,
     );
-    return this.handleVote(userId, voteDto, false);
+    await this.notificationService.create(
+      this.getSateVote(voteDto, vote, true),
+      this.getSateVote(voteDto, vote, false),
+      answer.user.id,
+      activity.id,
+    );
+    return vote;
   }
 
   /**
@@ -130,5 +157,56 @@ export class VoteService {
     trans["answer"] = !isQuestion ? voteDto.answer_id : null;
     trans["user"] = userId;
     return trans;
+  }
+
+  /**
+   * Get state vote
+   * @param voteDto
+   * @param state
+   * @param isTitle
+   * @param isRepu
+   */
+  private getSateVote(voteDto: any, state: number, isTitle: boolean) {
+    const voteText = isTitle
+      ? notificationText.VOTE
+      : notificationTextDesc.VOTE;
+
+    if (voteDto.vote_type == VoteType.UPVOTE) {
+      if (state == 1) {
+        return voteText.UP;
+      } else if (state == -1) {
+        return voteText.CANCEL_UP;
+      } else {
+        return voteText.CHANGE_DOWN_TO_UP;
+      }
+    } else if (voteDto.vote_type == VoteType.DOWNVOTE) {
+      if (state == -1) {
+        return voteText.CANCEL_DOWN;
+      } else if (state == 1) {
+        return voteText.DOWN;
+      } else {
+        return voteText.CHANGE_UP_TO_DOWN;
+      }
+    }
+  }
+
+  private getReputationType(voteDto: any, state: number) {
+    if (voteDto.vote_type == VoteType.UPVOTE) {
+      if (state == 1) {
+        return ReputationActivityTypeEnum.UPVOTE;
+      } else if (state == -1) {
+        return ReputationActivityTypeEnum.CANCLE_UPVOTE;
+      } else {
+        return ReputationActivityTypeEnum.CHANGE_DOWNVOTE_TO_UPVOTE;
+      }
+    } else if (voteDto.vote_type == VoteType.DOWNVOTE) {
+      if (state == -1) {
+        return ReputationActivityTypeEnum.CANCLE_DOWNVOTE;
+      } else if (state == 1) {
+        return ReputationActivityTypeEnum.DOWNVOTE;
+      } else {
+        return ReputationActivityTypeEnum.CHANGE_UPVOTE_TO_DOWNVOTE;
+      }
+    }
   }
 }

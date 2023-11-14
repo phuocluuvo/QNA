@@ -4,10 +4,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { User } from "../../users/entity/users.entity";
+import { Notification } from "../../notification/entity/notification.entity";
 
 @Entity()
 export class Activity {
@@ -39,4 +41,7 @@ export class Activity {
   })
   @JoinColumn({ name: "user_id" })
   user: User;
+
+  @OneToMany(() => Notification, (notification) => notification.activity)
+  notifications: Notification[];
 }

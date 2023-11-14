@@ -58,6 +58,20 @@ export class QuestionController {
     return this.questionService.find(query, tagNames);
   }
 
+  @ApiOkPaginatedResponse(Question, questionPaginateConfig)
+  @ApiPaginationQuery(questionPaginateConfig)
+  @ApiOperation({
+    summary: "related question",
+  })
+  @Get("/related")
+  @UseGuards()
+  async getRelated(
+    @Paginate() query: PaginateQuery,
+    @Query("tag_names") tagNames: string,
+  ) {
+    return this.questionService.related(query, tagNames);
+  }
+
   /**
    * Get a question by its ID and increase its view count.
    *
@@ -123,7 +137,12 @@ export class QuestionController {
     }
 
     if (ability.can(Action.Update, question)) {
-      return this.questionService.update(id, questionDto);
+      return this.questionService.updateWithActivity(
+        id,
+        questionDto,
+        question,
+        req.user["sub"],
+      );
     } else {
       throw new ForbiddenException(message.NOT_AUTHOR.QUESTION);
     }
