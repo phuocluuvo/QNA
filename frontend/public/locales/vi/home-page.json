@@ -35,6 +35,7 @@
   "ALREADY_HAVE_ACCOUNT": "Đã có tài khoản?",
   "ASKED_AT": "Hỏi vào lúc {0}",
   "ANSWERED_AT": "Trả lời vào lúc {0}",
+  "COMMENTED_AT": "Bình luận vào lúc {0}",
   "INTRODUCTION": "Nơi bạn đặt câu hỏi, chúng tôi trả lời! Chào mừng bạn đến với trang web hỏi đáp dành cho các lập trình viên và nhà phát triển.",
   "ANSWER_PLACEHOLDER": "Nhập câu trả lời",
   "SUBMIT": "Gửi",
@@ -64,5 +65,12 @@
   "UPDATE": "Cập nhật",
   "LOGIN_ERROR": "Tên đăng nhập hoặc mật khẩu không đúng",
   "LOGIN_WITH_GOOGLE": "Đăng nhập với Google",
-  "LOGIN_WITH_GITHUB": "Đăng nhập với Github"
+  "LOGIN_WITH_GITHUB": "Đăng nhập với Github",
+  "QUESTION_TITLE": "Tiêu đề câu hỏi",
+  "QUESTION_TAG": "Thẻ câu hỏi",
+  "QUESTION_CONTENT": "Nội dung câu hỏi",
+  "NO_TAG_FOUND": "Không tìm thấy thẻ. Bạn có muốn tạo thẻ <code>{tagname}</code> mới?",
+  "CREATE_NEW_TAG": "Tạo thẻ mới",
+  "TAG_DESCRIPTION": "Thẻ là cách để kết nối các chuyên gia với các câu hỏi mà họ có thể trả lời bằng cách sắp xếp các câu hỏi thành các danh mục cụ thể, được xác định rõ ràng.",
+  "TAGS": "Thẻ"
 }

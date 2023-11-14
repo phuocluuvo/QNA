@@ -35,6 +35,7 @@
   "ALREADY_HAVE_ACCOUNT": "Already have an account?",
   "ASKED_AT": "Asked at {0}",
   "ANSWERED_AT": "Answered at {0}",
+  "COMMENTED_AT": "Commented at {0}",
   "INTRODUCTION": "Ask questions, get answers! Welcome to the ultimate Q&amp;A platform for developers and programmers.",
   "ANSWER_PLACEHOLDER": "Enter your answer",
   "SUBMIT": "Submit",
@@ -64,5 +65,12 @@
   "UPDATE": "Update",
   "LOGIN_ERROR": "Invalid username or password",
   "LOGIN_WITH_GOOGLE": "Sign in with Google",
-  "LOGIN_WITH_GITHUB": "Sign in with Github"
+  "LOGIN_WITH_GITHUB": "Sign in with Github",
+  "QUESTION_TITLE": "Question Title",
+  "QUESTION_TAG": "Question Tag",
+  "QUESTION_CONTENT": "Question Content",
+  "NO_TAG_FOUND": "No results found. Do you want to create a <code>{tagname}</code> tag?",
+  "CREATE_NEW_TAG": "Create new tag",
+  "TAG_DESCRIPTION": "Tags are a means of connecting experts with questions they will be able to answer by sorting questions into specific, well-defined categories.",
+  "TAGS": "Tags"
 }
