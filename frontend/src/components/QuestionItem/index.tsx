@@ -153,7 +153,7 @@ function QuestionItem({
                   textDecoration: "underline",
                 },
               }}
-              headingText={getTranslate("ANSWERED_AT").replace(
+              headingText={getTranslate("ASKED_AT").replace(
                 "{0}",
                 helper.formatDate(
                   question.createdAt,

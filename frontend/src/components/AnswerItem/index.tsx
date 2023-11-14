@@ -48,6 +48,7 @@ function AnswerItem({
 }) {
   const session = useSession();
   const router = useRouter();
+  const commentRef = React.useRef<HTMLInputElement>(null);
   const [state, setState] = useStateWithCallback<{
     count: number;
     isDarkMode: boolean;
@@ -109,11 +110,13 @@ function AnswerItem({
         (res: any) => {
           const comments = [...answer.comments];
           comments.push(res);
+
           // @ts-ignore
           setState((oldState) =>
             helper.mappingState(oldState, {
               comment: "",
               answer: { comments },
+              isShowComment: false,
             })
           );
         },
@@ -232,6 +235,7 @@ function AnswerItem({
               alignItems={"flex-start"}
             >
               <Author
+                sizeAvatar={"xs"}
                 user={answer.user}
                 nameStyle={{
                   color: "gray.500",
@@ -263,8 +267,11 @@ function AnswerItem({
                     w={"full"}
                     borderBottom={"1px solid"}
                     borderColor={"gray.200"}
+                    opacity={0.8}
+                    _hover={{
+                      opacity: 1,
+                    }}
                     py={2}
-                    ml={10}
                     flexWrap={"wrap"}
                   >
                     <Text fontSize={"xs"}>{comment.content}</Text>
@@ -300,8 +307,14 @@ function AnswerItem({
               style={{ width: "100%" }}
             >
               <Input
-                type="submit"
+                ref={commentRef}
                 placeholder={getTranslate("COMMENT")}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    createComment();
+                  }
+                }}
+                autoFocus={true}
                 onChange={(e) => {
                   // @ts-ignore
                   setState((oldState) =>
@@ -316,7 +329,10 @@ function AnswerItem({
             <HStack>
               <Button
                 type="button"
-                isDisabled={!session.data?.user?.id}
+                isDisabled={
+                  !session.data?.user?.id ||
+                  (state.isShowComment && !state.comment)
+                }
                 variant={state.isShowComment ? "solid" : "link"}
                 colorScheme="facebook"
                 size="xs"
@@ -341,14 +357,17 @@ function AnswerItem({
                 colorScheme="facebook"
                 size="xs"
                 display={state.isShowComment ? "block" : "none"}
-                onClick={() =>
+                onClick={() => {
+                  if (commentRef.current && state.isShowComment === true) {
+                    commentRef.current.focus;
+                  }
                   // @ts-ignore
                   setState((oldState) =>
                     helper.mappingState(oldState, {
                       isShowComment: !oldState.isShowComment,
                     })
-                  )
-                }
+                  );
+                }}
               >
                 {getTranslate("CANCEL")}
               </Button>

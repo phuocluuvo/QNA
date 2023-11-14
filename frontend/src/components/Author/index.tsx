@@ -6,6 +6,7 @@ import {
   Text,
   TextProps,
   BoxProps,
+  ResponsiveValue,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import React from "react";
@@ -25,6 +26,12 @@ type AuthorProps = {
   nameStyle?: TextProps;
   onClick?: () => void;
   containerStyle?: BoxProps;
+  /**
+   * size of avatar
+   */
+  sizeAvatar?: ResponsiveValue<
+    (string & {}) | "sm" | "md" | "lg" | "xl" | "2xl" | "xs" | "full" | "2xs"
+  >;
 };
 
 function Author({
@@ -36,6 +43,7 @@ function Author({
   containerStyle,
   bottomText,
   bottomTextStyle,
+  sizeAvatar,
 }: AuthorProps) {
   const router = useRouter();
   return (
@@ -49,17 +57,21 @@ function Author({
       }}
       cursor={"pointer"}
     >
-      <Avatar size={"sm"} name={user.fullname} src={user.avatar} />
+      <Avatar
+        size={sizeAvatar ?? "sm"}
+        name={user.fullname}
+        src={user.avatar}
+      />
       <VStack alignItems={"start"} spacing={0}>
         {/* @ts-ignore */}
         {headingText ? (
-          <Text {...headingTextStyle} fontSize={"xs"}>
+          <Text {...headingTextStyle} fontSize={sizeAvatar ?? "xs"}>
             {headingText}
           </Text>
         ) : null}
         <Text
           {...nameStyle}
-          fontSize={"xs"}
+          fontSize={sizeAvatar ?? "xs"}
           cursor={"pointer"}
           onClick={() => {
             onClick ? onClick() : router.push(`/user/${user.id}`);
@@ -68,7 +80,7 @@ function Author({
           {user.fullname}
         </Text>
         {bottomText ? (
-          <Text {...bottomTextStyle} fontSize={"xs"}>
+          <Text {...bottomTextStyle} fontSize={sizeAvatar ?? "xs"}>
             {bottomText}
           </Text>
         ) : null}
