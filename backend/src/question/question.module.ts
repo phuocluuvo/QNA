@@ -8,6 +8,7 @@ import { CaslModule } from "../casl/casl.module";
 import { VoteModule } from "../vote/vote.module";
 import { TagModule } from "../tag/tag.module";
 import { ActivityModule } from "../activity/activity.module";
+import { NotificationModule } from "../notification/notification.module";
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ActivityModule } from "../activity/activity.module";
     TagModule,
     CaslModule,
     ActivityModule,
+    NotificationModule,
   ],
   controllers: [QuestionController],
   providers: [...questionProviders, QuestionService],

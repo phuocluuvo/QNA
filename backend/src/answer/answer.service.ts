@@ -17,6 +17,11 @@ import {
   ObjectActivityTypeEnum,
   ReputationActivityTypeEnum,
 } from "../enums/reputation.enum";
+import {
+  notificationText,
+  notificationTextDesc,
+} from "../constants/notification.constants";
+import { NotificationService } from "../notification/notification.service";
 
 @Injectable()
 export class AnswerService {
@@ -25,6 +30,7 @@ export class AnswerService {
     private readonly answerRepository: Repository<Answer>,
     private readonly voteService: VoteService,
     private readonly activityService: ActivityService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   /**
@@ -148,23 +154,18 @@ export class AnswerService {
   ): Promise<Answer> {
     const answer = await this.findOneById(answerVoteDto.answer_id);
 
-    if (!answer) {
-      throw new NotFoundException(message.NOT_FOUND.ANSWER);
-    }
-
-    const createVote = await this.voteService.voteAnswer(userId, answerVoteDto);
+    const createVote = await this.voteService.voteAnswer(
+      userId,
+      answerVoteDto,
+      answer,
+    );
 
     if (answerVoteDto.vote_type === VoteType.UPVOTE) {
       answer.votes += createVote;
     } else if (answerVoteDto.vote_type === VoteType.DOWNVOTE) {
       answer.votes -= createVote;
     }
-
-    try {
-      return this.answerRepository.save(answer);
-    } catch (error) {
-      throw new Error("Error updating vote");
-    }
+    return this.answerRepository.save(answer);
   }
 
   /**
@@ -200,14 +201,49 @@ export class AnswerService {
   @Transactional()
   async createWithActivity(answerDto: CreateAnswerDto, userId: string) {
     const answer = await this.create(answerDto, userId);
-    await this.activityService.create(
+    const activity = await this.activityService.create(
       ReputationActivityTypeEnum.CREATE_ANSWER,
       ObjectActivityTypeEnum.ANSWER,
       answer.id,
       userId,
+      userId,
     );
-
+    await this.notificationService.create(
+      notificationText.ANSWER.CREATE,
+      notificationTextDesc.ANSWER.CREATE,
+      userId,
+      activity.id,
+    );
     return answer;
+  }
+
+  /**
+   * Update an existing answer with activity.
+   * @param id - The ID of the answer to update.
+   * @param answerDto - The updated data for the answer.
+   * @param oldAnswer
+   */
+  @Transactional()
+  async updateWithActivity(
+    id: string,
+    answerDto: UpdateAnswerDto,
+    oldAnswer: Answer,
+  ) {
+    const answerUpdate = await this.update(id, answerDto);
+    const activity = await this.activityService.create(
+      ReputationActivityTypeEnum.UPDATE_ANSWER,
+      ObjectActivityTypeEnum.ANSWER,
+      id,
+      oldAnswer.user.id,
+      oldAnswer.user.id,
+    );
+    await this.notificationService.create(
+      notificationText.ANSWER.UPDATE,
+      notificationTextDesc.ANSWER.UPDATE,
+      oldAnswer.user.id,
+      activity.id,
+    );
+    return answerUpdate;
   }
 
   /**
@@ -217,14 +253,25 @@ export class AnswerService {
    */
   @Transactional()
   async removeWithActivity(answer: Answer, userId: string) {
-    await this.activityService.create(
+    const answerId = answer.id;
+    const answerRemove = await this.remove(answer);
+
+    const activity = await this.activityService.create(
       ReputationActivityTypeEnum.DELETE_ANSWER,
       ObjectActivityTypeEnum.ANSWER,
-      answer.id,
+      answerId,
       userId,
+      answer.user.id,
     );
-    await this.activityService.syncPointDelete(answer.id, userId);
-    return this.remove(answer);
+
+    await this.activityService.syncPointDelete(answer.id, answer.user.id);
+    await this.notificationService.create(
+      notificationText.ANSWER.DELETE,
+      notificationTextDesc.ANSWER.DELETE,
+      answer.user.id,
+      activity.id,
+    );
+    return answerRemove;
   }
 
   /**
@@ -239,13 +286,24 @@ export class AnswerService {
   ) {
     const answerApprove = await this.approveAnswer(approveAnswerDto);
 
-    await this.activityService.create(
+    const activity = await this.activityService.create(
       answerApprove.isApproved
         ? ReputationActivityTypeEnum.ACCEPT_ANSWER
         : ReputationActivityTypeEnum.UN_ACCEPT_ANSWER,
       ObjectActivityTypeEnum.ANSWER,
       answer.id,
       answer.user.id,
+      answer.user.id,
+    );
+    await this.notificationService.create(
+      answerApprove.isApproved
+        ? notificationText.ANSWER.ACCEPT
+        : notificationText.ANSWER.UN_APPROVE,
+      answerApprove.isApproved
+        ? notificationTextDesc.ANSWER.ACCEPT
+        : notificationTextDesc.ANSWER.UN_APPROVE,
+      answer.user.id,
+      activity.id,
     );
 
     return answerApprove;

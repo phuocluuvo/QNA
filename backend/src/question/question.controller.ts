@@ -137,7 +137,12 @@ export class QuestionController {
     }
 
     if (ability.can(Action.Update, question)) {
-      return this.questionService.update(id, questionDto);
+      return this.questionService.updateWithActivity(
+        id,
+        questionDto,
+        question,
+        req.user["sub"],
+      );
     } else {
       throw new ForbiddenException(message.NOT_AUTHOR.QUESTION);
     }
