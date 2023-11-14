@@ -2,13 +2,11 @@ import Head from "next/head";
 import { Fragment, useEffect, useState } from "react";
 import { clientNamespaces } from "ni18n";
 import {
-  Box,
   Button,
   Collapse,
   Flex,
   HStack,
   Heading,
-  IconButton,
   Spacer,
   Text,
   VStack,
@@ -26,7 +24,7 @@ import SelectOptions from "@/components/SelectOptions";
 import { LanguageHelper } from "@/util/Language/Language.util";
 import { Pages } from "@/assets/constant/Pages";
 import FilterColumn from "@/components/FilterColumn";
-import { BiFilter, BiFilterAlt } from "react-icons/bi";
+import { BiFilterAlt } from "react-icons/bi";
 import { GetQuesionParams } from "@/API/type/params/Question.params";
 import {
   SORT_DATA_EN,
@@ -35,6 +33,8 @@ import {
   SORT_ORDER_DATA_VI,
 } from "@/assets/constant/Filter.data";
 import TagList from "@/components/TagList";
+import SideRightMenu from "@/components/SideRightMenu";
+import PageContainer from "@/components/PageContainer";
 const limitations = [5, 10, 15, 20];
 
 export default function Home() {
@@ -132,270 +132,260 @@ export default function Home() {
         />
         <link rel="icon" href="/images/favicon.ico" sizes="any" />
       </Head>
-      <Flex
-        gap={3}
-        px={{ base: 5, md: 10 }}
-        height={"full"}
-        w={"full"}
-        direction={{ base: "column", md: "row" }}
-        alignItems={"flex-start"}
-        justifyContent={"flex-start"}
-      >
-        <VStack alignItems={"end"} flex={{ base: 1, md: 0.8 }}>
-          <HStack
-            w={"full"}
-            justifyContent={"space-between"}
-            alignItems={"flex-start"}
-          >
-            <VStack alignItems={"start"}>
-              <Heading size={"lg"} fontWeight={"medium"}>
-                {getTranslate("ALL_QUESTION")}
-              </Heading>
-              <Text>{QuestionNumberTitle()}</Text>
-            </VStack>
-            <VStack flex={1} alignItems={"flex-end"}>
-              <HStack>
-                <SelectOptions
-                  getTranslate={getTranslate}
-                  containerStyle={{
-                    fontSize: "xs",
-                    variant: "filled",
-                    w: "fit-content",
-                  }}
-                  onSelect={(e) => {
-                    router.push({
-                      pathname: router.pathname,
-                      query: { ...router.query, select: e.target.value },
-                    });
-                  }}
-                />
-                <Button
-                  aria-label="Search database"
-                  leftIcon={<BiFilterAlt />}
-                  onClick={onToggle}
-                >
-                  {getTranslate("FILTER")}
-                </Button>
-              </HStack>
-            </VStack>
-          </HStack>
-          <Collapse in={isOpen} animateOpacity>
-            <VStack w={"full"} alignItems={"flex-end"}>
-              <HStack
-                spacing={10}
-                p="20px 40px"
-                color="white"
-                w={"full"}
-                bg={Colors(colorMode === "dark").PRIMARY_BG}
-                rounded="md"
-                shadow="md"
-                justifyContent={"start"}
-                alignItems={"start"}
-              >
-                <FilterColumn
-                  title={getTranslate("ORDER_BY")}
-                  value={isDecending}
-                  setValue={setIsDecending}
-                  defaultValue={(router.query.orderBy as string) ?? "ASC"}
-                  dataList={
-                    getCurrentLanguage().code === "en"
-                      ? SORT_ORDER_DATA_EN
-                      : SORT_ORDER_DATA_VI
-                  }
-                />
-
-                <FilterColumn
-                  title={getTranslate("SORT_BY")}
-                  value={valueSort}
-                  defaultValue={(router.query.sortBy as string) ?? "title"}
-                  setValue={setValueSort}
-                  dataList={
-                    getCurrentLanguage().code === "en"
-                      ? SORT_DATA_EN
-                      : SORT_DATA_VI
-                  }
-                />
-              </HStack>
-              <Button
-                size={"sm"}
-                variant={"main_button"}
-                onClick={() => applyFilter()}
-              >
-                {"APPLY"}
-              </Button>
-            </VStack>
-          </Collapse>
-          <Flex
-            alignItems={"start"}
-            w={"full"}
-            justifyContent={"start"}
-            wrap={"wrap"}
-          >
-            <Flex
-              alignItems={"center"}
-              justifyContent={"center"}
-              mb={{ base: 3, md: 10 }}
-              w={"full"}
-            >
-              <HStack spacing={3}>
-                {questionList
-                  ? questionList?.meta.totalPages > 0 &&
-                    numberOfPages.map((_, index) => (
-                      <Button
-                        key={index}
-                        size={"xs"}
-                        variant={"outline"}
-                        bg={
-                          pageNumber
-                            ? pageNumber === index + 1
-                              ? "orange.500"
-                              : Colors(colorMode === "dark").PRIMARY_BG
-                            : index == 0
-                            ? "orange.500"
-                            : Colors(colorMode === "dark").PRIMARY_BG
-                        }
-                        color={
-                          pageNumber
-                            ? pageNumber === index + 1
-                              ? "white"
-                              : Colors(colorMode === "dark").BORDER
-                            : index == 0
-                            ? "white"
-                            : Colors(colorMode === "dark").BORDER
-                        }
-                        onClick={() => pageNumClick(index + 1, limit)}
-                      >
-                        {index + 1}
-                      </Button>
-                    ))
-                  : null}
-              </HStack>
-              <Spacer />
-              <HStack spacing={3} ml={5}>
-                {limitations.map((_limit, index) => (
-                  <Button
-                    key={index}
-                    size={"xs"}
-                    alignItems={"center"}
-                    justifyContent={"center"}
-                    _hover={{
-                      color: Colors(colorMode === "dark").PRIMARY,
-                    }}
-                    color={
-                      limit === _limit
-                        ? Colors(colorMode === "dark").PRIMARY
-                        : "gray.300"
-                    }
-                    variant={"link"}
-                    onClick={() => pageNumClick(1, _limit)}
-                  >
-                    {_limit}
-                  </Button>
-                ))}
-              </HStack>
-            </Flex>
-            {questionList?.data.map((question, index) => (
-              <QuestionItem
-                key={index}
-                question={question}
-                isLast={index === questionList?.data.length - 1}
-                isDarkMode={colorMode === "dark"}
-              />
-            ))}
-            <Flex
-              alignItems={"center"}
-              justifyContent={"center"}
-              mt={10}
-              mb={10}
-              w={"full"}
-            >
-              <HStack spacing={3}>
-                {questionList
-                  ? questionList?.meta.totalPages > 0 &&
-                    numberOfPages.map((_, index) => (
-                      <Button
-                        key={index}
-                        size={"xs"}
-                        variant={"outline"}
-                        bg={
-                          pageNumber
-                            ? pageNumber === index + 1
-                              ? "orange.500"
-                              : Colors(colorMode === "dark").PRIMARY_BG
-                            : index == 0
-                            ? "orange.500"
-                            : Colors(colorMode === "dark").PRIMARY_BG
-                        }
-                        color={
-                          pageNumber
-                            ? pageNumber === index + 1
-                              ? "white"
-                              : Colors(colorMode === "dark").BORDER
-                            : index == 0
-                            ? "white"
-                            : Colors(colorMode === "dark").BORDER
-                        }
-                        onClick={() => pageNumClick(index + 1, limit)}
-                      >
-                        {index + 1}
-                      </Button>
-                    ))
-                  : null}
-              </HStack>
-              <Spacer />
-              <HStack spacing={3} ml={5}>
-                {limitations.map((_limit, index) => (
-                  <Button
-                    key={index}
-                    alignItems={"center"}
-                    justifyContent={"center"}
-                    _hover={{
-                      color: Colors(colorMode === "dark").PRIMARY,
-                    }}
-                    size={"xs"}
-                    color={
-                      limit === _limit
-                        ? Colors(colorMode === "dark").PRIMARY
-                        : "gray.300"
-                    }
-                    variant={"link"}
-                    onClick={() => pageNumClick(1, _limit)}
-                  >
-                    {_limit}
-                  </Button>
-                ))}
-              </HStack>
-            </Flex>
-          </Flex>
-        </VStack>
-        <VStack
-          flex={{ base: 1, md: 0.2 }}
+      <VStack alignItems={"end"} flex={{ base: 1, md: 0.8 }}>
+        <HStack
           w={"full"}
-          style={{
-            position: "sticky",
-            top: "11%",
-          }}
-          p={0}
-          m={0}
+          justifyContent={"space-between"}
+          alignItems={"flex-start"}
         >
-          <TabsQuestion
-            router={router}
-            getTranslate={getTranslate}
-            containerStyles={{
-              flex: 1,
-            }}
-          />
-          <TagList
-            router={router}
-            getTranslate={getTranslate}
-            containerStyles={{
-              flex: 1,
-              w: "full",
-              my: 5,
-            }}
-          />
-        </VStack>
-      </Flex>
+          <VStack alignItems={"start"}>
+            <Heading size={"lg"} fontWeight={"medium"}>
+              {getTranslate("ALL_QUESTION")}
+            </Heading>
+            <Text>{QuestionNumberTitle()}</Text>
+          </VStack>
+          <VStack flex={1} alignItems={"flex-end"}>
+            <HStack>
+              <SelectOptions
+                getTranslate={getTranslate}
+                containerStyle={{
+                  fontSize: "xs",
+                  variant: "filled",
+                  w: "fit-content",
+                }}
+                onSelect={(e) => {
+                  router.push({
+                    pathname: router.pathname,
+                    query: { ...router.query, select: e.target.value },
+                  });
+                }}
+              />
+              <Button
+                aria-label="Search database"
+                leftIcon={<BiFilterAlt />}
+                onClick={onToggle}
+              >
+                {getTranslate("FILTER")}
+              </Button>
+            </HStack>
+          </VStack>
+        </HStack>
+        <Collapse in={isOpen} animateOpacity>
+          <VStack w={"full"} alignItems={"flex-end"}>
+            <HStack
+              spacing={10}
+              p="20px 40px"
+              color="white"
+              w={"full"}
+              bg={Colors(colorMode === "dark").PRIMARY_BG}
+              rounded="md"
+              shadow="md"
+              justifyContent={"start"}
+              alignItems={"start"}
+            >
+              <FilterColumn
+                title={getTranslate("ORDER_BY")}
+                value={isDecending}
+                setValue={setIsDecending}
+                defaultValue={(router.query.orderBy as string) ?? "ASC"}
+                dataList={
+                  getCurrentLanguage().code === "en"
+                    ? SORT_ORDER_DATA_EN
+                    : SORT_ORDER_DATA_VI
+                }
+              />
+
+              <FilterColumn
+                title={getTranslate("SORT_BY")}
+                value={valueSort}
+                defaultValue={(router.query.sortBy as string) ?? "title"}
+                setValue={setValueSort}
+                dataList={
+                  getCurrentLanguage().code === "en"
+                    ? SORT_DATA_EN
+                    : SORT_DATA_VI
+                }
+              />
+            </HStack>
+            <Button
+              size={"sm"}
+              variant={"main_button"}
+              onClick={() => applyFilter()}
+            >
+              {"APPLY"}
+            </Button>
+          </VStack>
+        </Collapse>
+        <Flex
+          alignItems={"start"}
+          w={"full"}
+          justifyContent={"start"}
+          wrap={"wrap"}
+        >
+          <Flex
+            alignItems={"center"}
+            justifyContent={"center"}
+            mb={{ base: 3, md: 10 }}
+            w={"full"}
+          >
+            <HStack spacing={3}>
+              {questionList
+                ? questionList?.meta.totalPages > 1 &&
+                  numberOfPages.map((_, index) => (
+                    <Button
+                      key={index}
+                      size={"xs"}
+                      variant={"outline"}
+                      bg={
+                        pageNumber
+                          ? pageNumber === index + 1
+                            ? "orange.500"
+                            : Colors(colorMode === "dark").PRIMARY_BG
+                          : index == 0
+                          ? "orange.500"
+                          : Colors(colorMode === "dark").PRIMARY_BG
+                      }
+                      color={
+                        pageNumber
+                          ? pageNumber === index + 1
+                            ? "white"
+                            : Colors(colorMode === "dark").BORDER
+                          : index == 0
+                          ? "white"
+                          : Colors(colorMode === "dark").BORDER
+                      }
+                      onClick={() => pageNumClick(index + 1, limit)}
+                    >
+                      {index + 1}
+                    </Button>
+                  ))
+                : null}
+            </HStack>
+            <Spacer />
+            <HStack spacing={3} ml={5}>
+              {limitations.map((_limit, index) => (
+                <Button
+                  key={index}
+                  size={"xs"}
+                  alignItems={"center"}
+                  justifyContent={"center"}
+                  _hover={{
+                    color: Colors(colorMode === "dark").PRIMARY,
+                  }}
+                  color={
+                    limit === _limit
+                      ? Colors(colorMode === "dark").PRIMARY
+                      : "gray.300"
+                  }
+                  variant={"link"}
+                  onClick={() => pageNumClick(1, _limit)}
+                >
+                  {_limit}
+                </Button>
+              ))}
+            </HStack>
+          </Flex>
+          {questionList?.data.map((question, index) => (
+            <QuestionItem
+              key={index}
+              question={question}
+              isLast={index === questionList?.data.length - 1}
+              isDarkMode={colorMode === "dark"}
+            />
+          ))}
+          <Flex
+            alignItems={"center"}
+            justifyContent={"center"}
+            mt={10}
+            mb={10}
+            w={"full"}
+          >
+            <HStack spacing={3}>
+              {questionList
+                ? questionList?.meta.totalPages > 1 &&
+                  numberOfPages.map((_, index) => (
+                    <Button
+                      key={index}
+                      size={"xs"}
+                      variant={"outline"}
+                      bg={
+                        pageNumber
+                          ? pageNumber === index + 1
+                            ? "orange.500"
+                            : Colors(colorMode === "dark").PRIMARY_BG
+                          : index == 0
+                          ? "orange.500"
+                          : Colors(colorMode === "dark").PRIMARY_BG
+                      }
+                      color={
+                        pageNumber
+                          ? pageNumber === index + 1
+                            ? "white"
+                            : Colors(colorMode === "dark").BORDER
+                          : index == 0
+                          ? "white"
+                          : Colors(colorMode === "dark").BORDER
+                      }
+                      onClick={() => pageNumClick(index + 1, limit)}
+                    >
+                      {index + 1}
+                    </Button>
+                  ))
+                : null}
+            </HStack>
+            <Spacer />
+            <HStack spacing={3} ml={5}>
+              {limitations.map((_limit, index) => (
+                <Button
+                  key={index}
+                  alignItems={"center"}
+                  justifyContent={"center"}
+                  _hover={{
+                    color: Colors(colorMode === "dark").PRIMARY,
+                  }}
+                  size={"xs"}
+                  color={
+                    limit === _limit
+                      ? Colors(colorMode === "dark").PRIMARY
+                      : "gray.300"
+                  }
+                  variant={"link"}
+                  onClick={() => pageNumClick(1, _limit)}
+                >
+                  {_limit}
+                </Button>
+              ))}
+            </HStack>
+          </Flex>
+        </Flex>
+      </VStack>
+      <VStack
+        flex={{ base: 1, md: 0.2 }}
+        w={"full"}
+        style={{
+          position: "sticky",
+          top: "11%",
+        }}
+        p={0}
+        m={0}
+      >
+        <TabsQuestion
+          router={router}
+          getTranslate={getTranslate}
+          containerStyles={{
+            flex: 1,
+          }}
+        />
+        <TagList
+          router={router}
+          getTranslate={getTranslate}
+          containerStyles={{
+            flex: 1,
+            w: "full",
+            my: 5,
+          }}
+        />
+      </VStack>
     </Fragment>
   );
 }

@@ -17,8 +17,10 @@ import NextNProgress from "nextjs-progressbar";
 import { Provider } from "react-redux";
 import { Colors } from "@/assets/constant/Colors";
 import "./index.css";
-  import { CacheProvider } from "@chakra-ui/next-js";
-  // @ts-ignore
+import { CacheProvider } from "@chakra-ui/next-js";
+import PageContainer from "@/components/PageContainer";
+import LayoutProvider from "@/provider/LayoutProvider";
+// @ts-ignore
 function App({ Component, pageProps: { session, ...pageProps } }) {
   return (
     <SessionProvider session={pageProps.session}>
@@ -28,29 +30,36 @@ function App({ Component, pageProps: { session, ...pageProps } }) {
             <ColorModeProvider>
               {/* @ts-ignore */}
               <ThemeProvider theme={theme}>
-                <Head>
-                  <title>Question Dân It</title>
-                  <meta
-                    name="description"
-                    content="The website answers the question about IT"
+                <LayoutProvider>
+                  <Head>
+                    <title>Question Dân It</title>
+                    <meta
+                      name="description"
+                      content="The website answers the question about IT"
+                    />
+                    <link rel="icon" href="/images/favicon.ico" sizes="any" />
+                    <link
+                      rel="stylesheet"
+                      href="//cdn.quilljs.com/1.3.6/quill.bubble.css"
+                    ></link>
+                    <script src="//cdn.quilljs.com/1.3.6/quill.js"></script>
+                  </Head>
+                  <Header {...pageProps} />
+                  <GoToTopButton {...pageProps} />
+                  <NextNProgress
+                    color={Colors(false).PRIMARY}
+                    startPosition={0.3}
+                    stopDelayMs={200}
+                    height={3}
+                    showOnShallow={true}
                   />
-                  <link rel="icon" href="/images/favicon.ico" sizes="any" />
-                  <link
-                    rel="stylesheet"
-                    href="//cdn.quilljs.com/1.3.6/quill.bubble.css"
-                  ></link>
-                  <script src="//cdn.quilljs.com/1.3.6/quill.js"></script>
-                </Head>
-                <Header {...pageProps} />
-                <GoToTopButton {...pageProps} />
-                <NextNProgress
-                  color={Colors(false).PRIMARY}
-                  startPosition={0.3}
-                  stopDelayMs={200}
-                  height={3}
-                  showOnShallow={true}
-                />
-                <Component data-i18n-is-dynamic-list={true} {...pageProps} />
+                  <PageContainer>
+                    <Component
+                      data-i18n-is-dynamic-list={true}
+                      {...pageProps}
+                    />
+                  </PageContainer>
+                </LayoutProvider>
               </ThemeProvider>
             </ColorModeProvider>
           </ChakraProvider>
