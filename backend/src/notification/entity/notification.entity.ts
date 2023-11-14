@@ -13,13 +13,19 @@ import { Activity } from "../../activity/entity/activity.entity";
 @Entity()
 export class Notification {
   @PrimaryGeneratedColumn("uuid")
-  id: number;
+  id: string;
 
   @Column()
   title: string;
 
-  @Column()
+  @Column({ type: "text" })
   description: string;
+
+  @Column({ name: "is_read", default: false })
+  isRead: boolean;
+
+  @Column({ name: "is_announcement", default: false })
+  isAnnouncement: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -29,7 +35,10 @@ export class Notification {
 
   //  This is the foreign key column for the relationship entities.
 
-  @ManyToOne(() => User, (user) => user.questions, { onDelete: "CASCADE" })
+  @ManyToOne(() => User, (user) => user.questions, {
+    nullable: true,
+    onDelete: "CASCADE",
+  })
   @JoinColumn({ name: "user_id" })
   user: User;
 

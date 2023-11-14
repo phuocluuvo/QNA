@@ -200,7 +200,6 @@ export class UsersService {
   async updateActivityPoint(id: string, pointChange: number) {
     return this.userRepository
       .createQueryBuilder("user")
-      .createQueryBuilder()
       .update(User)
       .set({ activityPoint: () => `activity_point + ${pointChange}` })
       .where("id = :id", { id })

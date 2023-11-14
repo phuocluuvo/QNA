@@ -11,9 +11,14 @@ import { commentPaginateConfig } from "../config/pagination/comment-pagination";
 import { Transactional } from "typeorm-transactional";
 import { ActivityService } from "../activity/activity.service";
 import {
-  ReputationActivityTypeEnum,
   ObjectActivityTypeEnum,
+  ReputationActivityTypeEnum,
 } from "../enums/reputation.enum";
+import {
+  notificationText,
+  notificationTextDesc,
+} from "../constants/notification.constants";
+import { NotificationService } from "../notification/notification.service";
 
 @Injectable()
 export class CommentService {
@@ -21,6 +26,7 @@ export class CommentService {
     @Inject("COMMENT_REPOSITORY")
     private readonly commentRepository: Repository<Comment>,
     private readonly activityService: ActivityService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   /**
@@ -108,7 +114,7 @@ export class CommentService {
   }
 
   /**
-   * Remove an comment.
+   * Remove a comment.
    *
    * @param comment - The comment entity to remove.
    * @returns The removed comment.
@@ -125,13 +131,49 @@ export class CommentService {
   @Transactional()
   async createWithActivity(commentDto: CreateCommentDto, userId: string) {
     const comment = await this.create(commentDto, userId);
-    await this.activityService.create(
+    const activity = await this.activityService.create(
       ReputationActivityTypeEnum.CREATE_COMMENT,
       ObjectActivityTypeEnum.COMMENT,
       comment.id,
       userId,
+      userId,
     );
+    await this.notificationService.create(
+      notificationText.COMMENT.CREATE,
+      notificationTextDesc.COMMENT.CREATE,
+      userId,
+      activity.id,
+    );
+    return comment;
+  }
 
+  /**
+   * Update an existing comment with activity.
+   * @param id - The ID of the answer to update.
+   * @param commentDto - The updated data for the comment.
+   * @param oldComment  - The old comment data.
+   * @param userId - The ID of the user updating the comment.
+   */
+  async updateWithActivity(
+    id: string,
+    commentDto: UpdateCommentDto,
+    oldComment: Comment,
+    userId: string,
+  ) {
+    const comment = await this.update(id, commentDto);
+    const activity = await this.activityService.create(
+      ReputationActivityTypeEnum.UPDATE_COMMENT,
+      ObjectActivityTypeEnum.COMMENT,
+      comment.id,
+      userId,
+      oldComment.user.id,
+    );
+    await this.notificationService.create(
+      notificationText.COMMENT.UPDATE,
+      notificationTextDesc.COMMENT.UPDATE,
+      oldComment.user.id,
+      activity.id,
+    );
     return comment;
   }
 
@@ -142,11 +184,18 @@ export class CommentService {
    */
   @Transactional()
   async removeWithActivity(comment: Comment, userId: string) {
-    await this.activityService.create(
+    const activity = await this.activityService.create(
       ReputationActivityTypeEnum.DELETE_COMMENT,
       ObjectActivityTypeEnum.COMMENT,
       comment.id,
       userId,
+      comment.user.id,
+    );
+    await this.notificationService.create(
+      notificationText.COMMENT.DELETE,
+      notificationTextDesc.COMMENT.DELETE,
+      comment.user.id,
+      activity.id,
     );
     return this.remove(comment);
   }

@@ -130,7 +130,7 @@ export class AnswerController {
     }
 
     if (ability.can(Action.Update, answer)) {
-      return this.answerService.update(id, answerDto);
+      return this.answerService.updateWithActivity(id, answerDto, answer);
     } else {
       throw new ForbiddenException(message.NOT_AUTHOR.ANSWER);
     }
@@ -204,17 +204,11 @@ export class AnswerController {
     const answer = await this.answerService.findOneById(
       approveAnswerDto.answer_id,
     );
-    if (!answer) {
-      throw new NotFoundException(message.NOT_FOUND.ANSWER);
-    }
 
     //Check question exist
     const question = await this.questionService.findOneById(
       approveAnswerDto.question_id,
     );
-    if (!question) {
-      throw new NotFoundException(message.NOT_FOUND.ANSWER);
-    }
 
     if (ability.can(Action.Update, question)) {
       return this.answerService.approveAnswerWithActivity(

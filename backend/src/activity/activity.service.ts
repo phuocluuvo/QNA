@@ -7,8 +7,8 @@ import { paginate, PaginateQuery } from "nestjs-paginate";
 import { activityPaginateConfig } from "../config/pagination/activity-pagination";
 import { Activity } from "./entity/activity.entity";
 import {
-  ReputationActivityTypeEnum,
   ObjectActivityTypeEnum,
+  ReputationActivityTypeEnum,
 } from "../enums/reputation.enum";
 import { reputationActivityPoint } from "../constants/reputation.constants";
 
@@ -37,6 +37,7 @@ export class ActivityService {
    * @param objectType - Object type (question, answer, comment)
    * @param objectId - object id (question id, answer id, comment id)
    * @param userId - The ID of the user who created the activity
+   * @param authorId - Author id (question, answer, comment)
    */
   @Transactional()
   async create(
@@ -44,6 +45,7 @@ export class ActivityService {
     objectType: ObjectActivityTypeEnum,
     objectId: string,
     userId: string,
+    authorId: string,
   ) {
     const newActivity = new Activity();
     newActivity.activityType = activityType;
@@ -52,13 +54,14 @@ export class ActivityService {
     newActivity.pointChange = reputationActivityPoint[activityType];
     newActivity.user = { id: userId } as unknown as User;
 
-    await this.activityRepository.save(newActivity);
+    const activity = await this.activityRepository.save(newActivity);
 
     // Update activity points
     await this.usersService.updateActivityPoint(
-      userId,
+      authorId,
       reputationActivityPoint[activityType],
     );
+    return activity;
   }
 
   /**
