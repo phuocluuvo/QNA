@@ -72,5 +72,6 @@
   "NO_TAG_FOUND": "Không tìm thấy thẻ. Bạn có muốn tạo thẻ <code>{tagname}</code> mới?",
   "CREATE_NEW_TAG": "Tạo thẻ mới",
   "TAG_DESCRIPTION": "Thẻ là cách để kết nối các chuyên gia với các câu hỏi mà họ có thể trả lời bằng cách sắp xếp các câu hỏi thành các danh mục cụ thể, được xác định rõ ràng.",
-  "TAGS": "Thẻ"
+  "TAGS": "Thẻ",
+  "USERS": "Người dùng"
 }

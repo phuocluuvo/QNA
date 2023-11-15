@@ -17,7 +17,11 @@ function SideRightMenu() {
   }
 
   function checkRoute() {
-    return route.pathname === "/" || route.pathname === "/tags";
+    return (
+      route.pathname === "/" ||
+      route.pathname === "/tags" ||
+      route.pathname === "/user/profile"
+    );
   }
 
   return (
@@ -89,6 +93,28 @@ function SideRightMenu() {
             onClick={() => changeRoute("/tags")}
           >
             {isMobile ? null : getTranslate("TAGS")}
+          </Button>
+          <Button
+            leftIcon={<FaTags />}
+            variant={"ghost"}
+            isActive={route.pathname === "/user/profile"}
+            w={isMobile ? "fit-content" : 150}
+            justifyContent={"flex-start"}
+            style={{
+              textDecoration: "none",
+              fontWeight: "bold",
+              paddingBlock: 10,
+              paddingInline: 20,
+            }}
+            _hover={{
+              textDecoration: "none",
+              fontWeight: "bold",
+              paddingBlock: 10,
+              paddingInline: 20,
+            }}
+            onClick={() => changeRoute("/user/profile")}
+          >
+            {isMobile ? null : getTranslate("USERS")}
           </Button>
         </VStack>
       </Box>

@@ -7,8 +7,8 @@ interface User {
   dob?: string;
   status?: Status;
   avatar?: string;
-  updateAt?: string;
-  createAt?: string;
+  updatedAt?: string;
+  createdAt?: string;
   username: string;
 }
 

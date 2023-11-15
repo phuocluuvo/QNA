@@ -18,4 +18,5 @@ export const url = {
   USER_PROFILE: "/api/user/profile",
   VOTE_ANSWER: "/api/answer/vote",
   COMMENT: "/api/comment",
+  ACTIVITY_HISTORY: "/api/activity/history",
 };

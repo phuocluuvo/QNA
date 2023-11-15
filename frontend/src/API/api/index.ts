@@ -132,6 +132,9 @@ const getTag = (nameTag: string) => {
   });
 };
 
+const getActivityHistory = (params: CommonParams) => {
+  return AuthApi(REQUEST_METHOD.GET, url.ACTIVITY_HISTORY, params);
+};
 export default {
   requestSignUp,
   getQuestion,
@@ -153,4 +156,5 @@ export default {
   getTags,
   updateQuestion,
   getTag,
+  getActivityHistory,
 };
