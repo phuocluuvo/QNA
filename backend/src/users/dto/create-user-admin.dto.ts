@@ -1,6 +1,6 @@
 import {
   IsDate,
-  IsEmail,
+  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -11,8 +11,10 @@ import {
 } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 import { Expose } from "class-transformer";
+import { UserState } from "../../enums/user-state.enum";
+import { Role } from "../../enums/role.enum";
 
-export class CreateUserDto {
+export class CreateUserAdminDto {
   @ApiProperty()
   @Expose()
   @IsNotEmpty({
@@ -48,17 +50,6 @@ export class CreateUserDto {
   @ApiProperty()
   @Expose()
   @IsNotEmpty({
-    message: "Email is required",
-  })
-  @IsString({
-    message: "Email must be a string",
-  })
-  @IsEmail()
-  email: string;
-
-  @ApiProperty()
-  @Expose()
-  @IsNotEmpty({
     message: "Password is required",
   })
   @IsString()
@@ -70,5 +61,11 @@ export class CreateUserDto {
 
   @Expose()
   @ApiProperty()
-  refreshToken: string;
+  @IsEnum(UserState)
+  state: UserState;
+
+  @Expose()
+  @ApiProperty()
+  @IsEnum(Role)
+  role: Role;
 }

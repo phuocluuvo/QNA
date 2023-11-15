@@ -2,7 +2,9 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Patch,
+  Query,
   Request,
   UseGuards,
 } from "@nestjs/common";
@@ -12,6 +14,17 @@ import { AccessTokenGuard } from "../auth/guards/accessToken.guard";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { plainToClass } from "class-transformer";
 import { UserDto } from "./dto/user.dto";
+import {
+  ApiOkPaginatedResponse,
+  ApiPaginationQuery,
+  PaginateQuery,
+} from "nestjs-paginate";
+import { RolesGuard } from "../auth/guards/roles.guard";
+import { Roles } from "../auth/decorator/roles.decorator";
+import { Role } from "../enums/role.enum";
+import { userPaginateConfig } from "../config/pagination/user-pagination";
+import { User } from "./entity/users.entity";
+import { UpdateUserAdminDto } from "./dto/update-user-admin.dto";
 
 @ApiTags("user")
 @Controller("user")
@@ -51,6 +64,47 @@ export class UsersController {
   async update(@Request() req, @Body() updateUserDto: UpdateUserDto) {
     const id = req.user["sub"];
     const user = await this.usersService.updateProfile(id, updateUserDto);
+    return plainToClass(UserDto, user, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  /**
+   * Get all user.
+   * @param query - Pagination query.
+   */
+  @ApiOperation({
+    summary: "get all user for admin",
+  })
+  @ApiOkPaginatedResponse(User, userPaginateConfig)
+  @ApiPaginationQuery(userPaginateConfig)
+  @ApiBearerAuth()
+  @Get()
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async getAllUser(@Query() query: PaginateQuery) {
+    return this.usersService.getAllUser(query);
+  }
+
+  /**
+   * Update the profile of a user.
+   *
+   * @param id ID of the user to update.
+   * @param updateUserDto Data for updating the user profile.
+   * @returns Promise<User> The updated user profile.
+   */
+  @ApiOperation({
+    summary: "update user for admin",
+  })
+  @ApiBearerAuth()
+  @Patch(":id")
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async updateUserForAdmin(
+    @Param("id") id: string,
+    @Body() updateUserDto: UpdateUserAdminDto,
+  ) {
+    const user = await this.usersService.updateUserForAdmin(id, updateUserDto);
     return plainToClass(UserDto, user, {
       excludeExtraneousValues: true,
     });

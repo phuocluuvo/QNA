@@ -11,6 +11,7 @@ import { Question } from "../../question/entity/question.entity";
 import { Answer } from "../../answer/entity/answer.entity";
 import { Vote } from "../../vote/entity/vote.entity";
 import { Activity } from "../../activity/entity/activity.entity";
+import { UserState } from "../../enums/user-state.enum";
 
 @Entity()
 export class User {
@@ -49,6 +50,13 @@ export class User {
 
   @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
+
+  @Column({
+    type: "enum",
+    enum: UserState,
+    default: UserState.ACTIVE,
+  })
+  state: UserState;
 
   // This is the foreign key column for the relationship entities.
 
