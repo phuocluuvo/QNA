@@ -17,6 +17,9 @@ export enum ReputationActivityTypeEnum {
   CANCLE_DOWNVOTE = "cancle_down_vote",
   CHANGE_UPVOTE_TO_DOWNVOTE = "change_up_vote_to_down_vote",
   UN_ACCEPT_ANSWER = "un_accept_answer",
+
+  BLOCK_QUESTION = "block_question",
+  VERIFY_QUESTION = "verify_question",
 }
 
 export enum ObjectActivityTypeEnum {

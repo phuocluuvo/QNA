@@ -17,6 +17,7 @@ import { Vote } from "../../vote/entity/vote.entity";
 import { Tag } from "../../tag/entity/tag.entity";
 import { QuestionTypeEnum } from "../../enums/question-type.enum";
 import { Activity } from "../../activity/entity/activity.entity";
+import { QuestionState } from "../../enums/question-state.enum";
 
 @Entity()
 export class Question {
@@ -40,6 +41,9 @@ export class Question {
 
   @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
+
+  @Column({ type: "enum", enum: QuestionState, default: QuestionState.PENDING })
+  state: QuestionState;
 
   // This is the foreign key column for the relationship entities.
 
