@@ -87,8 +87,10 @@ export class NotificationController {
       req["user"]["sub"],
     );
     if (notification) {
-      await this.notificationService.readNotification(id);
-      return this.notificationService.getBadgeNumber(req["user"]["sub"]);
+      const result = await this.notificationService.readNotification(id);
+      result["notificationsNumber"] =
+        await this.notificationService.getBadgeNumber(req["user"]["sub"]);
+      return result;
     } else {
       throw new NotFoundException(message.NOT_FOUND.NOTIFICATION);
     }
