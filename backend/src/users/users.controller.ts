@@ -82,8 +82,6 @@ export class UsersController {
   @ApiPaginationQuery(userPaginateConfig)
   @ApiBearerAuth()
   @Get()
-  @UseGuards(AccessTokenGuard, RolesGuard)
-  @Roles(Role.ADMIN)
   async getAllUser(@Query() query: PaginateQuery) {
     return this.usersService.getAllUser(query);
   }
