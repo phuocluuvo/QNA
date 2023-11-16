@@ -81,7 +81,7 @@ export class NotificationController {
   })
   @Post(":id")
   @UseGuards(AccessTokenGuard)
-  async readNotification(@Req() req: Request, @Param() id: string) {
+  async readNotification(@Req() req: Request, @Param("id") id: string) {
     const notification = this.notificationService.findOneByIdUser(
       id,
       req["user"]["sub"],
