@@ -91,7 +91,13 @@ export class CommentService {
       excludeExtraneousValues: true,
     });
     commentTrans["user"] = userId;
-    commentTrans["answer"] = commentDto.answer_id;
+
+    if (commentDto.answer_id) {
+      commentTrans["answer"] = commentDto.answer_id;
+    } else {
+      commentTrans["question"] = commentDto.question_id;
+    }
+
     return this.commentRepository.save(commentTrans);
   }
 

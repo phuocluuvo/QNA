@@ -7,6 +7,7 @@ import { CaslModule } from "../casl/casl.module";
 import { AnswerModule } from "../answer/answer.module";
 import { ActivityModule } from "../activity/activity.module";
 import { NotificationModule } from "../notification/notification.module";
+import { QuestionModule } from "../question/question.module";
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { NotificationModule } from "../notification/notification.module";
     AnswerModule,
     ActivityModule,
     NotificationModule,
+    QuestionModule,
   ],
   controllers: [CommentController],
   providers: [...commentProviders, CommentService],
