@@ -349,6 +349,7 @@ export class QuestionService {
     );
   }
 
+  @Transactional()
   async censoring(questionId: string, userId: string, state: QuestionState) {
     const question = await this.findOneById(questionId);
     if (question.state == state) {

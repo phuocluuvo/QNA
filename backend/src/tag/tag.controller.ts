@@ -120,7 +120,8 @@ export class TagController {
   })
   @ApiBearerAuth()
   @Delete(":id")
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.MONITOR)
   async remove(@Param("id") id: string) {
     const tag = await this.tagService.findOne({ id: id });
 
