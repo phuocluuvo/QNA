@@ -79,7 +79,7 @@ export class NotificationController {
   @ApiOperation({
     summary: "update is read notification",
   })
-  @Post(":id")
+  @Get(":id")
   @UseGuards(AccessTokenGuard)
   async readNotification(@Req() req: Request, @Param("id") id: string) {
     const notification = this.notificationService.findOneByIdUser(
