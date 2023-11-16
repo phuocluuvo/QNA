@@ -217,7 +217,7 @@ export class QuestionController {
   @ApiBearerAuth()
   @Post(":questionId/verify")
   @UseGuards(AccessTokenGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.MONITOR)
   async verify(@Req() req: Request, @Param("questionId") questionId: string) {
     const userId = req.user["sub"];
     return this.questionService.censoring(
@@ -240,7 +240,7 @@ export class QuestionController {
   @ApiBearerAuth()
   @Post(":questionId/block")
   @UseGuards(AccessTokenGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.MONITOR)
   async block(@Req() req: Request, @Param("questionId") questionId: string) {
     const userId = req.user["sub"];
     return this.questionService.censoring(

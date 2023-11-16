@@ -30,4 +30,7 @@ export const message = {
     VERIFIED: "QUESTION_IS_VERIFIED",
     BLOCKED: "QUESTION_IS_BLOCKED",
   },
+  TAG: {
+    VERIFIED: "TAG_IS_VERIFIED",
+  },
 };

@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   UseGuards,
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
@@ -24,6 +25,10 @@ import {
 } from "nestjs-paginate";
 import { Question } from "../question/entity/question.entity";
 import { tagPaginateConfig } from "../config/pagination/tag-pagination.config";
+import { RolesGuard } from "../auth/guards/roles.guard";
+import { Roles } from "../auth/decorator/roles.decorator";
+import { Role } from "../enums/role.enum";
+import { TagState } from "../enums/tag-state.enum";
 
 @ApiTags("tag")
 @Controller("tag")
@@ -71,11 +76,11 @@ export class TagController {
   @ApiBearerAuth()
   @Post()
   @UseGuards(AccessTokenGuard)
-  async create(@Body() tagDto: CreateTagDto) {
+  async create(@Req() req: Request, @Body() tagDto: CreateTagDto) {
+    const userId = req["user"]["sub"];
     const tag = await this.tagService.findOne({ name: tagDto.name });
-
     if (!tag) {
-      return this.tagService.create(tagDto);
+      return this.tagService.create(tagDto, userId);
     } else {
       throw new BadRequestException(message.EXISTED.TAG);
     }
@@ -124,5 +129,24 @@ export class TagController {
     }
 
     return this.tagService.remove(tag);
+  }
+
+  /**
+   * verify for a tag.
+   *
+   * @param req - The request object.
+   * @param tagId
+   * @returns The result of the tag.
+   */
+  @ApiOperation({
+    summary: "verify tag",
+  })
+  @ApiBearerAuth()
+  @Post(":tagId/verify")
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.MONITOR)
+  async verify(@Req() req: Request, @Param("tagId") tagId: string) {
+    const userId = req["user"]["sub"];
+    return this.tagService.censoring(tagId, userId, TagState.VERIFIED);
   }
 }

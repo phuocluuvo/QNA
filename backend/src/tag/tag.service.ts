@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { Repository } from "typeorm";
 import { Tag } from "./entity/tag.entity";
 import { message } from "../constants/message.constants";
@@ -7,12 +12,19 @@ import { plainToClass } from "class-transformer";
 import { UpdateTagDto } from "./dto/update-tag.dto";
 import { paginate, PaginateQuery } from "nestjs-paginate";
 import { tagPaginateConfig } from "../config/pagination/tag-pagination.config";
+import { TagState } from "../enums/tag-state.enum";
+import {
+  ObjectActivityTypeEnum,
+  ReputationActivityTypeEnum,
+} from "../enums/reputation.enum";
+import { ActivityService } from "../activity/activity.service";
 
 @Injectable()
 export class TagService {
   constructor(
     @Inject("TAG_REPOSITORY")
     private readonly tagRepository: Repository<Tag>,
+    private readonly activityService: ActivityService,
   ) {}
 
   /**
@@ -71,11 +83,11 @@ export class TagService {
    * @param tagDto - The data to create a new tag.
    * @returns The created tag.
    */
-  async create(tagDto: CreateTagDto) {
+  async create(tagDto: CreateTagDto, userId: string) {
     const tagTrans = plainToClass(CreateTagDto, tagDto, {
       excludeExtraneousValues: true,
     });
-
+    tagTrans["user"] = userId;
     return this.tagRepository.save(tagTrans);
   }
 
@@ -118,5 +130,26 @@ export class TagService {
     });
 
     return await Promise.all(tagPromises);
+  }
+
+  async censoring(tagId: string, userId: string, state: TagState) {
+    const tag = await this.findOne({ id: tagId });
+    if (tag) {
+      throw new NotFoundException(message.NOT_FOUND.TAG);
+    }
+    if (tag.state == state) {
+      throw new BadRequestException(message.TAG.VERIFIED);
+    }
+    tag.state = state;
+    const result = await this.tagRepository.save(tag);
+    await this.activityService.create(
+      ReputationActivityTypeEnum.VERIFY_QUESTION,
+      ObjectActivityTypeEnum.TAG,
+      tagId,
+      userId,
+      tag.user.id,
+    );
+
+    return result;
   }
 }

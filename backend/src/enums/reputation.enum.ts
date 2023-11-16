@@ -20,6 +20,8 @@ export enum ReputationActivityTypeEnum {
 
   BLOCK_QUESTION = "block_question",
   VERIFY_QUESTION = "verify_question",
+
+  VERIFY_TAG = "verify_tag",
 }
 
 export enum ObjectActivityTypeEnum {
@@ -28,4 +30,5 @@ export enum ObjectActivityTypeEnum {
   COMMENT = "comment",
   VOTE_QUESTION = "vote_question",
   VOTE_ANSWER = "vote_answer",
+  TAG = "tag",
 }
