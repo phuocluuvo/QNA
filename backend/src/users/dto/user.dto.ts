@@ -16,7 +16,7 @@ export class UserDto {
   avatar: string;
 
   @Expose()
-  activityPoints: number;
+  activityPoint: number;
 
   @Expose()
   dob: Date;
