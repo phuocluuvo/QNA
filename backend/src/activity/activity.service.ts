@@ -11,6 +11,9 @@ import {
   ReputationActivityTypeEnum,
 } from "../enums/reputation.enum";
 import { reputationActivityPoint } from "../constants/reputation.constants";
+import { Question } from "../question/entity/question.entity";
+import { Answer } from "../answer/entity/answer.entity";
+import { Comment } from "../comment/entity/comment.entity";
 
 @Injectable()
 export class ActivityService {
@@ -53,6 +56,24 @@ export class ActivityService {
     newActivity.objectId = objectId;
     newActivity.pointChange = reputationActivityPoint[activityType];
     newActivity.user = { id: userId } as unknown as User;
+
+    switch (objectType) {
+      case ObjectActivityTypeEnum.QUESTION:
+        newActivity.question = { id: objectId } as unknown as Question;
+        break;
+      case ObjectActivityTypeEnum.ANSWER:
+        newActivity.answer = { id: objectId } as unknown as Answer;
+        break;
+      case ObjectActivityTypeEnum.COMMENT:
+        newActivity.comment = { id: objectId } as unknown as Comment;
+        break;
+      case ObjectActivityTypeEnum.VOTE_QUESTION:
+        newActivity.question = { id: objectId } as unknown as Question;
+        break;
+      case ObjectActivityTypeEnum.VOTE_ANSWER:
+        newActivity.answer = { id: objectId } as unknown as Answer;
+        break;
+    }
 
     const activity = await this.activityRepository.save(newActivity);
 

@@ -37,8 +37,25 @@ export class NotificationController {
   })
   @Get()
   @UseGuards(AccessTokenGuard)
-  async getNotifications(@Query() query: PaginateQuery, @Req() req: Request) {
-    return this.notificationService.findByUserId(query, req["user"]["sub"]);
+  async getNotifications(
+    @Query() query: PaginateQuery,
+    @Query("filter.isRead") filter: string,
+    @Req() req: Request,
+  ) {
+    return this.notificationService.findByUserId(
+      query,
+      filter,
+      req["user"]["sub"],
+    );
+  }
+
+  @ApiOperation({
+    summary: "get announcement",
+  })
+  @Get("badgeNumber")
+  @UseGuards(AccessTokenGuard)
+  async getBadgeNumber(@Req() req: Request) {
+    return this.notificationService.getBadgeNumber(req["user"]["sub"]);
   }
 
   @ApiOperation({
@@ -48,6 +65,15 @@ export class NotificationController {
   @UseGuards(AccessTokenGuard)
   async getAnnouncement() {
     return this.notificationService.findAnnouncement();
+  }
+
+  @ApiOperation({
+    summary: "update is read notification",
+  })
+  @Post("all")
+  @UseGuards(AccessTokenGuard)
+  async readAllNotification(@Req() req: Request) {
+    return this.notificationService.readAllNotification(req["user"]["sub"]);
   }
 
   @ApiOperation({

@@ -12,6 +12,7 @@ import { jwtConstants } from "../constants/constants";
 import { Role } from "../enums/role.enum";
 import { User } from "../users/entity/users.entity";
 import { message } from "../constants/message.constants";
+import { UserState } from "../enums/user-state.enum";
 
 @Injectable()
 export class AuthService {
@@ -84,6 +85,10 @@ export class AuthService {
 
     if (!passwordMatches)
       throw new BadRequestException(message.PASSWORD_IS_INCORRECT);
+
+    const isBlock = user.state === UserState.BLOCKED;
+
+    if (isBlock) throw new BadRequestException(message.USER_IS_BLOCK);
 
     const tokens = await this.getTokens(user.id, user.username, user.role);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
@@ -182,15 +187,22 @@ export class AuthService {
    */
   async refreshTokens(userId: string, refreshToken: string) {
     const user = await this.usersService.findById(userId);
+
+    const isBlock = user.state === UserState.BLOCKED;
+    if (isBlock) throw new BadRequestException(message.USER_IS_BLOCK);
+
     if (!user || !user.refreshToken)
       throw new ForbiddenException(message.ACCESS_DENIED);
     const refreshTokenMatches = await argon2.verify(
       user.refreshToken,
       refreshToken,
     );
+
     if (!refreshTokenMatches)
       throw new ForbiddenException(message.ACCESS_DENIED);
+
     const tokens = await this.getTokens(user.id, user.username, user.role);
+
     await this.updateRefreshToken(user.id, tokens.refreshToken);
     return tokens;
   }
