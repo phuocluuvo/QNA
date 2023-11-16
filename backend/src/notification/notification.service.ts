@@ -22,14 +22,18 @@ export class NotificationService {
    * @param query - paginate query
    * @param userId - login user id
    */
-  async findByUserId(query: PaginateQuery, userId: string) {
-    const queryBuilder = this.notificationRepository
-      .createQueryBuilder("notification")
-      .where("notification.user.id = :userId", { userId })
-      .orWhere("notification.isAnnouncement = true")
-      .andWhere("notification.isRead = false");
-
-    return paginate<Notification>(query, queryBuilder, notificationPagination);
+  async findByUserId(query: PaginateQuery, filter: string, userId: string) {
+    const queryBuidler =
+      this.notificationRepository.createQueryBuilder("notification");
+    queryBuidler.where({ user: { id: userId } });
+    if (filter) {
+      const isRead = filter === "true";
+      queryBuidler.andWhere("notification.isRead = :isRead", {
+        isRead: isRead,
+      });
+    }
+    queryBuidler.orWhere({ isAnnouncement: true });
+    return paginate<Notification>(query, queryBuidler, notificationPagination);
   }
 
   /**
@@ -38,6 +42,7 @@ export class NotificationService {
   async findAnnouncement() {
     return this.notificationRepository.find({
       where: { isAnnouncement: true },
+      relations: ["user"],
     });
   }
 
@@ -150,5 +155,24 @@ export class NotificationService {
       isRead: true,
     });
     return this.notificationRepository.save(notification);
+  }
+
+  /**
+   * Read all notification
+   * @param id - notification id
+   */
+  async readAllNotification(userId: string) {
+    const result = this.notificationRepository
+      .createQueryBuilder("nocification")
+      .update(Notification)
+      .set({ isRead: true })
+      .where({ user: { id: userId } })
+      .execute();
+
+    if (result) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

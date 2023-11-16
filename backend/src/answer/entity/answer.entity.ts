@@ -13,6 +13,7 @@ import { User } from "../../users/entity/users.entity";
 import { Question } from "../../question/entity/question.entity";
 import { Vote } from "../../vote/entity/vote.entity";
 import { Comment } from "../../comment/entity/comment.entity";
+import { Activity } from "../../activity/entity/activity.entity";
 
 @Entity()
 export class Answer {
@@ -54,11 +55,16 @@ export class Answer {
   @OneToMany(() => Comment, (comment) => comment.answer)
   comments: Comment[];
 
+  @OneToMany(() => Activity, (activity) => activity.answer)
+  activity: Activity[];
+
   //Virtual Columns
 
   @VirtualColumn({
     query: (alias) =>
-      `SELECT COUNT(*) FROM comment WHERE comment.answer_id = ${alias}.id`,
+      `SELECT COUNT(*)
+             FROM comment
+             WHERE comment.answer_id = ${alias}.id`,
   })
   commentsNumber: number;
 }

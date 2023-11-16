@@ -7,4 +7,13 @@ export const notificationPagination: PaginateConfig<Notification> = {
     ["isAnnouncement", "DESC"],
     ["createdAt", "ASC"],
   ],
+  relations: [
+    "user",
+    "activity",
+    "activity.user",
+    "activity.question",
+    "activity.answer",
+    "activity.comment",
+  ],
+  searchableColumns: ["title", "description"],
 };

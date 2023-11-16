@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Patch,
+  Post,
   Query,
   Request,
   UseGuards,
@@ -25,6 +26,7 @@ import { Role } from "../enums/role.enum";
 import { userPaginateConfig } from "../config/pagination/user-pagination";
 import { User } from "./entity/users.entity";
 import { UpdateUserAdminDto } from "./dto/update-user-admin.dto";
+import { CreateUserAdminDto } from "./dto/create-user-admin.dto";
 
 @ApiTags("user")
 @Controller("user")
@@ -84,6 +86,30 @@ export class UsersController {
   @Roles(Role.ADMIN)
   async getAllUser(@Query() query: PaginateQuery) {
     return this.usersService.getAllUser(query);
+  }
+
+  /**
+   * Update the profile of a user.
+   *
+   * @param id ID of the user to update.
+   * @param createUserDto
+   * @returns Promise<User> The updated user profile.
+   */
+  @ApiOperation({
+    summary: "create user for admin",
+  })
+  @ApiBearerAuth()
+  @Post()
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async createUserForAdmin(
+    @Param("id") id: string,
+    @Body() createUserDto: CreateUserAdminDto,
+  ) {
+    const user = await this.usersService.createUserForAdmin(createUserDto);
+    return plainToClass(UserDto, user, {
+      excludeExtraneousValues: true,
+    });
   }
 
   /**

@@ -1,5 +1,6 @@
 import {
   IsDate,
+  IsEmail,
   IsEnum,
   IsNotEmpty,
   IsOptional,
@@ -43,6 +44,17 @@ export class CreateUserAdminDto {
 
   @ApiProperty()
   @Expose()
+  @IsNotEmpty({
+    message: "Email is required",
+  })
+  @IsString({
+    message: "Email must be a string",
+  })
+  @IsEmail()
+  email: string;
+
+  @ApiProperty()
+  @Expose()
   @IsOptional()
   @IsDate()
   dob: Date;
@@ -60,6 +72,7 @@ export class CreateUserAdminDto {
   password: string;
 
   @Expose()
+  @IsOptional()
   @ApiProperty()
   @IsEnum(UserState)
   state: UserState;

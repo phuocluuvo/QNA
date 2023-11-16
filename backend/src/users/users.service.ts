@@ -14,6 +14,7 @@ import { paginate, PaginateQuery } from "nestjs-paginate";
 import { userPaginateConfig } from "../config/pagination/user-pagination";
 import { plainToClass } from "class-transformer";
 import { UpdateUserAdminDto } from "./dto/update-user-admin.dto";
+import { CreateUserAdminDto } from "./dto/create-user-admin.dto";
 
 @Injectable()
 export class UsersService {
@@ -204,6 +205,33 @@ export class UsersService {
     } catch (e) {
       throw new BadRequestException(message.EXISTED.EMAIL);
     }
+  }
+
+  async createUserForAdmin(createUserDto: CreateUserAdminDto) {
+    const errExits = {};
+    const userExists = await this.findOne(createUserDto.username);
+    if (userExists) {
+      errExits["username"] = "User already exists";
+    }
+
+    const emailExists = await this.findOneByEmail(createUserDto.email);
+    if (emailExists) {
+      errExits["email"] = "Email already exists";
+    }
+
+    if (emailExists || userExists) {
+      throw new BadRequestException({
+        statusCode: 400,
+        error: "Bad Request",
+        message: errExits,
+      });
+    }
+
+    const userTrans = plainToClass(CreateUserAdminDto, createUserDto, {
+      excludeExtraneousValues: true,
+    });
+
+    return this.userRepository.save(userTrans);
   }
 
   /**
