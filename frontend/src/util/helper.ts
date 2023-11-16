@@ -1,5 +1,9 @@
 import moment from "moment";
 import { HISTORY_ACTIVITY_TYPE } from "./type/HistoryActivity.enum";
+import {
+  NotificationDesEumn,
+  NotificationEumn,
+} from "./type/Notification.enum";
 
 const formatDate = (date: string, useCount = false, formarter?: string) => {
   const datetime = moment(date);
@@ -110,6 +114,171 @@ const getTranslationFromHistoryAcitvityEn = (
       return "";
   }
 };
+const getTranslationFromNotificationVi = (noti_type: NotificationEumn) => {
+  switch (noti_type) {
+    case NotificationEumn.CREATED_QUESTION:
+      return "đã đăng một câu hỏi";
+    case NotificationEumn.UPDATED_QUESTION:
+      return "đã cập nhật câu hỏi";
+    case NotificationEumn.DELETED_QUESTION:
+      return "đã xóa câu hỏi";
+    case NotificationEumn.CREATED_ANSWER:
+      return "đã trả lời câu hỏi";
+    case NotificationEumn.UPDATED_ANSWER:
+      return "đã cập nhật câu trả lời";
+    case NotificationEumn.DELETED_ANSWER:
+      return "đã xóa câu trả lời";
+    case NotificationEumn.ACCEPTED_ANSWER:
+      return "đã chấp nhận câu trả lời";
+    case NotificationEumn.UN_APPROVED_ANSWER:
+      return "đã hủy câu trả lời được chấp nhận";
+    case NotificationEumn.CREATED_COMMENT:
+      return "đã bình luận";
+    case NotificationEumn.UPDATED_COMMENT:
+      return "đã cập nhật bình luận";
+    case NotificationEumn.DELETED_COMMENT:
+      return "đã xóa bình luận";
+    case NotificationEumn.UP_VOTE:
+      return "đã upvote";
+    case NotificationEumn.DOWN_VOTE:
+      return "đã downvote";
+    case NotificationEumn.CANCEL_UP_VOTE:
+      return "đã hủy upvote";
+    case NotificationEumn.CANCEL_DOWN_VOTE:
+      return "đã hủy downvote";
+    case NotificationEumn.CHANGE_VOTE_UP_TO_DOWN:
+      return "đã đổi upvote thành downvote";
+    case NotificationEumn.CHANGE_VOTE_DOWN_TO_UP:
+      return "đã đổi downvote thành upvote";
+    default:
+      return "";
+  }
+};
+
+const getTranslationFromNotificationEn = (
+  noti_type: NotificationEumn | string
+) => {
+  switch (noti_type) {
+    case NotificationEumn.CREATED_QUESTION:
+      return "created a question";
+    case NotificationEumn.UPDATED_QUESTION:
+      return "updated a question";
+    case NotificationEumn.DELETED_QUESTION:
+      return "deleted a question";
+    case NotificationEumn.CREATED_ANSWER:
+      return "created an answer";
+    case NotificationEumn.UPDATED_ANSWER:
+      return "updated an answer";
+    case NotificationEumn.DELETED_ANSWER:
+      return "deleted an answer";
+    case NotificationEumn.ACCEPTED_ANSWER:
+      return "accepted an answer";
+    case NotificationEumn.UN_APPROVED_ANSWER:
+      return "unaccepted an answer";
+    case NotificationEumn.CREATED_COMMENT:
+      return "commented";
+    case NotificationEumn.UPDATED_COMMENT:
+      return "updated a comment";
+    case NotificationEumn.DELETED_COMMENT:
+      return "deleted a comment";
+    case NotificationEumn.UP_VOTE:
+      return "upvoted";
+    case NotificationEumn.DOWN_VOTE:
+      return "downvoted";
+    case NotificationEumn.CANCEL_UP_VOTE:
+      return "cancled upvote";
+    case NotificationEumn.CANCEL_DOWN_VOTE:
+      return "cancled downvote";
+    case NotificationEumn.CHANGE_VOTE_UP_TO_DOWN:
+      return "changed upvote to downvote";
+    case NotificationEumn.CHANGE_VOTE_DOWN_TO_UP:
+      return "changed downvote to upvote";
+    default:
+      return noti_type;
+  }
+};
+
+function getDescriptionFromNotificationVi(type: NotificationDesEumn | string) {
+  switch (type) {
+    case NotificationDesEumn.DESCRIPTION_CREATED_QUESTION:
+      return "đã đăng một câu hỏi";
+    case NotificationDesEumn.DESCRIPTION_UPDATED_QUESTION:
+      return "đã cập nhật câu hỏi";
+    case NotificationDesEumn.DESCRIPTION_DELETED_QUESTION:
+      return "đã xóa câu hỏi";
+    case NotificationDesEumn.DESCRIPTION_CREATED_ANSWER:
+      return "đã trả lời câu hỏi";
+    case NotificationDesEumn.DESCRIPTION_UPDATED_ANSWER:
+      return "đã cập nhật câu trả lời";
+    case NotificationDesEumn.DESCRIPTION_DELETED_ANSWER:
+      return "đã xóa câu trả lời";
+    case NotificationDesEumn.DESCRIPTION_ACCEPTED_ANSWER:
+      return "đã chấp nhận câu trả lời";
+    case NotificationDesEumn.DESCRIPTION_UN_APPROVED_ANSWER:
+      return "đã hủy câu trả lời được chấp nhận";
+    case NotificationDesEumn.DESCRIPTION_CREATED_COMMENT:
+      return "đã bình luận";
+    case NotificationDesEumn.DESCRIPTION_UPDATED_COMMENT:
+      return "đã cập nhật bình luận";
+    case NotificationDesEumn.DESCRIPTION_DELETED_COMMENT:
+      return "đã xóa bình luận";
+    case NotificationDesEumn.DESCRIPTION_UP_VOTE:
+      return "đã upvote";
+    case NotificationDesEumn.DESCRIPTION_DOWN_VOTE:
+      return "đã downvote";
+    case NotificationDesEumn.DESCRIPTION_CANCEL_UP_VOTE:
+      return "đã hủy upvote";
+    case NotificationDesEumn.DESCRIPTION_CANCEL_DOWN_VOTE:
+      return "đã hủy downvote";
+    case NotificationDesEumn.DESCRIPTION_CHANGE_VOTE_UP_TO_DOWN:
+      return "đã đổi upvote thành downvote";
+    case NotificationDesEumn.DESCRIPTION_CHANGE_VOTE_DOWN_TO_UP_VOTE:
+      return "đã đổi downvote thành upvote";
+    default:
+      return type;
+  }
+}
+
+function getDescriptionFromNotificationEn(type: NotificationDesEumn) {
+  switch (type) {
+    case NotificationDesEumn.DESCRIPTION_CREATED_QUESTION:
+      return "created a question";
+    case NotificationDesEumn.DESCRIPTION_UPDATED_QUESTION:
+      return "updated a question";
+    case NotificationDesEumn.DESCRIPTION_DELETED_QUESTION:
+      return "deleted a question";
+    case NotificationDesEumn.DESCRIPTION_CREATED_ANSWER:
+      return "created an answer";
+    case NotificationDesEumn.DESCRIPTION_UPDATED_ANSWER:
+      return "updated an answer";
+    case NotificationDesEumn.DESCRIPTION_DELETED_ANSWER:
+      return "deleted an answer";
+    case NotificationDesEumn.DESCRIPTION_ACCEPTED_ANSWER:
+      return "accepted an answer";
+    case NotificationDesEumn.DESCRIPTION_UN_APPROVED_ANSWER:
+      return "unaccepted an answer";
+    case NotificationDesEumn.DESCRIPTION_CREATED_COMMENT:
+      return "commented";
+    case NotificationDesEumn.DESCRIPTION_UPDATED_COMMENT:
+      return "updated a comment";
+    case NotificationDesEumn.DESCRIPTION_DELETED_COMMENT:
+      return "deleted a comment";
+    case NotificationDesEumn.DESCRIPTION_UP_VOTE:
+      return "upvoted";
+    case NotificationDesEumn.DESCRIPTION_DOWN_VOTE:
+      return "downvoted";
+    case NotificationDesEumn.DESCRIPTION_CANCEL_UP_VOTE:
+      return "cancled upvote";
+    case NotificationDesEumn.DESCRIPTION_CANCEL_DOWN_VOTE:
+      return "cancled downvote";
+    case NotificationDesEumn.DESCRIPTION_CHANGE_VOTE_UP_TO_DOWN:
+      return "changed upvote to downvote";
+    case NotificationDesEumn.DESCRIPTION_CHANGE_VOTE_DOWN_TO_UP_VOTE:
+      return "changed downvote to upvote";
+    default:
+      return type;
+  }
+}
 
 export default {
   numberFormat,
@@ -117,4 +286,8 @@ export default {
   mappingState,
   getTranslationFromHistoryAcitvityVi,
   getTranslationFromHistoryAcitvityEn,
+  getTranslationFromNotificationVi,
+  getTranslationFromNotificationEn,
+  getDescriptionFromNotificationVi,
+  getDescriptionFromNotificationEn,
 };
