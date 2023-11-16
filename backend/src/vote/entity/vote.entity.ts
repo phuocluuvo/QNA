@@ -4,6 +4,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
@@ -11,6 +12,7 @@ import { User } from "../../users/entity/users.entity";
 import { Question } from "../../question/entity/question.entity";
 import { Answer } from "../../answer/entity/answer.entity";
 import { VoteType } from "../../enums/vote-type.enum";
+import { Activity } from "../../activity/entity/activity.entity";
 
 @Entity()
 export class Vote {
@@ -43,4 +45,7 @@ export class Vote {
 
   @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
+
+  @OneToMany(() => Activity, (activity) => activity.comment)
+  activity: Activity[];
 }

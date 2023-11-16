@@ -1,5 +1,6 @@
 import { Role } from "../../enums/role.enum";
 import { Expose } from "class-transformer";
+import { UserState } from "../../enums/user-state.enum";
 
 export class UserDto {
   @Expose()
@@ -15,6 +16,9 @@ export class UserDto {
   avatar: string;
 
   @Expose()
+  activityPoints: number;
+
+  @Expose()
   dob: Date;
 
   @Expose()
@@ -22,6 +26,9 @@ export class UserDto {
 
   @Expose()
   role: Role;
+
+  @Expose()
+  state: UserState;
 
   @Expose()
   createdAt: Date;

@@ -16,6 +16,7 @@ import { Answer } from "../../answer/entity/answer.entity";
 import { Vote } from "../../vote/entity/vote.entity";
 import { Tag } from "../../tag/entity/tag.entity";
 import { QuestionTypeEnum } from "../../enums/question-type.enum";
+import { Activity } from "../../activity/entity/activity.entity";
 
 @Entity()
 export class Question {
@@ -66,25 +67,30 @@ export class Question {
   })
   tags: Tag[];
 
+  @OneToMany(() => Activity, (activity) => activity.question)
+  activity: Activity[];
+
   // This is the virtual column for the relationship entities.
 
   @VirtualColumn({
     query: (alias) =>
-      `SELECT COUNT(*) FROM answer WHERE answer.question_id = ${alias}.id`,
+      `SELECT COUNT(*)
+             FROM answer
+             WHERE answer.question_id = ${alias}.id`,
   })
   answersNumber: number;
 
   @VirtualColumn({
     query: (alias) =>
-      `SELECT 
-        CASE
-          WHEN EXISTS (SELECT 1 FROM answer WHERE question_id = ${alias}.id) THEN
-            CASE
-              WHEN EXISTS (SELECT 1 FROM answer WHERE question_id = ${alias}.id AND is_approved = 1) THEN 'normal'
-              ELSE 'no_approved'
-            END
-          ELSE 'no_answer'
-        END AS result`,
+      `SELECT CASE
+                        WHEN EXISTS (SELECT 1 FROM answer WHERE question_id = ${alias}.id) THEN
+                            CASE
+                                WHEN EXISTS (SELECT 1 FROM answer WHERE question_id = ${alias}.id AND is_approved = 1)
+                                    THEN 'normal'
+                                ELSE 'no_approved'
+                                END
+                        ELSE 'no_answer'
+                        END AS result`,
   })
   type: QuestionTypeEnum;
 

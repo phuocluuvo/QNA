@@ -4,11 +4,13 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { User } from "../../users/entity/users.entity";
 import { Answer } from "../../answer/entity/answer.entity";
+import { Activity } from "../../activity/entity/activity.entity";
 
 @Entity()
 export class Comment {
@@ -35,4 +37,7 @@ export class Comment {
 
   @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
+
+  @OneToMany(() => Activity, (activity) => activity.comment)
+  activity: Activity[];
 }
