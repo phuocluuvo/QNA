@@ -89,6 +89,19 @@ export class UsersController {
   }
 
   /**
+   * Get all user.
+   * @param id
+   */
+  @ApiOperation({
+    summary: "get one user",
+  })
+  @Get(":id")
+  async getInfoUser(@Param("id") id: string) {
+    const user = await this.usersService.getProfile(id);
+    return plainToClass(UserDto, user, { excludeExtraneousValues: true });
+  }
+
+  /**
    * Update the profile of a user.
    *
    * @param id ID of the user to update.

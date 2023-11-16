@@ -6,6 +6,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  VirtualColumn,
 } from "typeorm";
 import { Question } from "../../question/entity/question.entity";
 import { Answer } from "../../answer/entity/answer.entity";
@@ -57,6 +58,17 @@ export class User {
     default: UserState.ACTIVE,
   })
   state: UserState;
+
+  // This is the virtual column.
+
+  @VirtualColumn({
+    query: (alias) =>
+      `SELECT COUNT(*)
+             FROM notification
+             WHERE notification.user_id = ${alias}.id
+               AND notification.is_read = false`,
+  })
+  notificationsNumber: number;
 
   // This is the foreign key column for the relationship entities.
 

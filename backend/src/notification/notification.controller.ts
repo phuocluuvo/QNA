@@ -52,6 +52,15 @@ export class NotificationController {
   @ApiOperation({
     summary: "get announcement",
   })
+  @Get("badgeNumber")
+  @UseGuards(AccessTokenGuard)
+  async getBadgeNumber(@Req() req: Request) {
+    return this.notificationService.getBadgeNumber(req["user"]["sub"]);
+  }
+
+  @ApiOperation({
+    summary: "get announcement",
+  })
   @Get("announcement")
   @UseGuards(AccessTokenGuard)
   async getAnnouncement() {

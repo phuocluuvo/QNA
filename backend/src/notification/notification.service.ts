@@ -47,6 +47,15 @@ export class NotificationService {
   }
 
   /**
+   * Find all announcement
+   */
+  async getBadgeNumber(userId: string) {
+    return this.notificationRepository.count({
+      where: { isRead: false, user: { id: userId } },
+    });
+  }
+
+  /**
    * Find one notification by id
    * @param id - notification id
    * @param userId - login user id
