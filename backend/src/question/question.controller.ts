@@ -215,7 +215,7 @@ export class QuestionController {
     summary: "verify question",
   })
   @ApiBearerAuth()
-  @Post(":questionId/verify")
+  @Get(":questionId/verify")
   @UseGuards(AccessTokenGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.MONITOR)
   async verify(@Req() req: Request, @Param("questionId") questionId: string) {
@@ -238,7 +238,7 @@ export class QuestionController {
     summary: "verify question",
   })
   @ApiBearerAuth()
-  @Post(":questionId/block")
+  @Get(":questionId/block")
   @UseGuards(AccessTokenGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.MONITOR)
   async block(@Req() req: Request, @Param("questionId") questionId: string) {
