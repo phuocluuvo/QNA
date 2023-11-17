@@ -73,5 +73,10 @@
   "CREATE_NEW_TAG": "Create new tag",
   "TAG_DESCRIPTION": "Tags are a means of connecting experts with questions they will be able to answer by sorting questions into specific, well-defined categories.",
   "TAGS": "Tags",
-  "USERS": "Users"
+  "USERS": "Users",
+  "USERS_DESCRIPTION": "Users are the people who ask and answer questions.",
+  "NOTIFICATIONS": "Notifications",
+  "NO_DATA": "No data",
+  "CENSORING": "Censoring",
+  "SHOW_MORE": "Show more"
 }

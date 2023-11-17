@@ -73,5 +73,10 @@
   "CREATE_NEW_TAG": "Tạo thẻ mới",
   "TAG_DESCRIPTION": "Thẻ là cách để kết nối các chuyên gia với các câu hỏi mà họ có thể trả lời bằng cách sắp xếp các câu hỏi thành các danh mục cụ thể, được xác định rõ ràng.",
   "TAGS": "Thẻ",
-  "USERS": "Người dùng"
+  "USERS": "Người dùng",
+  "USERS_DESCRIPTION": "Người dùng là những người đang sử dụng trang web này.",
+  "NOTIFICATIONS": "Thông báo",
+  "NO_DATA": "Không có dữ liệu",
+  "CENSORING": "Kiểm duyệt",
+  "SHOW_MORE": "Xem thêm"
 }
