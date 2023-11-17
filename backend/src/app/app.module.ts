@@ -12,6 +12,7 @@ import { CommentModule } from "../comment/comment.module";
 import { TagModule } from "../tag/tag.module";
 import { ActivityModule } from "../activity/activity.module";
 import { NotificationModule } from "../notification/notification.module";
+import { BookmarkModule } from "../bookmark/bookmark.module";
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { NotificationModule } from "../notification/notification.module";
     TagModule,
     ActivityModule,
     NotificationModule,
+    BookmarkModule,
   ],
   controllers: [AppController],
   providers: [AppService],
