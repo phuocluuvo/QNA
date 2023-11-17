@@ -6,6 +6,7 @@ import { bookmarkPaginateConfig } from "../config/pagination/bookmark-pagination
 import { message } from "../constants/message.constants";
 import { CreateBookmarkDto } from "./dto/create-bookmark.dto";
 import { ObjectActivityTypeEnum } from "../enums/reputation.enum";
+import { Collection } from "../collection/enity/collection.entity";
 
 @Injectable()
 export class BookmarkService {
@@ -49,6 +50,17 @@ export class BookmarkService {
   }
 
   /**
+   * Update a bookmark.
+   * @param id
+   * @param collection_id
+   * @param bookmark
+   */
+  async update(bookmark: Bookmark, collection_id: string) {
+    bookmark.collection = { id: collection_id } as unknown as Collection;
+    return this.bookmarkRepository.save(bookmark);
+  }
+
+  /**
    * Delete a bookmark.
    * @param bookmark
    */
@@ -66,5 +78,11 @@ export class BookmarkService {
       throw new NotFoundException(message.NOT_FOUND.BOOKMARK);
     }
     return bookmark;
+  }
+
+  async findOne(id: string) {
+    return await this.bookmarkRepository.findOne({
+      where: { id: id },
+    });
   }
 }

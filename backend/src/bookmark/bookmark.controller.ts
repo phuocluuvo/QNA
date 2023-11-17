@@ -6,11 +6,12 @@ import {
   ForbiddenException,
   Get,
   Param,
+  Patch,
   Post,
   Req,
   UseGuards,
 } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { BookmarkService } from "./bookmark.service";
 import { Paginate, PaginateQuery } from "nestjs-paginate";
 import { CreateBookmarkDto } from "./dto/create-bookmark.dto";
@@ -28,9 +29,13 @@ export class BookmarkController {
     private readonly bookmarkService: BookmarkService,
     private readonly questionService: QuestionService,
     private readonly answerService: AnswerService,
+    private readonly collectionService: BookmarkService,
     private readonly caslAbilityFactory: CaslAbilityFactory,
   ) {}
 
+  @ApiOperation({
+    summary: "get all bookmark",
+  })
   @Get()
   @UseGuards(AccessTokenGuard)
   async find(@Paginate() query: PaginateQuery, @Req() req: Request) {
@@ -38,6 +43,9 @@ export class BookmarkController {
     return this.bookmarkService.find(query, userId);
   }
 
+  @ApiOperation({
+    summary: "create bookmark",
+  })
   @Post()
   @UseGuards(AccessTokenGuard)
   async create(
@@ -58,6 +66,37 @@ export class BookmarkController {
     return this.bookmarkService.create(createBookmarkDto, req["user"]["sub"]);
   }
 
+  @ApiOperation({
+    summary: "update collection of bookmark",
+  })
+  @Patch(":id")
+  @UseGuards(AccessTokenGuard)
+  async update(
+    @Body("collection_id") collectionId: string,
+    @Req() req: Request,
+    @Param("id") id: string,
+  ) {
+    const ability = this.caslAbilityFactory.createForUser(req["user"]);
+    const bookmark = await this.bookmarkService.findOneById(id);
+
+    if (collectionId != null) {
+      const checkCollection =
+        await this.collectionService.findOne(collectionId);
+      if (checkCollection) {
+        throw new BadRequestException(message.NOT_FOUND.COLLECTION);
+      }
+    }
+
+    if (ability.can(Action.Update, bookmark)) {
+      return this.bookmarkService.update(bookmark, collectionId);
+    } else {
+      throw new ForbiddenException(message.NOT_AUTHOR.BOOKMARK);
+    }
+  }
+
+  @ApiOperation({
+    summary: "delete bookmark",
+  })
   @Delete(":id")
   @UseGuards(AccessTokenGuard)
   async delete(@Param("id") id: string, @Req() req: Request) {
@@ -67,7 +106,7 @@ export class BookmarkController {
     if (ability.can(Action.Delete, bookmark)) {
       return this.bookmarkService.remove(bookmark);
     } else {
-      throw new ForbiddenException(message.NOT_AUTHOR.COMMENT);
+      throw new ForbiddenException(message.NOT_AUTHOR.BOOKMARK);
     }
   }
 }

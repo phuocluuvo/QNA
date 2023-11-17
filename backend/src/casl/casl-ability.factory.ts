@@ -13,6 +13,7 @@ import { Role } from "../enums/role.enum";
 import { Answer } from "../answer/entity/answer.entity";
 import { Comment } from "../comment/entity/comment.entity";
 import { Bookmark } from "../bookmark/entity/bookmark.entity";
+import { Collection } from "../collection/enity/collection.entity";
 
 type Subjects =
   | InferSubjects<
@@ -21,6 +22,7 @@ type Subjects =
       | typeof Answer
       | typeof Comment
       | typeof Bookmark
+      | typeof Collection
     >
   | "all";
 
@@ -39,6 +41,10 @@ type FlatComment = Comment & {
 };
 
 type FlatBookmark = Bookmark & {
+  "user.id": Bookmark["user"]["id"];
+};
+
+type FlatCollection = Collection & {
   "user.id": Bookmark["user"]["id"];
 };
 
@@ -63,6 +69,9 @@ export class CaslAbilityFactory {
         "user.id": userReq["sub"],
       });
       can<FlatBookmark>([Action.Update, Action.Delete], Bookmark, {
+        "user.id": userReq["sub"],
+      });
+      can<FlatCollection>([Action.Update, Action.Delete], Collection, {
         "user.id": userReq["sub"],
       });
     }
