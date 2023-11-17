@@ -28,11 +28,14 @@ export class NotificationService {
     queryBuidler.where({ user: { id: userId } });
     if (filter) {
       const isRead = filter === "true";
+      queryBuidler.andWhere({ isAnnouncement: false });
       queryBuidler.andWhere("notification.isRead = :isRead", {
         isRead: isRead,
       });
+    } else {
+      queryBuidler.orWhere({ isAnnouncement: true });
     }
-    queryBuidler.orWhere({ isAnnouncement: true });
+
     return paginate<Notification>(query, queryBuidler, notificationPagination);
   }
 

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -29,6 +30,7 @@ import {
 } from "nestjs-paginate";
 import { Question } from "../question/entity/question.entity";
 import { commentPaginateConfig } from "../config/pagination/comment-pagination";
+import { QuestionService } from "../question/question.service";
 
 @ApiTags("comment")
 @Controller("comment")
@@ -37,6 +39,7 @@ export class CommentController {
     private readonly commentService: CommentService,
     private readonly caslAbilityFactory: CaslAbilityFactory,
     private readonly answerService: AnswerService,
+    private readonly questionService: QuestionService,
   ) {}
 
   /**
@@ -84,10 +87,18 @@ export class CommentController {
   @UseGuards(AccessTokenGuard)
   async create(@Body() answerDto: CreateCommentDto, @Req() req: Request) {
     const userId = req["user"]["sub"];
-    const answer = await this.answerService.findOneById(answerDto.answer_id);
-    if (answer) {
-      return this.commentService.createWithActivity(answerDto, userId);
+    if (
+      (answerDto.answer_id && answerDto.question_id) ||
+      (!answerDto.answer_id && !answerDto.question_id)
+    ) {
+      throw new BadRequestException(
+        "Either answer_id or question_id should be provided, not both or none.",
+      );
     }
+    await this.answerService.findOneById(answerDto.answer_id);
+    await this.questionService.findOneById(answerDto.question_id);
+
+    return this.commentService.createWithActivity(answerDto, userId);
   }
 
   /**

@@ -19,4 +19,7 @@ export const reputationActivityPoint = {
   [ReputationActivityTypeEnum.CANCLE_DOWNVOTE]: 1,
   [ReputationActivityTypeEnum.CHANGE_UPVOTE_TO_DOWNVOTE]: -2,
   [ReputationActivityTypeEnum.UN_ACCEPT_ANSWER]: -20,
+
+  [ReputationActivityTypeEnum.BLOCK_QUESTION]: -10,
+  [ReputationActivityTypeEnum.VERIFY_QUESTION]: 0,
 };

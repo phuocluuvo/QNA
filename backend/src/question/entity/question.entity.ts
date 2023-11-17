@@ -17,6 +17,8 @@ import { Vote } from "../../vote/entity/vote.entity";
 import { Tag } from "../../tag/entity/tag.entity";
 import { QuestionTypeEnum } from "../../enums/question-type.enum";
 import { Activity } from "../../activity/entity/activity.entity";
+import { QuestionState } from "../../enums/question-state.enum";
+import { Comment } from "../../comment/entity/comment.entity";
 
 @Entity()
 export class Question {
@@ -41,6 +43,9 @@ export class Question {
   @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
 
+  @Column({ type: "enum", enum: QuestionState, default: QuestionState.PENDING })
+  state: QuestionState;
+
   // This is the foreign key column for the relationship entities.
 
   @ManyToOne(() => User, (user) => user.questions)
@@ -49,6 +54,9 @@ export class Question {
 
   @OneToMany(() => Answer, (answer) => answer.question)
   answers: Answer[];
+
+  @OneToMany(() => Comment, (comment) => comment.question)
+  comments: Comment[];
 
   @OneToMany(() => Vote, (vote) => vote.question)
   vote: Vote[];

@@ -27,6 +27,8 @@ import {
   notificationText,
   notificationTextDesc,
 } from "../constants/notification.constants";
+import { Role } from "../enums/role.enum";
+import { QuestionState } from "../enums/question-state.enum";
 
 @Injectable()
 export class QuestionService {
@@ -46,7 +48,7 @@ export class QuestionService {
    * @param tagNames - The tag names to filter questions by.
    * @returns A paginated list of questions.
    */
-  async find(query: PaginateQuery, tagNames: string) {
+  async findWithRole(query: PaginateQuery, tagNames: string, loginUser: any) {
     const tags = tagNames ? tagNames.split(",") : [];
     const queryBuilder = this.questionRepository.createQueryBuilder("question");
 
@@ -62,6 +64,12 @@ export class QuestionService {
     queryBuilder.where(`JSON_CONTAINS( ${subQuery}, :tags)`, {
       tags: JSON.stringify(tags),
     });
+
+    if (loginUser == null || loginUser.role == Role.USER) {
+      queryBuilder.andWhere("question.state <> :state", {
+        state: QuestionState.BLOCKED,
+      });
+    }
 
     return await paginate<Question>(
       query,
@@ -339,5 +347,40 @@ export class QuestionService {
       queryBuilder,
       questionPaginateConfig,
     );
+  }
+
+  @Transactional()
+  async censoring(questionId: string, userId: string, state: QuestionState) {
+    const question = await this.findOneById(questionId);
+    if (question.state == state) {
+      throw new BadRequestException(
+        state == QuestionState.VERIFIED
+          ? message.QUESTION.VERIFIED
+          : message.QUESTION.BLOCKED,
+      );
+    }
+
+    question.state = state;
+    const result = await this.questionRepository.save(question);
+
+    const activity = await this.activityService.create(
+      state == QuestionState.VERIFIED
+        ? ReputationActivityTypeEnum.VERIFY_QUESTION
+        : ReputationActivityTypeEnum.BLOCK_QUESTION,
+      ObjectActivityTypeEnum.QUESTION,
+      questionId,
+      userId,
+      question.user.id,
+    );
+    await this.notificationService.create(
+      state == QuestionState.VERIFIED
+        ? notificationText.QUESTION.VERIFY
+        : notificationText.QUESTION.BLOCK,
+      notificationTextDesc.QUESTION.DELETE,
+      question.user.id,
+      activity.id,
+    );
+
+    return result;
   }
 }
