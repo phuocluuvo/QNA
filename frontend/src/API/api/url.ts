@@ -19,4 +19,7 @@ export const url = {
   VOTE_ANSWER: "/api/answer/vote",
   COMMENT: "/api/comment",
   ACTIVITY_HISTORY: "/api/activity/history",
+  NOTIFICATION: "/api/notification",
+  NOTIFICATION_ANOUNTMENT: "/api/notification/announcement",
+  BADGE_NOTIFICATION: "/api/notification/badgeNumber",
 };

@@ -51,6 +51,8 @@ async function refreshToken(
     data.statusCode === STATUS.BAD_REQUEST ||
     data.statusCode === STATUS.ACCESS_DENIED
   ) {
+    sessionStorage.removeItem("next-auth.session-token");
+
     signIn();
   } else {
     console.log("refreshToken:", data);

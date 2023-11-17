@@ -133,7 +133,51 @@ const getTag = (nameTag: string) => {
 };
 
 const getActivityHistory = (params: CommonParams) => {
-  return AuthApi(REQUEST_METHOD.GET, url.ACTIVITY_HISTORY, params);
+  let urlString = url.ACTIVITY_HISTORY + "?";
+  for (let key in params) {
+    // @ts-ignore
+    urlString += key + "=" + params[key] + "&";
+  }
+  return AuthApi(REQUEST_METHOD.GET, urlString);
+};
+
+export const sendMedia = (media: any, type: string) => {
+  const data = new FormData();
+  data.append("file", media);
+  data.append("upload_preset", "chat-chit");
+  data.append("cloud_name", "voluu");
+  return fetch(`https://api.cloudinary.com/v1_1/voluu/${type}/upload`, {
+    method: "POST",
+    body: data,
+  });
+};
+
+export const getAllNotification = (params: CommonParams) => {
+  // params to url
+  let urlString = url.NOTIFICATION + "?";
+  for (let key in params) {
+    // @ts-ignore
+    urlString += key + "=" + params[key] + "&";
+  }
+  return AuthApi(REQUEST_METHOD.GET, urlString);
+};
+
+export const readNotification = (id: string) => {
+  return AuthApi(REQUEST_METHOD.GET, url.NOTIFICATION + "/" + id);
+};
+
+export const getBadgeNumber = () => {
+  return AuthApi(REQUEST_METHOD.GET, url.BADGE_NOTIFICATION);
+};
+
+export const getAllUsers = (params: CommonParams) => {
+  // params to url
+  let urlString = url.USER + "?";
+  for (let key in params) {
+    // @ts-ignore
+    urlString += key + "=" + params[key] + "&";
+  }
+  return api.get(urlString);
 };
 export default {
   requestSignUp,
@@ -157,4 +201,8 @@ export default {
   updateQuestion,
   getTag,
   getActivityHistory,
+  getAllNotification,
+  readNotification,
+  getBadgeNumber,
+  getAllUsers,
 };
