@@ -3,6 +3,8 @@ export const notificationText = {
     CREATE: "CREATED_QUESTION",
     UPDATE: "UPDATED_QUESTION",
     DELETE: "DELETED_QUESTION",
+    VERIFY: "VERIFIED_QUESTION",
+    BLOCK: "BLOCKED_QUESTION",
   },
   ANSWER: {
     CREATE: "CREATED_ANSWER",
@@ -23,6 +25,9 @@ export const notificationText = {
     CANCEL_DOWN: "CANCEL_DOWN_VOTE",
     CHANGE_UP_TO_DOWN: "CHANGE_VOTE_UP_TO_DOWN",
     CHANGE_DOWN_TO_UP: "CHANGE_VOTE_DOWN_TO_UP",
+  },
+  TAG: {
+    VERIFY: "VERIFIED_TAG",
   },
 };
 export const notificationTextDesc = {
@@ -50,5 +55,8 @@ export const notificationTextDesc = {
     CANCEL_DOWN: "DESCRIPTION_CANCEL_DOWN_VOTE",
     CHANGE_UP_TO_DOWN: "DESCRIPTION_CHANGE_VOTE_UP_TO_DOWN",
     CHANGE_DOWN_TO_UP: "DESCRIPTION_CHANGE_VOTE_DOWN_TO_UP_VOTE",
+  },
+  TAG: {
+    VERIFY: "DESCRIPTION_VERIFIED_TAG",
   },
 };

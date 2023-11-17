@@ -15,5 +15,6 @@ export const questionPaginateConfig: PaginateConfig<Question> = {
   relations: ["user"],
   filterableColumns: {
     type: [FilterOperator.EQ],
+    state: [FilterOperator.EQ],
   },
 };

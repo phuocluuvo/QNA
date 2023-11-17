@@ -31,6 +31,10 @@ import {
   PaginateQuery,
 } from "nestjs-paginate";
 import { questionPaginateConfig } from "../config/pagination/question-pagination.config";
+import { Role } from "../enums/role.enum";
+import { RolesGuard } from "../auth/guards/roles.guard";
+import { Roles } from "../auth/decorator/roles.decorator";
+import { QuestionState } from "../enums/question-state.enum";
 
 @ApiTags("question")
 @Controller("question")
@@ -46,16 +50,19 @@ export class QuestionController {
    * @returns Promise<Pagination<Question>> Paginated list of questions.
    * @param query
    * @param tagNames
+   * @param req
    */
   @ApiOkPaginatedResponse(Question, questionPaginateConfig)
   @ApiPaginationQuery(questionPaginateConfig)
   @Get()
-  @UseGuards()
+  @UseGuards(PublicGuard)
   find(
     @Paginate() query: PaginateQuery,
     @Query("filter.tags") tagNames: string,
+    @Req() req: Request,
   ) {
-    return this.questionService.find(query, tagNames);
+    const user = req.user ? req.user : null;
+    return this.questionService.findWithRole(query, tagNames, user);
   }
 
   @ApiOkPaginatedResponse(Question, questionPaginateConfig)
@@ -195,5 +202,51 @@ export class QuestionController {
   async vote(@Body() questionVoteDto: VoteQuestionDto, @Req() req: Request) {
     const userId = req.user["sub"];
     return this.questionService.updateVote(userId, questionVoteDto);
+  }
+
+  /**
+   * verify for a question.
+   *
+   * @param req - The request object.
+   * @param questionId
+   * @returns The result of the vote.
+   */
+  @ApiOperation({
+    summary: "verify question",
+  })
+  @ApiBearerAuth()
+  @Post(":questionId/verify")
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.MONITOR)
+  async verify(@Req() req: Request, @Param("questionId") questionId: string) {
+    const userId = req.user["sub"];
+    return this.questionService.censoring(
+      questionId,
+      userId,
+      QuestionState.VERIFIED,
+    );
+  }
+
+  /**
+   * verify for a question.
+   *
+   * @param req - The request object.
+   * @param questionId
+   * @returns The result of the vote.
+   */
+  @ApiOperation({
+    summary: "verify question",
+  })
+  @ApiBearerAuth()
+  @Post(":questionId/block")
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.MONITOR)
+  async block(@Req() req: Request, @Param("questionId") questionId: string) {
+    const userId = req.user["sub"];
+    return this.questionService.censoring(
+      questionId,
+      userId,
+      QuestionState.BLOCKED,
+    );
   }
 }
