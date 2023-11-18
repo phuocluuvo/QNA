@@ -1,4 +1,4 @@
-import { PaginateConfig } from "nestjs-paginate";
+import { FilterOperator, PaginateConfig } from "nestjs-paginate";
 import { Notification } from "../../notification/entity/notification.entity";
 
 export const notificationPagination: PaginateConfig<Notification> = {
@@ -16,4 +16,20 @@ export const notificationPagination: PaginateConfig<Notification> = {
     "activity.comment",
   ],
   searchableColumns: ["title", "description"],
+  filterableColumns: {
+    createdAt: [
+      FilterOperator.BTW,
+      FilterOperator.LTE,
+      FilterOperator.GTE,
+      FilterOperator.LT,
+      FilterOperator.GT,
+    ],
+    updatedAt: [
+      FilterOperator.BTW,
+      FilterOperator.LTE,
+      FilterOperator.GTE,
+      FilterOperator.LT,
+      FilterOperator.GT,
+    ],
+  },
 };

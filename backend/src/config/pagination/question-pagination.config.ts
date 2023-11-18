@@ -16,5 +16,19 @@ export const questionPaginateConfig: PaginateConfig<Question> = {
   filterableColumns: {
     type: [FilterOperator.EQ],
     state: [FilterOperator.EQ],
+    createdAt: [
+      FilterOperator.BTW,
+      FilterOperator.LTE,
+      FilterOperator.GTE,
+      FilterOperator.LT,
+      FilterOperator.GT,
+    ],
+    updatedAt: [
+      FilterOperator.BTW,
+      FilterOperator.LTE,
+      FilterOperator.GTE,
+      FilterOperator.LT,
+      FilterOperator.GT,
+    ],
   },
 };
