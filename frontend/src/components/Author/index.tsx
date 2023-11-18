@@ -7,6 +7,9 @@ import {
   TextProps,
   BoxProps,
   ResponsiveValue,
+  Heading,
+  Badge,
+  useColorMode,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import React from "react";
@@ -45,6 +48,7 @@ function Author({
   bottomTextStyle,
   sizeAvatar,
 }: AuthorProps) {
+  const { colorMode } = useColorMode();
   const router = useRouter();
   return (
     <HStack
@@ -58,27 +62,50 @@ function Author({
       cursor={"pointer"}
     >
       <Avatar
-        size={sizeAvatar ?? "sm"}
+        size={sizeAvatar ?? "xs"}
         name={user.fullname}
         src={user.avatar}
       />
       <VStack alignItems={"start"} spacing={0}>
+        {user.role !== "user" ? (
+          <Badge
+            colorScheme={
+              user.role === "admin"
+                ? "red"
+                : user.role === "monitor"
+                ? "blue"
+                : "whatsapp"
+            }
+          >
+            {user.role}
+          </Badge>
+        ) : null}
+        <HStack>
+          <Text
+            {...nameStyle}
+            fontSize={sizeAvatar ?? "xs"}
+            cursor={"pointer"}
+            // colorScheme="blue"
+            color={colorMode === "dark" ? "lightblue" : "blue.500"}
+            onClick={() => {
+              onClick ? onClick() : router.push(`/user/${user.id}`);
+            }}
+          >
+            {user.fullname}
+          </Text>{" "}
+          <Heading
+            fontSize={sizeAvatar ?? "xs"}
+            color={colorMode === "dark" ? "yellow" : "orange"}
+          >
+            {user.activityPoint}
+          </Heading>
+        </HStack>
         {/* @ts-ignore */}
         {headingText ? (
           <Text {...headingTextStyle} fontSize={sizeAvatar ?? "xs"}>
             {headingText}
           </Text>
         ) : null}
-        <Text
-          {...nameStyle}
-          fontSize={sizeAvatar ?? "xs"}
-          cursor={"pointer"}
-          onClick={() => {
-            onClick ? onClick() : router.push(`/user/${user.id}`);
-          }}
-        >
-          {user.fullname}
-        </Text>
         {bottomText ? (
           <Text {...bottomTextStyle} fontSize={sizeAvatar ?? "xs"}>
             {bottomText}

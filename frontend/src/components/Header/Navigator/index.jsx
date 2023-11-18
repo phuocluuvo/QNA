@@ -1,19 +1,16 @@
 import {
   Avatar,
   Box,
-  Flex,
   HStack,
   IconButton,
-  Toast,
-  VStack,
   useColorMode,
   useDisclosure,
   Menu,
   MenuButton,
   MenuList,
   MenuItem,
+  useToast,
 } from "@chakra-ui/react";
-import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import React from "react";
 import LinkButton from "@/components/LinkButton";
 import { Colors } from "@/assets/constant/Colors";
@@ -29,14 +26,16 @@ function Navigator({ getTranslate, isMobile }) {
   const userData = useSelector((state) => state.userReducer.data);
   const { data: session } = useSession();
   const routes = useRouter();
+  const toast = useToast();
   const LogoutHandle = async () => {
     await api.signOut().then(async (res) => {
       await signOut({ redirect: false, callbackUrl: "/user/signin" })
         .then((res) => {
+          signIn();
           console.log("logout success", res);
           localStorage.removeItem("userLogin");
           sessionStorage.removeItem("next-auth.session-token");
-          Toast({
+          toast({
             title: "Logout success",
             status: "success",
             duration: 3000,
@@ -64,12 +63,12 @@ function Navigator({ getTranslate, isMobile }) {
       <Box
         display={{ base: "flex", md: "none" }}
         alignItems="center"
-        justifyContent="flex-end"
-        width="full"
+        justifyContent="center"
+        aspectRatio={1}
         height={"50px"}
         position={{ base: "fixed", md: "relative" }}
         top={{ base: "0", md: "auto" }}
-        left={{ base: "0", md: "auto" }}
+        right={{ base: "0", md: "auto" }}
       >
         <DrawerMenu
           onCloseButtonClick={handleClick}
@@ -112,6 +111,7 @@ function Navigator({ getTranslate, isMobile }) {
   ) : session?.user ? (
     <Menu>
       <IconButton
+        w={"fit-content"}
         as={MenuButton}
         variant="ghost"
         icon={

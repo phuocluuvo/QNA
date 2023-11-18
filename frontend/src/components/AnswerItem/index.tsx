@@ -32,6 +32,7 @@ import actionVoteAnswer from "@/API/redux/actions/answer/actionVoteAnswer";
 import actionCreateCommentAnswer from "@/API/redux/actions/answer/actionCreateCommentAnswer";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import { CommentType } from "@/util/type/Comment.type";
 
 function AnswerItem({
   answer,
@@ -48,6 +49,9 @@ function AnswerItem({
 }) {
   const session = useSession();
   const router = useRouter();
+  const [commentArray, setCommentArray] = useStateWithCallback<
+    Array<CommentType>
+  >(answer.comments ?? []);
   const commentRef = React.useRef<HTMLInputElement>(null);
   const [state, setState] = useStateWithCallback<{
     count: number;
@@ -76,6 +80,7 @@ function AnswerItem({
         answer: answer,
       })
     );
+    // setCommentArray(answer.comments);
   }, [answer]);
   const voteHandler = (type: VOTE) => {
     const form: FormVoteAnswer = {
@@ -108,16 +113,18 @@ function AnswerItem({
       actionCreateCommentAnswer(
         form,
         (res: any) => {
-          const comments = [...answer.comments];
-          comments.push(res);
-
-          // @ts-ignore
-          setState((oldState) =>
-            helper.mappingState(oldState, {
-              comment: "",
-              answer: { comments },
-              isShowComment: false,
-            })
+          setCommentArray(
+            (oldArray) => [...oldArray, res],
+            (res) => {
+              // @ts-ignore
+              setState((oldState) =>
+                helper.mappingState(oldState, {
+                  comment: "",
+                  answer: { ...answer, comments: res },
+                  isShowComment: false,
+                })
+              );
+            }
           );
         },
         () => {}

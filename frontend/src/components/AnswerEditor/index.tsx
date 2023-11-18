@@ -18,7 +18,6 @@ import dynamic from "next/dynamic";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import LinkButton from "../LinkButton";
-import { Colors } from "@/assets/constant/Colors";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 type State = {
   id: string;

@@ -55,13 +55,16 @@ const SelectOptions = ({
   let hardData = [
     {
       label: getTranslate("UNANSWERED"),
-      value: QUESTION_SORT_BY.NO_ANSWER,
+      value: QUESTION_SORT_BY.NO_ANSWER as string,
     },
     {
       label: getTranslate("UNAPPROVED"),
-      value: QUESTION_SORT_BY.NO_APPROVED,
+      value: QUESTION_SORT_BY.NO_APPROVED as string,
     },
   ];
+  if (data) {
+    hardData = data;
+  }
   return (
     <Select {...containerStyle} onChange={(e) => onSelect(e)}>
       {hardData.map((_data, index) => (
