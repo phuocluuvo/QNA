@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Box,
   Button,
@@ -94,13 +94,13 @@ function EditQuestion() {
     return error;
   };
   const validateTags = (value: Set<any>) => {
-    let error;
+    let error = undefined;
     if (!value) {
       error = "Tags is required";
     } else if (value.size < 1) {
       error = "Tags is required";
-    } else if (value.size > 5) {
-      error = "Tags must be less than 5";
+    } else if (value.size >= 5) {
+      error = "Tags reach the number of tag can added";
     }
     return error;
   };
@@ -360,7 +360,12 @@ function EditQuestion() {
                         {...field}
                         variant={"unstyled"}
                         id="selectedTags"
-                        placeholder="Search a tag"
+                        placeholder={
+                          validateTags(state.selectedTags)
+                            ? "You reach the number of tag can added"
+                            : "Search a tag"
+                        }
+                        isDisabled={validateTags(state.selectedTags)}
                         type="text"
                         value={state.searchTagId}
                         onChange={(e) => {
@@ -403,7 +408,7 @@ function EditQuestion() {
                                 colorScheme="orange"
                                 cursor={"pointer"}
                                 onClick={() => {
-                                  addTagHandle(tag);
+                                  !checkTagExist(tag) && addTagHandle(tag);
                                 }}
                                 position={"relative"}
                                 style={{
@@ -470,7 +475,7 @@ function EditQuestion() {
                     isInvalid={form.errors.body && form.touched.body}
                   >
                     <FormLabel>
-                     {getTranslate("QUESTION_CONTENT")}
+                      {getTranslate("QUESTION_CONTENT")}
                       <Text fontSize="sm" color="gray.500">
                         Your question needs to be as detailed as possible for
                         people to answer it correctly.

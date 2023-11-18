@@ -9,10 +9,17 @@ import TagQuestion from "@/components/TagQuestion";
 import VoteButton from "@/components/VoteButton";
 import { LanguageHelper } from "@/util/Language/Language.util";
 import helper from "@/util/helper";
-import { QuestionType } from "@/util/type/Question.type";
+import { QuestionListType, QuestionType } from "@/util/type/Question.type";
 import { UserType } from "@/util/type/User.type";
 import { ChatIcon, ViewIcon } from "@chakra-ui/icons";
-import { BiDotsVerticalRounded, BiPencil, BiSolidShare } from "react-icons/bi";
+import {
+  BiBookBookmark,
+  BiBookmarkPlus,
+  BiDotsVerticalRounded,
+  BiPencil,
+  BiSolidBookmarkPlus,
+  BiSolidShare,
+} from "react-icons/bi";
 import {
   Box,
   Button,
@@ -22,6 +29,7 @@ import {
   HStack,
   Heading,
   Icon,
+  IconButton,
   Menu,
   MenuButton,
   MenuItem,
@@ -46,6 +54,7 @@ import { FormVote } from "@/API/type/Form.type";
 import { useSession } from "next-auth/react";
 import useStateWithCallback from "@/hooks/useStateWithCallback";
 import actionGetQuestionList from "@/API/redux/actions/question/ActionGetQuestionList";
+import { RiBookMarkLine } from "react-icons/ri";
 
 function Question() {
   const { getTranslate } = LanguageHelper(Pages.HOME);
@@ -162,6 +171,8 @@ function Question() {
               isVoted: data.vote.length > 0,
             })
           );
+          let arrayTags = data.tags?.map((tag) => tag.name);
+          arrayTags && fecthQuestionsWithTag(arrayTags);
           fecthAnswer();
         },
         () => {
@@ -193,19 +204,21 @@ function Question() {
     );
   };
   // ------------ get related question ----------
-  const fecthQuestionsWithTag = (tagId: string) => {
+  const fecthQuestionsWithTag = (tagIds: string[]) => {
+    let tagsString = tagIds.join(",");
     dispatch<any>(
       actionGetQuestionList(
         {
-          "filter.type": `$eq:${router.query.select}`,
-          limit: 20,
+          // @ts-ignore
+          tag_names: tagsString,
+          limit: 5,
           page: 1,
         },
         (res) => {
           // @ts-ignore
           setState((oldState) => {
             return helper.mappingState(oldState, {
-              questionList: res,
+              relatedQuestions: res,
             });
           });
         },
@@ -244,6 +257,7 @@ function Question() {
     answerList: AnswerListType;
     voteType: VOTE;
     isVoted: boolean;
+    relatedQuestions: QuestionListType;
   }>({
     count: 0,
     // @ts-ignore
@@ -266,7 +280,7 @@ function Question() {
     // Returns null on first render, so the client and server match
     return null;
   }
-  const parseLines = (value: string) => value.replace(/(\\n)/g, "\n");
+  function saveQuestionToCollection(question: QuestionType) {}
   return (
     <>
       {state.question ? (
@@ -278,14 +292,14 @@ function Question() {
               content={state.question.content}
             />
           </Head>
-          <Container maxW={{ base: "fit-content", md: "90%" }}>
+          <Container maxW={{ base: "fit-content", md: "100%" }}>
             <Flex
               direction={{
                 base: "column",
                 md: "row",
               }}
             >
-              <Box flex={1}>
+              <Box display={"flex"} flexDir={"column"} flex={1}>
                 <HStack alignItems={"start"} mb={10}>
                   <VStack
                     spacing={0}
@@ -311,13 +325,22 @@ function Question() {
                       type="down"
                       onClick={() => voteQuestion(VOTE.DOWNVOTE)}
                     />
-                    <VStack py={5}>
+                    <VStack pt={5}>
                       <ChatIcon />
                       <Text>
                         {state.answerList && state.answerList.meta?.totalItems}
                       </Text>
                       <ViewIcon />
                       <Text>{state.question.views}</Text>
+                    </VStack>
+                    <VStack pb={5}>
+                      <IconButton
+                        variant={"ghost"}
+                        size={"lg"}
+                        aria-label="Save"
+                        icon={<BiSolidBookmarkPlus />}
+                        title="Save question"
+                      />
                     </VStack>
                   </VStack>
                   <Box width={"full"}>
@@ -342,9 +365,13 @@ function Question() {
                             alignItems={"start"}
                             justifyContent={"space-between"}
                             width={"full"}
-                            // bg={Colors(isDarkMode).PRIMARY_BG}
                           >
-                            <Heading flex={1} maxW={"85%"}>
+                            <Heading
+                              flex={1}
+                              maxW={"90%"}
+                              fontWeight={"medium"}
+                              mb={2}
+                            >
                               {state.question.title}
                             </Heading>
                             <Menu>
@@ -400,10 +427,21 @@ function Question() {
                     </Box>
                     <Box
                       dangerouslySetInnerHTML={{
-                        __html: state.question.content,
+                        __html: state.question.content
+                          .replace(
+                            /<img/g,
+                            '<img style="max-width:100%;height:auto;"'
+                          )
+                          .replace(
+                            /<pre/g,
+                            '<pre style="overflow:scroll;background-color:#1a202c;color:#fff;white-space:pre-wrap;"'
+                          ),
                       }}
                       fontSize={"sm"}
-                      maxW={"full"}
+                      maxW={{
+                        base: "100%",
+                        md: "80%",
+                      }}
                     />
                     {userData ? (
                       state.question.user.id === userData?.id ? (
@@ -420,16 +458,6 @@ function Question() {
                                 router.basePath +
                                   `/question/edit?questionId=${state.question.id}`
                               );
-                              // setEditQuestion(
-                              //   // @ts-ignore
-                              //   (oldState) =>
-                              //     helper.mappingState(oldState, {
-                              //       title: state.question.title,
-                              //       content: parseLines(state.question.content),
-                              //       tagNames: state.question.tagNames,
-                              //     })
-                              // );
-                              // onOpen();
                             }}
                           >
                             Edit
@@ -487,7 +515,64 @@ function Question() {
                 }}
                 bg={Colors(colorMode === "dark").PRIMARY_BG}
               >
-                <Heading size={"sm"}>Related questions</Heading>
+                <Heading
+                  size={"sm"}
+                  style={{
+                    marginBottom: "10px",
+                  }}
+                >
+                  Related questions width similar tags
+                </Heading>
+                <VStack>
+                  {state.relatedQuestions &&
+                  state.relatedQuestions.data.length > 0
+                    ? state.relatedQuestions.data.map((question) => (
+                        <HStack w={"full"}>
+                          <Box
+                            style={{
+                              fontSize: "sm",
+                              fontWeight: "bold",
+                              position: "relative",
+                              padding: "2px 10px",
+                              borderRadius: "5px",
+                              border: "1px solid",
+                              borderColor: Colors(colorMode === "dark")
+                                .PRIMARY_BG,
+                            }}
+                          >
+                            <span
+                              style={{
+                                position: "absolute",
+                                left: "3px",
+                              }}
+                            >
+                              {question.votes < 0 ? "-" : ""}
+                            </span>
+                            {Math.abs(question.votes)}
+                          </Box>
+                          <Text
+                            maxW={"full"}
+                            fontSize={"xs"}
+                            opacity={0.8}
+                            onClick={() =>
+                              // @ts-ignore
+                              router.push(
+                                router.basePath + `/question/${question.id}`
+                              )
+                            }
+                            transition={"all 0.2s ease-in-out"}
+                            _hover={{
+                              textDecoration: "underline",
+                              cursor: "pointer",
+                              opacity: 1,
+                            }}
+                          >
+                            {question.title.trim()}
+                          </Text>
+                        </HStack>
+                      ))
+                    : null}
+                </VStack>
               </Box>
             </Flex>
           </Container>

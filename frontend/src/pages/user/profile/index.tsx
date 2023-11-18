@@ -1,42 +1,34 @@
-import { ActionGetUserHistory } from "@/API/redux/actions/user/ActionGetActivityHistory";
 import actionGetProfile from "@/API/redux/actions/user/ActionGetProfile";
+import { Colors } from "@/assets/constant/Colors";
 import { Pages } from "@/assets/constant/Pages";
-import useStateWithCallback from "@/hooks/useStateWithCallback";
 import { LanguageHelper } from "@/util/Language/Language.util";
 import helper from "@/util/helper";
-import {
-  HistoryActivityListType,
-  HistoryActivityType,
-} from "@/util/type/HistoryActivity";
+import { HistoryActivityListType } from "@/util/type/HistoryActivity";
 import { UserType } from "@/util/type/User.type";
 import { TimeIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
-  Container,
   HStack,
   Heading,
-  Image,
   Stack,
-  Table,
-  TableCaption,
-  TableContainer,
-  Tbody,
-  Td,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
   Text,
-  Tfoot,
-  Th,
-  Thead,
-  Toast,
-  Tr,
   VStack,
+  useColorMode,
   useToast,
 } from "@chakra-ui/react";
 import moment from "moment";
+import { useRouter } from "next/router";
 import React from "react";
 import { BiCake } from "react-icons/bi";
-import { FaBirthdayCake, FaClock, FaRegClock } from "react-icons/fa";
 import { useDispatch } from "react-redux";
+import TabActivity from "./(TabAcivity)";
+import TabProfile from "./(TabProfile)";
 const DEFAULT_USER: UserType = {
   fullname: "",
   email: "",
@@ -46,12 +38,18 @@ const DEFAULT_USER: UserType = {
   updatedAt: "",
   username: "",
   avatar: "",
+  activityPoint: 0,
+  role: "user",
 };
+
 function DashBoard() {
   const [state, setState] = React.useState<UserType>(DEFAULT_USER);
   const [history, setHistory] = React.useState<HistoryActivityListType | null>(
     null
   );
+  const { colorMode } = useColorMode();
+  const router = useRouter();
+  const query = router.query;
   const dispatch = useDispatch();
   const toast = useToast();
   function getFormatedDateFromNow(date: string | undefined) {
@@ -68,26 +66,13 @@ function DashBoard() {
       ? "hours"
       : "days";
   }
-  const { getCurrentLanguage } = LanguageHelper(Pages.HOME);
+
+  const { getTranslate } = LanguageHelper(Pages.HOME);
   React.useEffect(() => {
-    dispatch(
-      // @ts-ignore
-      ActionGetUserHistory(
-        {
-          limit: 5,
-          page: 1,
-        },
-        (res) => {
-          setHistory(res);
-        },
-        (err) => {
-          console.log(err);
-        }
-      )
-    );
     dispatch(
       actionGetProfile(
         (res: UserType) => {
+          console.log(res);
           // @ts-ignore
           setState((oldState) =>
             helper.mappingState(oldState, {
@@ -99,13 +84,14 @@ function DashBoard() {
               updatedAt: res.updatedAt,
               username: res.username,
               avatar: res.avatar,
+              activityPoint: res.activityPoint,
             })
           );
         },
         () => {}
       )
     );
-  }, []);
+  }, [query]);
   return (
     <Box
       style={{
@@ -126,6 +112,7 @@ function DashBoard() {
             }}
             objectFit="cover"
             borderRadius="12"
+            name={state.fullname}
           />
           <Text
             cursor={"pointer"}
@@ -168,7 +155,19 @@ function DashBoard() {
           />
         </Box>
         <VStack spacing={1} alignItems={"start"}>
-          <Heading>{state.fullname}</Heading>
+          <HStack justifyItems={"flex-start"}>
+            <Heading>{state.fullname}</Heading>
+          </HStack>
+          <Heading size={"sm"}>
+            {state.activityPoint}{" "}
+            <span
+              style={{
+                color: Colors(colorMode === "dark").PRIMARY,
+              }}
+            >
+              contribuite points
+            </span>
+          </Heading>
           <Stack
             direction={{
               base: "column",
@@ -205,50 +204,20 @@ function DashBoard() {
           </Stack>
         </VStack>
       </Stack>
-      <TableContainer mt={5}>
-        <Table
-          variant="striped"
-          size={{
-            base: "sm",
-            md: "lg",
-          }}
-        >
-          <TableCaption>
-            {history?.data.length} activities in {history?.meta.itemCount} pages
-          </TableCaption>
-          <Thead>
-            <Tr>
-              <Th>Activity</Th>
-              <Th>Date</Th>
-              <Th isNumeric>Point Received</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {history?.data.map((item: HistoryActivityType) => (
-              <Tr>
-                <Td>
-                  {getCurrentLanguage().code === "vi"
-                    ? helper.getTranslationFromHistoryAcitvityVi(
-                        item.activityType
-                      )
-                    : helper.getTranslationFromHistoryAcitvityEn(
-                        item.activityType
-                      )}
-                </Td>
-                <Td>
-                  {helper.formatDate(
-                    item.createdAt,
-                    false,
-                    "HH:mm:ss - DD/MM/YYYY"
-                  )}
-                </Td>
-                <Td isNumeric>{item.pointChange}</Td>
-              </Tr>
-            ))}
-          </Tbody>
-          <Tfoot></Tfoot>
-        </Table>
-      </TableContainer>
+      <Tabs variant="enclosed">
+        <TabList>
+          <Tab>{getTranslate("ACITVITY")}</Tab>
+          <Tab>{getTranslate("PROFILE")}</Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <TabActivity />
+          </TabPanel>
+          <TabPanel>
+            <TabProfile user={state} />
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
     </Box>
   );
 }

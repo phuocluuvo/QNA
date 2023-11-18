@@ -23,12 +23,17 @@ import { useRouter } from "next/router";
 import { getCsrfToken, getSession, signIn } from "next-auth/react";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import LoginButton from "@/components/LoginButton";
+import { useDispatch } from "react-redux";
+import { ActionGetBadgeNotification } from "@/API/redux/actions/user/ActionGetNotificationBadge";
+import { LayoutContext } from "@/provider/LayoutProvider";
 export default function SignIn() {
   const { colorMode } = useColorMode();
   const [show, setShow] = React.useState(false);
   const toast = useToast();
   const router = useRouter();
+  const dispatch = useDispatch();
   const { getTranslate } = LanguageHelper(Pages.HOME);
+  const { setBadgeNumber } = React.useContext(LayoutContext);
   const usernameRef = React.useRef<HTMLInputElement>(null);
   function validatePassword(value = "") {
     let error = "";
@@ -69,6 +74,16 @@ export default function SignIn() {
         callbackUrl: router.query.callbackUrl as string,
       }).then((response) => {
         if (response && response.ok) {
+          dispatch(
+            // @ts-ignore
+            ActionGetBadgeNotification(
+              (res) => {
+                console.log(res);
+                setBadgeNumber(res);
+              },
+              () => {}
+            )
+          );
           if (router.query.callbackUrl) {
             router.push(router.query.callbackUrl as string);
           } else {
@@ -130,8 +145,8 @@ export default function SignIn() {
           {/* Facebook  */}
           <Formik
             initialValues={{
-              username: "vincent12",
-              password: "Voluu113@",
+              username: "trong123123",
+              password: "Kocomk123@",
             }}
             onSubmit={(values, actions) => {
               LoginHandle(values, actions);

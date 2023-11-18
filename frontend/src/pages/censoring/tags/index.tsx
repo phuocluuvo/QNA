@@ -123,16 +123,8 @@ function TagsPage() {
       </Head>
       <VStack alignItems={"start"}>
         <Heading size={"lg"} fontWeight={"medium"}>
-          {getTranslate("TAGS")}
+          {getTranslate("ALL_TAGS")}
         </Heading>
-        <Text
-          maxW={{ base: "100%", md: "50%" }}
-          style={{
-            marginBottom: "20px",
-          }}
-        >
-          {getTranslate("TAG_DESCRIPTION")}
-        </Text>
         <HStack
           w={{
             base: "100%",

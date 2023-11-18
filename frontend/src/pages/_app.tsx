@@ -22,6 +22,7 @@ import PageContainer from "@/components/PageContainer";
 import LayoutProvider from "@/provider/LayoutProvider";
 // @ts-ignore
 function App({ Component, pageProps: { session, ...pageProps } }) {
+  
   return (
     <SessionProvider session={pageProps.session}>
       <Provider store={store}>

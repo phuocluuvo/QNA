@@ -28,6 +28,7 @@ interface Post {
    */
   tagNames?: Array<string>;
   vote: VoteType;
+  type: "no_answer" | "no_approved" | "normal";
 }
 
 interface QuestionList {
@@ -48,6 +49,9 @@ interface QuestionList {
 export enum QUESTION_SORT_BY {
   NO_ANSWER = "no_answer",
   NO_APPROVED = "no_approved",
+  /**
+   * Có trả lời, có approved
+   */
   NORMAL = "normal",
 }
 

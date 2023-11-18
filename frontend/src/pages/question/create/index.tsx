@@ -211,6 +211,13 @@ function CreateQuestion() {
       actions.setSubmitting(false);
     }, 1000);
   };
+  function checkTagExist(tag: TagType) {
+    let isExist = false;
+    state.selectedTags?.forEach((item) => {
+      if (item.name === tag.name) isExist = true;
+    });
+    return isExist;
+  }
   return (
     <Container my={0} minW={{ lg: "70%", base: "90%" }} maxH={"30vh"}>
       <Formik
@@ -219,7 +226,6 @@ function CreateQuestion() {
           bodyQuestion: state.bodyQuestion,
           resultsTagIds: [],
         }}
-        enableReinitialize={true}
         onSubmit={(values, actions) => {
           // @ts-ignore
           createQuestionHandle(values, actions);
@@ -355,7 +361,13 @@ function CreateQuestion() {
                                 colorScheme="orange"
                                 cursor={"pointer"}
                                 onClick={() => {
-                                  addTagHandle(tag);
+                                  !checkTagExist(tag) && addTagHandle(tag);
+                                }}
+                                style={{
+                                  ...(checkTagExist(tag) && {
+                                    opacity: "0.5",
+                                    cursor: "not-allowed",
+                                  }),
                                 }}
                               >
                                 {tag.name}
@@ -408,7 +420,14 @@ function CreateQuestion() {
                       id="body"
                       theme="snow"
                       value={state.bodyQuestion}
-                      onChange={handleChangeBodyQuestion}
+                      onChange={(value) =>
+                        // @ts-ignore
+                        setState((oldState) =>
+                          helper.mappingState(oldState, {
+                            bodyQuestion: value,
+                          })
+                        )
+                      }
                       modules={{
                         toolbar: [
                           [{ header: [1, 2, false] }],
@@ -522,7 +541,7 @@ function CreateQuestion() {
                 createTagHandle();
               }}
             >
-              Create
+              {getTranslate("CREATE")}
             </Button>
           </ModalFooter>
         </ModalContent>

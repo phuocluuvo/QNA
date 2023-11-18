@@ -4,8 +4,14 @@ import React from "react";
 import { useRouter } from "next/router";
 function CustomError({ statusCode }) {
   const [countdown, setCountdown] = React.useState(5);
+  const [message, setMessage] = React.useState("");
   const router = useRouter();
   React.useEffect(() => {
+    if (statusCode === 404) {
+      setMessage("Page not found");
+    } else if (statusCode === 500) {
+      setMessage("Loading..." + "\n" + "Please wait a moment");
+    }
     const interval = setInterval(() => {
       setCountdown((prev) => prev - 1);
     }, 1000);
@@ -21,13 +27,8 @@ function CustomError({ statusCode }) {
 
   return (
     <Container>
-      <Heading>
-        {statusCode
-          ? `An error ${statusCode} occurred on server`
-          : "An error occurred on client"}
-      </Heading>
-      <Text my={10}>Sorry, something went wrong.</Text>
-      <Text my={10}>
+      <Heading>{message}</Heading>
+      <Text my={10} display={statusCode !== 500 ? "flex" : "none"}>
         You will be redirected to the homepage in {countdown} seconds.
       </Text>
       <Button variant={"link"} leftIcon={<ArrowBackIcon />} as="a" href="/">

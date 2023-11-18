@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useState, useContext } from "react";
 import { clientNamespaces } from "ni18n";
 import {
   Button,
@@ -35,6 +35,9 @@ import {
 import TagList from "@/components/TagList";
 import SideRightMenu from "@/components/SideRightMenu";
 import PageContainer from "@/components/PageContainer";
+import { useSession } from "next-auth/react";
+import { LayoutContext } from "@/provider/LayoutProvider";
+import { ActionGetBadgeNotification } from "@/API/redux/actions/user/ActionGetNotificationBadge";
 const limitations = [5, 10, 15, 20];
 
 export default function Home() {
@@ -52,11 +55,12 @@ export default function Home() {
     ? Number(query.limit)
     : (questionList?.meta.itemsPerPage as number);
   const numberOfPages: number[] = [...Array(questionList?.meta.totalPages)];
-
+  const session = useSession();
   const { getTranslate, getCurrentLanguage } = LanguageHelper(Pages.HOME);
   const [valueSort, setValueSort] = useState("title");
   const [isDecending, setIsDecending] = useState("ASC");
   const { isOpen, onToggle } = useDisclosure();
+
   useEffect(() => {
     const defaultLimit = 10;
     const defaultPage = 1;
