@@ -29,6 +29,8 @@ import {
 } from "../constants/notification.constants";
 import { Role } from "../enums/role.enum";
 import { QuestionState } from "../enums/question-state.enum";
+import { QuestionTimeTypeEnum } from "src/enums/question-type.enum";
+import { UsersService } from "src/users/users.service";
 import { HistoryService } from "../history/history.service";
 
 @Injectable()
@@ -40,6 +42,7 @@ export class QuestionService {
     private readonly tagService: TagService,
     private readonly activityService: ActivityService,
     private readonly notificationService: NotificationService,
+    private readonly userService: UsersService,
     private readonly historyService: HistoryService,
   ) {}
 
@@ -389,6 +392,96 @@ export class QuestionService {
     );
 
     return result;
+  }
+
+  async getCountQuestionByTime(timeType: QuestionTimeTypeEnum) {
+    const currentDate = new Date();
+    const currentDay = currentDate.getDate();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1;
+    const currentQuarter = Math.ceil(currentMonth / 3);
+
+    const queryBuilder = this.questionRepository.createQueryBuilder("question");
+    switch (timeType) {
+      case QuestionTimeTypeEnum.DAY:
+        queryBuilder
+          .where("YEAR(question.createdAt) = :year", { year: currentYear })
+          .andWhere("MONTH(question.createdAt) = :month", {
+            month: currentMonth,
+          })
+          .andWhere("DAY(question.createdAt) = :day", {
+            day: currentDay,
+          });
+        break;
+      case QuestionTimeTypeEnum.MONTH:
+        queryBuilder
+          .where("YEAR(question.createdAt) = :year", { year: currentYear })
+          .andWhere("MONTH(question.createdAt) = :month", {
+            month: currentMonth,
+          });
+        break;
+      case QuestionTimeTypeEnum.QUARTER:
+        queryBuilder
+          .where("YEAR(question.createdAt) = :year", { year: currentYear })
+          .andWhere("QUARTER(question.createdAt) = :quarter", {
+            quarter: currentQuarter,
+          });
+        break;
+      case QuestionTimeTypeEnum.YEAR:
+        queryBuilder.where("YEAR(question.createdAt) = :year", {
+          year: currentYear,
+        });
+        break;
+      default:
+        break;
+    }
+    return await queryBuilder.getCount();
+  }
+
+  async getCountQuestion() {
+    return {
+      data: {
+        all: await this.questionRepository.count(),
+        currentDay: await this.getCountQuestionByTime(QuestionTimeTypeEnum.DAY),
+        currentMonth: await this.getCountQuestionByTime(
+          QuestionTimeTypeEnum.MONTH,
+        ),
+        currentQuarter: await this.getCountQuestionByTime(
+          QuestionTimeTypeEnum.QUARTER,
+        ),
+        currentYear: await this.getCountQuestionByTime(
+          QuestionTimeTypeEnum.YEAR,
+        ),
+      },
+    };
+  }
+
+  getTop5ByViews() {
+    const queryBuilder = this.questionRepository
+      .createQueryBuilder("question")
+      .orderBy(`question.views`, "DESC")
+      .limit(5);
+    return queryBuilder.getMany();
+  }
+
+  getTop5ByVotes() {
+    const queryBuilder = this.questionRepository
+      .createQueryBuilder("question")
+      .orderBy(`question.votes`, "DESC")
+      .limit(5);
+    return queryBuilder.getMany();
+  }
+
+  getTop5ByAnswers() {
+    const queryBuilder = this.questionRepository
+      .createQueryBuilder("question")
+      .addSelect("COUNT(answer.id)", "answer_count")
+      .leftJoin("question.answers", "answer")
+      .groupBy("question.id")
+      .orderBy("answer_count", "DESC")
+      .limit(5);
+
+    return queryBuilder.getMany();
   }
 
   async getQuestionHistory(query: PaginateQuery, questionId: string) {

@@ -173,4 +173,24 @@ export class TagService {
 
     return result;
   }
+
+  getTop5HasMostQuestion() {
+    const queryBuilder = this.tagRepository
+      .createQueryBuilder("tag")
+      .select([
+        "tag.id as id",
+        "tag.name as name",
+        "tag.content as content",
+        "tag.state as state",
+        "tag.created_at as created_at",
+        "tag.updated_at as updated_at",
+      ])
+      .addSelect("COUNT(tag.id)", "question_count")
+      .leftJoin("question_tag", "question_tag", "question_tag.tag_id = tag.id")
+      .groupBy("tag.id")
+      .orderBy("question_count", "DESC")
+      .limit(5);
+
+    return queryBuilder.getRawMany();
+  }
 }

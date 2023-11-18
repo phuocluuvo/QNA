@@ -14,6 +14,7 @@ import { ActivityModule } from "../activity/activity.module";
 import { NotificationModule } from "../notification/notification.module";
 import { BookmarkModule } from "../bookmark/bookmark.module";
 import { CollectionModule } from "../collection/collection.module";
+import { DashboardModule } from "src/dashboard/dashboard.module";
 import { HistoryModule } from "../history/history.module";
 
 @Module({
@@ -31,6 +32,7 @@ import { HistoryModule } from "../history/history.module";
     NotificationModule,
     BookmarkModule,
     CollectionModule,
+    DashboardModule,
     HistoryModule,
   ],
   controllers: [AppController],
