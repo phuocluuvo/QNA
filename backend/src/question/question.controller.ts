@@ -97,6 +97,20 @@ export class QuestionController {
   }
 
   /**
+   * Get a specific question history by its ID.
+   * @param id
+   * @param query
+   */
+  @ApiOperation({
+    summary: "get question history",
+  })
+  @Get(":id/history")
+  @UseGuards()
+  async findHistory(@Param("id") id: string, @Paginate() query: PaginateQuery) {
+    return this.questionService.getQuestionHistory(query, id);
+  }
+
+  /**
    * Create a new question.
    *
    * @param questionDto The data for creating a new question.

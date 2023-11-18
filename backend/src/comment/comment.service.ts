@@ -19,6 +19,7 @@ import {
   notificationTextDesc,
 } from "../constants/notification.constants";
 import { NotificationService } from "../notification/notification.service";
+import { HistoryService } from "../history/history.service";
 
 @Injectable()
 export class CommentService {
@@ -27,6 +28,7 @@ export class CommentService {
     private readonly commentRepository: Repository<Comment>,
     private readonly activityService: ActivityService,
     private readonly notificationService: NotificationService,
+    private readonly historyService: HistoryService,
   ) {}
 
   /**
@@ -174,12 +176,17 @@ export class CommentService {
       userId,
       oldComment.user.id,
     );
-    await this.notificationService.create(
-      notificationText.COMMENT.UPDATE,
-      notificationTextDesc.COMMENT.UPDATE,
-      oldComment.user.id,
-      activity.id,
-    );
+
+    await this.historyService.createCommentHistory(oldComment, userId);
+
+    if (userId != oldComment.user.id) {
+      await this.notificationService.create(
+        notificationText.COMMENT.UPDATE,
+        notificationTextDesc.COMMENT.UPDATE,
+        oldComment.user.id,
+        activity.id,
+      );
+    }
     return comment;
   }
 
@@ -204,5 +211,9 @@ export class CommentService {
       activity.id,
     );
     return this.remove(comment);
+  }
+
+  async getCommentHistory(query: PaginateQuery, commentId: string) {
+    return this.historyService.getAnswerHistory(query, commentId);
   }
 }

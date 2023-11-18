@@ -20,6 +20,7 @@ import { Activity } from "../../activity/entity/activity.entity";
 import { QuestionState } from "../../enums/question-state.enum";
 import { Comment } from "../../comment/entity/comment.entity";
 import { Bookmark } from "../../bookmark/entity/bookmark.entity";
+import { History } from "../../history/entity/history.entity";
 
 @Entity()
 export class Question {
@@ -81,6 +82,9 @@ export class Question {
 
   @OneToMany(() => Bookmark, (bk) => bk.question)
   bookmarks: Bookmark[];
+
+  @OneToMany(() => History, (history) => history.question)
+  histories: History[];
 
   // This is the virtual column for the relationship entities.
 

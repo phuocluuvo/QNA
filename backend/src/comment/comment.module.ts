@@ -8,6 +8,7 @@ import { AnswerModule } from "../answer/answer.module";
 import { ActivityModule } from "../activity/activity.module";
 import { NotificationModule } from "../notification/notification.module";
 import { QuestionModule } from "../question/question.module";
+import { HistoryModule } from "../history/history.module";
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { QuestionModule } from "../question/question.module";
     ActivityModule,
     NotificationModule,
     QuestionModule,
+    HistoryModule,
   ],
   controllers: [CommentController],
   providers: [...commentProviders, CommentService],
