@@ -78,5 +78,18 @@
   "NOTIFICATIONS": "Thông báo",
   "NO_DATA": "Không có dữ liệu",
   "CENSORING": "Kiểm duyệt",
-  "SHOW_MORE": "Xem thêm"
+  "SHOW_MORE": "Xem thêm",
+  "MARK_ALL_AS_READ": "Đánh dấu tất cả là đã đọc",
+  "CENSORE": "Kiểm duyệt",
+  "BLOCK": "Chặn",
+  "REJECT": "Từ chối",
+  "CHECK_EXPLICT_CONTENT": "Kiểm tra từ cấm",
+  "GOOD_TO_GO": "Đã sẵn sàng 👌",
+  "INCLUDE_EXPLICT_WORDS": "Có chứa từ cấm",
+  "CONTENT": "Nội dung",
+  "TITLE": "Tiêu đề",
+  "AUTHOR": "Tác giả",
+  "QUESTION": "Câu hỏi",
+  "TAG": "Thẻ",
+  "CRATED_AT": "Tạo lúc"
 }

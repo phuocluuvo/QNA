@@ -47,7 +47,8 @@ export type FormVoteAnswer = {
 };
 
 export type FormCommentAnswer = {
-  answer_id: string;
+  answer_id?: string;
+  question_id?: string;
   content: string;
 };
 

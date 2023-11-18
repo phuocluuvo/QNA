@@ -152,7 +152,7 @@ export const sendMedia = (media: any, type: string) => {
   });
 };
 
-export const getAllNotification = (params: CommonParams) => {
+const getAllNotification = (params: CommonParams) => {
   // params to url
   let urlString = url.NOTIFICATION + "?";
   for (let key in params) {
@@ -162,15 +162,19 @@ export const getAllNotification = (params: CommonParams) => {
   return AuthApi(REQUEST_METHOD.GET, urlString);
 };
 
-export const readNotification = (id: string) => {
+const readNotification = (id: string) => {
   return AuthApi(REQUEST_METHOD.GET, url.NOTIFICATION + "/" + id);
 };
 
-export const getBadgeNumber = () => {
+const readAllNotification = () => {
+  return AuthApi(REQUEST_METHOD.GET, url.NOTIFICATION + "/all");
+};
+
+const getBadgeNumber = () => {
   return AuthApi(REQUEST_METHOD.GET, url.BADGE_NOTIFICATION);
 };
 
-export const getAllUsers = (params: CommonParams) => {
+const getAllUsers = (params: CommonParams) => {
   // params to url
   let urlString = url.USER + "?";
   for (let key in params) {
@@ -178,6 +182,18 @@ export const getAllUsers = (params: CommonParams) => {
     urlString += key + "=" + params[key] + "&";
   }
   return api.get(urlString);
+};
+
+const verifyQuesiton = (id: string) => {
+  return AuthApi(REQUEST_METHOD.GET, url.QUESTION + "/" + id + "/verify");
+};
+
+const blockQuestion = (id: string) => {
+  return AuthApi(REQUEST_METHOD.GET, url.QUESTION + "/" + id + "/block");
+};
+
+const verifyTag = (tagId: string) => {
+  return AuthApi(REQUEST_METHOD.GET, url.TAG + "/" + tagId + "/verify");
 };
 export default {
   requestSignUp,
@@ -205,4 +221,8 @@ export default {
   readNotification,
   getBadgeNumber,
   getAllUsers,
+  readAllNotification,
+  verifyQuesiton,
+  blockQuestion,
+  verifyTag,
 };

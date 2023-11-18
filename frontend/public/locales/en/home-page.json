@@ -78,5 +78,18 @@
   "NOTIFICATIONS": "Notifications",
   "NO_DATA": "No data",
   "CENSORING": "Censoring",
-  "SHOW_MORE": "Show more"
+  "SHOW_MORE": "Show more",
+  "MARK_ALL_AS_READ": "Mark all as read",
+  "CENSORE": "Censore",
+  "BLOCK": "Block",
+  "REJECT": "Reject",
+  "CHECK_EXPLICT_CONTENT": "Check Explict Content",
+  "GOOD_TO_GO": "Good to go 👌",
+  "INCLUDE_EXPLICT_WORDS": "Include explited word",
+  "CONTENT": "Content",
+  "TITLE": "Title",
+  "AUTHOR": "Author",
+  "QUESTION": "Question",
+  "TAG": "Tag",
+  "CRATED_AT": "Created at"
 }
