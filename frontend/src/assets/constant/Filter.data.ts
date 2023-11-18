@@ -65,3 +65,25 @@ export const SORT_DATA_VI = [
     value: "createdAt",
   },
 ];
+
+export const SORT_DATA_ADMIN_VI = [
+  {
+    label: "Tiêu đề",
+    value: "title",
+  },
+  {
+    label: "Nội dung",
+    value: "content",
+  },
+];
+
+export const SORT_DATA_ADMIN_EN = [
+  {
+    label: "Title",
+    value: "title",
+  },
+  {
+    label: "Content",
+    value: "content",
+  },
+];
