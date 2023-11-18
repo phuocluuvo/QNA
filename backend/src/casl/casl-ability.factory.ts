@@ -12,10 +12,17 @@ import { Injectable } from "@nestjs/common";
 import { Role } from "../enums/role.enum";
 import { Answer } from "../answer/entity/answer.entity";
 import { Comment } from "../comment/entity/comment.entity";
+import { Bookmark } from "../bookmark/entity/bookmark.entity";
+import { Collection } from "../collection/enity/collection.entity";
 
 type Subjects =
   | InferSubjects<
-      typeof Question | typeof User | typeof Answer | typeof Comment
+      | typeof Question
+      | typeof User
+      | typeof Answer
+      | typeof Comment
+      | typeof Bookmark
+      | typeof Collection
     >
   | "all";
 
@@ -31,6 +38,14 @@ type FlatAnswer = Answer & {
 
 type FlatComment = Comment & {
   "user.id": Comment["user"]["id"];
+};
+
+type FlatBookmark = Bookmark & {
+  "user.id": Bookmark["user"]["id"];
+};
+
+type FlatCollection = Collection & {
+  "user.id": Bookmark["user"]["id"];
 };
 
 @Injectable()
@@ -51,6 +66,12 @@ export class CaslAbilityFactory {
         "user.id": userReq["sub"],
       });
       can<FlatComment>([Action.Update, Action.Delete], Comment, {
+        "user.id": userReq["sub"],
+      });
+      can<FlatBookmark>([Action.Update, Action.Delete], Bookmark, {
+        "user.id": userReq["sub"],
+      });
+      can<FlatCollection>([Action.Update, Action.Delete], Collection, {
         "user.id": userReq["sub"],
       });
     }

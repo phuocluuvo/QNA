@@ -14,6 +14,7 @@ import { Vote } from "../../vote/entity/vote.entity";
 import { Activity } from "../../activity/entity/activity.entity";
 import { UserState } from "../../enums/user-state.enum";
 import { Tag } from "../../tag/entity/tag.entity";
+import { Bookmark } from "../../bookmark/entity/bookmark.entity";
 
 @Entity()
 export class User {
@@ -87,4 +88,7 @@ export class User {
 
   @OneToMany(() => Tag, (tag) => tag.user)
   tags: Tag[];
+
+  @OneToMany(() => Bookmark, (bk) => bk.user)
+  bookmarks: Bookmark[];
 }

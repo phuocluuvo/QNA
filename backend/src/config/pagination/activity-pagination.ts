@@ -4,7 +4,7 @@ import { Activity } from "../../activity/entity/activity.entity";
 export const activityPaginateConfig: PaginateConfig<Activity> = {
   sortableColumns: ["createdAt", "updatedAt"],
   defaultSortBy: [["createdAt", "DESC"]],
-  relations: ["user", "question", "answer", "comment"],
+  relations: ["user", "question", "answer", "comment", "answer.question"],
   filterableColumns: {
     createdAt: [
       FilterOperator.BTW,
@@ -21,4 +21,5 @@ export const activityPaginateConfig: PaginateConfig<Activity> = {
       FilterOperator.GT,
     ],
   },
+
 };
