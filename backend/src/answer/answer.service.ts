@@ -222,27 +222,31 @@ export class AnswerService {
    * @param id - The ID of the answer to update.
    * @param answerDto - The updated data for the answer.
    * @param oldAnswer
+   * @param userId
    */
   @Transactional()
   async updateWithActivity(
     id: string,
     answerDto: UpdateAnswerDto,
     oldAnswer: Answer,
+    userId: string,
   ) {
     const answerUpdate = await this.update(id, answerDto);
     const activity = await this.activityService.create(
       ReputationActivityTypeEnum.UPDATE_ANSWER,
       ObjectActivityTypeEnum.ANSWER,
       id,
-      oldAnswer.user.id,
+      userId,
       oldAnswer.user.id,
     );
-    await this.notificationService.create(
-      notificationText.ANSWER.UPDATE,
-      notificationTextDesc.ANSWER.UPDATE,
-      oldAnswer.user.id,
-      activity.id,
-    );
+    if (userId != oldAnswer.user.id) {
+      await this.notificationService.create(
+        notificationText.ANSWER.UPDATE,
+        notificationTextDesc.ANSWER.UPDATE,
+        oldAnswer.user.id,
+        activity.id,
+      );
+    }
     return answerUpdate;
   }
 

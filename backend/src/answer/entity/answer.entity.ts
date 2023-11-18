@@ -14,6 +14,7 @@ import { Question } from "../../question/entity/question.entity";
 import { Vote } from "../../vote/entity/vote.entity";
 import { Comment } from "../../comment/entity/comment.entity";
 import { Activity } from "../../activity/entity/activity.entity";
+import { Bookmark } from "../../bookmark/entity/bookmark.entity";
 
 @Entity()
 export class Answer {
@@ -57,6 +58,9 @@ export class Answer {
 
   @OneToMany(() => Activity, (activity) => activity.answer)
   activity: Activity[];
+
+  @OneToMany(() => Bookmark, (bk) => bk.answer)
+  bookmarks: Bookmark[];
 
   //Virtual Columns
 

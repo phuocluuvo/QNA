@@ -27,10 +27,10 @@ export class Notification {
   @Column({ name: "is_announcement", default: false })
   isAnnouncement: boolean;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
 
   //  This is the foreign key column for the relationship entities.
