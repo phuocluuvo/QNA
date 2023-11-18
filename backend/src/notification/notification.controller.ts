@@ -70,7 +70,7 @@ export class NotificationController {
   @ApiOperation({
     summary: "update is read notification",
   })
-  @Post("all")
+  @Get("all")
   @UseGuards(AccessTokenGuard)
   async readAllNotification(@Req() req: Request) {
     return this.notificationService.readAllNotification(req["user"]["sub"]);

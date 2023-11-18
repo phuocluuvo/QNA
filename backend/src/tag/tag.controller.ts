@@ -143,7 +143,7 @@ export class TagController {
     summary: "verify tag",
   })
   @ApiBearerAuth()
-  @Post(":tagId/verify")
+  @Get(":tagId/verify")
   @UseGuards(AccessTokenGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.MONITOR)
   async verify(@Req() req: Request, @Param("tagId") tagId: string) {

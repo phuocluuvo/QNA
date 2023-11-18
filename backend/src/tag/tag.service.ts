@@ -47,6 +47,7 @@ export class TagService {
       "tag.name",
       "tag.content",
       "tag.questionsNumber",
+      "tag.state",
     ]);
     queryBuilder.leftJoin("tag.questions", "question");
 
