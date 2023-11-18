@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { Vote } from "./entity/vote.entity";
 import { VoteQuestionDto } from "./dto/vote-question.dto";
@@ -16,6 +16,7 @@ import {
   notificationText,
   notificationTextDesc,
 } from "../constants/notification.constants";
+import { message } from "../constants/message.constants";
 
 @Injectable()
 export class VoteService {
@@ -37,6 +38,9 @@ export class VoteService {
     voteDto: VoteQuestionDto,
     question: Question,
   ): Promise<number> {
+    if (userId == question.user.id)
+      throw new BadRequestException(message.VOTE.NOT_VOTE_MY_SELF);
+
     const vote = await this.handleVote(userId, voteDto, true);
     const activity = await this.activityService.create(
       this.getReputationType(voteDto, vote),
@@ -65,6 +69,9 @@ export class VoteService {
     voteDto: VoteAnswerDto,
     answer: Answer,
   ): Promise<number> {
+    if (userId == answer.user.id)
+      throw new BadRequestException(message.VOTE.NOT_VOTE_MY_SELF);
+
     const vote = await this.handleVote(userId, voteDto, false);
     const activity = await this.activityService.create(
       this.getReputationType(voteDto, vote),

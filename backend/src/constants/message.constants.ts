@@ -37,5 +37,8 @@ export const message = {
   TAG: {
     VERIFIED: "TAG_IS_VERIFIED",
   },
+  VOTE: {
+    NOT_VOTE_MY_SELF: "NOT_VOTE_MY_SELF",
+  },
   COLLECTION_NAME_IS_EXIST: "COLLECTION_NAME_IS_EXIST",
 };
