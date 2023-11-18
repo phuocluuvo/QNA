@@ -1,10 +1,11 @@
 import { Status } from "./Status.type";
 
 interface Tag {
-  id: string | number;
+  id: string;
   name: string;
   questionsNumber: number;
   content?: string;
+  state?: "pending" | "verified" | "blocked";
 }
 export type TagListType = {
   data: Array<Tag>;

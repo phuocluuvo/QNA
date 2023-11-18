@@ -1,7 +1,11 @@
+import { AnswerType } from "./Answer.type";
+import { CommentType } from "./Comment.type";
 import {
   HISTORY_ACTIVITY_TYPE,
   OBJECT_ACTIVITY_TYPE,
 } from "./HistoryActivity.enum";
+import { QuestionType } from "./Question.type";
+import { UserType } from "./User.type";
 
 type HistoryActivity = {
   activityType: HISTORY_ACTIVITY_TYPE;
@@ -11,6 +15,10 @@ type HistoryActivity = {
   objectType: OBJECT_ACTIVITY_TYPE;
   pointChange: 2;
   updatedAt: string;
+  user: UserType;
+  question?: QuestionType | null;
+  answer?: AnswerType | null;
+  comment?: CommentType | null;
 };
 
 interface HistoryActivityList {

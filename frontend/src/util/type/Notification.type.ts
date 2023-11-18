@@ -1,3 +1,6 @@
+import { HistoryActivityType } from "./HistoryActivity";
+import { UserType } from "./User.type";
+
 type Notification = {
   createdAt: string;
   description: string;
@@ -6,6 +9,9 @@ type Notification = {
   isRead: Boolean;
   title: string;
   updatedAt: string;
+  activity: HistoryActivityType;
+  user: UserType;
+  notificationsNumber?: number;
 };
 
 interface NotificationList {

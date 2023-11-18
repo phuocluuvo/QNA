@@ -1,5 +1,6 @@
 import moment from "moment";
 import { HISTORY_ACTIVITY_TYPE } from "./type/HistoryActivity.enum";
+import wordsExplictEn from "naughty-words/en.json";
 import {
   NotificationDesEumn,
   NotificationEumn,
@@ -279,7 +280,40 @@ function getDescriptionFromNotificationEn(type: NotificationDesEumn) {
       return type;
   }
 }
+const checkExplictWords = (htmlString: string) => {
+  let isExplict = false;
+  let stringExplictWords: string[] = [];
 
+  wordsExplictEn.forEach((word) => {
+    let regex = new RegExp(`\\b${word}\\b`, "gi");
+    if (regex.test(htmlString)) {
+      isExplict = true;
+      htmlString = htmlString.replace(
+        regex,
+        (match) => `<span style="color: red;">${match}</span>`
+      );
+      stringExplictWords.push(word);
+    }
+  });
+
+  return {
+    isExplict,
+    explictWords: stringExplictWords,
+    warningNewContent: htmlString,
+  };
+};
+function gaurdsRouteRoles(
+  userRole: "admin" | "user" | "monitor",
+  callback: () => void,
+  callbackError: () => void
+) {
+  let roles = ["admin", "monitor"];
+  if (roles.includes(userRole)) {
+    callback();
+  } else {
+    callbackError();
+  }
+}
 export default {
   numberFormat,
   formatDate,
@@ -290,4 +324,6 @@ export default {
   getTranslationFromNotificationEn,
   getDescriptionFromNotificationVi,
   getDescriptionFromNotificationEn,
+  checkExplictWords,
+  gaurdsRouteRoles,
 };

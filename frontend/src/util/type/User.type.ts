@@ -7,9 +7,11 @@ interface User {
   dob?: string;
   status?: Status;
   avatar?: string;
-  updatedAt?: string;
-  createdAt?: string;
+  updatedAt: string;
+  createdAt: string;
   username: string;
+  activityPoint: number;
+  role: "admin" | "user" | "monitor";
 }
 
 // github user type
@@ -27,6 +29,21 @@ export interface GithubUser {
   created_at: string;
   updated_at: string;
 }
-
+type UserList = {
+  data: Array<User>;
+  meta: {
+    currentPage: number;
+    itemCount: number;
+    itemsPerPage: number;
+    totalItems: number;
+    totalPages: number;
+  };
+  links: {
+    current: string;
+    last: string;
+    next: string;
+  };
+};
 export type UserType = User;
+export type UserListType = UserList;
 export type UserGithubType = GithubUser;
