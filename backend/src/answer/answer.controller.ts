@@ -81,6 +81,20 @@ export class AnswerController {
   }
 
   /**
+   * Get a specific answer history by its ID.
+   * @param id
+   * @param query
+   */
+  @ApiOperation({
+    summary: "get answer history",
+  })
+  @Get(":id/history")
+  @UseGuards()
+  async findHistory(@Param("id") id: string, @Paginate() query: PaginateQuery) {
+    return this.answerService.getAnswerHistory(query, id);
+  }
+
+  /**
    * Create a new answer for a question.
    *
    * @param answerDto - The data to create a new answer.

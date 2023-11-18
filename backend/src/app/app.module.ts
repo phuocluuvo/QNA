@@ -15,6 +15,7 @@ import { NotificationModule } from "../notification/notification.module";
 import { BookmarkModule } from "../bookmark/bookmark.module";
 import { CollectionModule } from "../collection/collection.module";
 import { DashboardModule } from "src/dashboard/dashboard.module";
+import { HistoryModule } from "../history/history.module";
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { DashboardModule } from "src/dashboard/dashboard.module";
     BookmarkModule,
     CollectionModule,
     DashboardModule,
+    HistoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

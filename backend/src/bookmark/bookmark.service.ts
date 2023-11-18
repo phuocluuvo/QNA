@@ -48,6 +48,21 @@ export class BookmarkService {
   }
 
   /**
+   * Find bookmark for later and paginate the results.
+   * @param query
+   * @param userId
+   */
+  async getBookmarkCollectionForLater(query: PaginateQuery, userId: string) {
+    const queryBuilder = this.bookmarkRepository.createQueryBuilder("bookmark");
+    queryBuilder.leftJoinAndSelect("bookmark.user", "user");
+    queryBuilder.leftJoinAndSelect("bookmark.collection", "collection");
+
+    queryBuilder.where({ user: { id: userId } });
+    queryBuilder.andWhere("bookmark.collection.id IS NULL");
+    return paginate<Bookmark>(query, queryBuilder, bookmarkPaginateConfig);
+  }
+
+  /**
    * Create a new bookmark.
    * @param createBookmarkDto
    * @param userId
