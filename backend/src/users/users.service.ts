@@ -273,4 +273,54 @@ export class UsersService {
       .where("id = :id", { id })
       .execute();
   }
+
+  getTop5HasMostQuestion() {
+    const queryBuilder = this.userRepository
+      .createQueryBuilder("user")
+      .select([
+        "user.id as id",
+        "user.username as username",
+        "user.fullname as fullname",
+        "user.avatar as avatar",
+        "user.dob as dob",
+        "user.email as email",
+        "user.role as role",
+        "user.activityPoint as activityPoint",
+        "user.createdAt as createdAt",
+        "user.updatedAt as updatedAt",
+        "user.state as state",
+      ])
+      .addSelect("COUNT(user.id)", "question_count")
+      .leftJoin("question", "question", "question.user_id = user.id")
+      .groupBy("user.id")
+      .orderBy("question_count", "DESC")
+      .limit(5);
+
+    return queryBuilder.getRawMany();
+  }
+
+  getTop5HasMostAnswer() {
+    const queryBuilder = this.userRepository
+      .createQueryBuilder("user")
+      .select([
+        "user.id as id",
+        "user.username as username",
+        "user.fullname as fullname",
+        "user.avatar as avatar",
+        "user.dob as dob",
+        "user.email as email",
+        "user.role as role",
+        "user.activityPoint as activityPoint",
+        "user.createdAt as createdAt",
+        "user.updatedAt as updatedAt",
+        "user.state as state",
+      ])
+      .addSelect("COUNT(user.id)", "answer_count")
+      .leftJoin("answer", "answer", "answer.user_id = user.id")
+      .groupBy("user.id")
+      .orderBy("answer_count", "DESC")
+      .limit(5);
+
+    return queryBuilder.getRawMany();
+  }
 }
