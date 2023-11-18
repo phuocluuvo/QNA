@@ -293,12 +293,14 @@ export class QuestionService {
       userId,
       oldQuestion.user.id,
     );
-    await this.notificationService.create(
-      notificationText.QUESTION.UPDATE,
-      notificationTextDesc.QUESTION.UPDATE,
-      oldQuestion.user.id,
-      activity.id,
-    );
+    if (userId != oldQuestion.user.id) {
+      await this.notificationService.create(
+        notificationText.QUESTION.UPDATE,
+        notificationTextDesc.QUESTION.UPDATE,
+        oldQuestion.user.id,
+        activity.id,
+      );
+    }
     return questionUpdate;
   }
 

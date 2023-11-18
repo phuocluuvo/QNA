@@ -130,7 +130,12 @@ export class AnswerController {
     }
 
     if (ability.can(Action.Update, answer)) {
-      return this.answerService.updateWithActivity(id, answerDto, answer);
+      return this.answerService.updateWithActivity(
+        id,
+        answerDto,
+        answer,
+        req.user["sub"],
+      );
     } else {
       throw new ForbiddenException(message.NOT_AUTHOR.ANSWER);
     }
