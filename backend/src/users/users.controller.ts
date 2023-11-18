@@ -51,27 +51,6 @@ export class UsersController {
   }
 
   /**
-   * Update the profile of a user.
-   *
-   * @param req get id login user
-   * @param updateUserDto Data for updating the user profile.
-   * @returns Promise<User> The updated user profile.
-   */
-  @ApiOperation({
-    summary: "update profile user",
-  })
-  @ApiBearerAuth()
-  @UseGuards(AccessTokenGuard)
-  @Patch()
-  async update(@Request() req, @Body() updateUserDto: UpdateUserDto) {
-    const id = req.user["sub"];
-    const user = await this.usersService.updateProfile(id, updateUserDto);
-    return plainToClass(UserDto, user, {
-      excludeExtraneousValues: true,
-    });
-  }
-
-  /**
    * Get all user.
    * @param query - Pagination query.
    */
@@ -118,6 +97,27 @@ export class UsersController {
     @Body() createUserDto: CreateUserAdminDto,
   ) {
     const user = await this.usersService.createUserForAdmin(createUserDto);
+    return plainToClass(UserDto, user, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  /**
+   * Update the profile of a user.
+   *
+   * @param req get id login user
+   * @param updateUserDto Data for updating the user profile.
+   * @returns Promise<User> The updated user profile.
+   */
+  @ApiOperation({
+    summary: "update profile user",
+  })
+  @ApiBearerAuth()
+  @UseGuards(AccessTokenGuard)
+  @Patch("profile")
+  async update(@Request() req, @Body() updateUserDto: UpdateUserDto) {
+    const id = req.user["sub"];
+    const user = await this.usersService.updateProfile(id, updateUserDto);
     return plainToClass(UserDto, user, {
       excludeExtraneousValues: true,
     });

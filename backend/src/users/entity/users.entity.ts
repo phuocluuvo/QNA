@@ -36,6 +36,23 @@ export class User {
   @Column({ nullable: false, unique: true })
   email: string;
 
+  @Column({ nullable: true, unique: true, default: null })
+  title: string;
+
+  //Social links
+  @Column({ nullable: true, name: "facebook_link", default: null })
+  facebookLink: string;
+
+  @Column({ nullable: true, name: "github_link", default: null })
+  githubLink: string;
+
+  @Column({ nullable: true, name: "linkedin_link", default: null })
+  twitterLink: string;
+
+  @Column({ nullable: true, name: "website_link", default: null })
+  websiteLink: string;
+  //
+
   @Column({ nullable: false, select: false })
   password: string;
 

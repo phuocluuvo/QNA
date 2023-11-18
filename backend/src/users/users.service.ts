@@ -201,6 +201,7 @@ export class UsersService {
       delete userTrans.username;
       delete userTrans.email;
       delete userTrans.refreshToken;
+
       return await this.update(id, userTrans);
     } catch (e) {
       throw new BadRequestException(message.EXISTED.EMAIL);

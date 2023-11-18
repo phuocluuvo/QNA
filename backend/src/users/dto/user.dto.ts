@@ -25,6 +25,22 @@ export class UserDto {
   email: string;
 
   @Expose()
+  title: string;
+
+  //Social links
+  @Expose()
+  facebookLink: string;
+
+  @Expose()
+  githubLink: string;
+
+  @Expose()
+  twitterLink: string;
+
+  @Expose()
+  websiteLink: string;
+
+  @Expose()
   role: Role;
 
   @Expose()
