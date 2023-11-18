@@ -15,6 +15,8 @@ export const notificationPagination: PaginateConfig<Notification> = {
     "activity.answer",
     "activity.comment",
     "activity.answer.question",
+    "activity.comment.answer.question",
+    "activity.comment.question",
   ],
   searchableColumns: ["title", "description"],
   filterableColumns: {
