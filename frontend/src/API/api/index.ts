@@ -8,6 +8,7 @@ import {
   FormGetAnswer,
   FormQuestion,
   FormSignUp,
+  FormUpdateProfile,
   FormVote,
   FormVoteAnswer,
   FromUserLogin,
@@ -121,6 +122,11 @@ const updateQuestion = (form: FormCreateQuestion, questionId: string) => {
   );
 };
 
+const updateProfile = (form: FormUpdateProfile) => {
+  removeEmpty(form);
+  return AuthApi(REQUEST_METHOD.PATCH, url.USER_PROFILE, form);
+};
+
 const getTag = (nameTag: string) => {
   return api.get(url.TAG, {
     params: {
@@ -195,6 +201,10 @@ const blockQuestion = (id: string) => {
 const verifyTag = (tagId: string) => {
   return AuthApi(REQUEST_METHOD.GET, url.TAG + "/" + tagId + "/verify");
 };
+
+const bookmarkQuestion = (questionId: string) => {
+  return AuthApi(REQUEST_METHOD.POST, url.BOOKMARK, { questionId });
+};
 export default {
   requestSignUp,
   getQuestion,
@@ -225,4 +235,6 @@ export default {
   verifyQuesiton,
   blockQuestion,
   verifyTag,
+  updateProfile,
+  bookmarkQuestion,
 };

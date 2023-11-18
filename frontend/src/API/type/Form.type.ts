@@ -56,3 +56,23 @@ export type FormCreateTag = {
   name: string;
   content: string;
 };
+export type FormGetProfile = {
+  page: number;
+  limit: number;
+  sortBy:
+    | "fullname"
+    | "username"
+    | "email"
+    | "role"
+    | "activityPoint"
+    | "createdAt"
+    | "updatedAt ";
+  search: string;
+  searchBy: "fullname" | "username" | "email";
+};
+
+export type FormUpdateProfile = {
+  fullname?: string;
+  email?: string;
+  avatar?: string;
+};

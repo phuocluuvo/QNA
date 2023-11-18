@@ -22,4 +22,7 @@ export const url = {
   NOTIFICATION: "/api/notification",
   NOTIFICATION_ANOUNTMENT: "/api/notification/announcement",
   BADGE_NOTIFICATION: "/api/notification/badgeNumber",
+  BOOKMARK: "/api/bookmark",
+  BOOKMARK_COLLECTION: "/api/bookmark/collection/{id}",
+  UPDATE_BOOKMARK: "/api/bookmark/{id}",
 };
