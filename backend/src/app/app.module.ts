@@ -14,6 +14,7 @@ import { ActivityModule } from "../activity/activity.module";
 import { NotificationModule } from "../notification/notification.module";
 import { BookmarkModule } from "../bookmark/bookmark.module";
 import { CollectionModule } from "../collection/collection.module";
+import { HistoryModule } from "../history/history.module";
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { CollectionModule } from "../collection/collection.module";
     NotificationModule,
     BookmarkModule,
     CollectionModule,
+    HistoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

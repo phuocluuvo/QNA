@@ -73,6 +73,20 @@ export class CommentController {
   }
 
   /**
+   * Get a specific comment history by its ID.
+   * @param id
+   * @param query
+   */
+  @ApiOperation({
+    summary: "get comment history",
+  })
+  @Get(":id/history")
+  @UseGuards()
+  async findHistory(@Param("id") id: string, @Paginate() query: PaginateQuery) {
+    return this.commentService.getCommentHistory(query, id);
+  }
+
+  /**
    * Create a new comment for a answer.
    *
    * @param answerDto - The data to create a new comment.

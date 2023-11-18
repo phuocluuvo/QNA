@@ -29,6 +29,7 @@ import {
 } from "../constants/notification.constants";
 import { Role } from "../enums/role.enum";
 import { QuestionState } from "../enums/question-state.enum";
+import { HistoryService } from "../history/history.service";
 
 @Injectable()
 export class QuestionService {
@@ -39,6 +40,7 @@ export class QuestionService {
     private readonly tagService: TagService,
     private readonly activityService: ActivityService,
     private readonly notificationService: NotificationService,
+    private readonly historyService: HistoryService,
   ) {}
 
   /**
@@ -293,6 +295,9 @@ export class QuestionService {
       userId,
       oldQuestion.user.id,
     );
+
+    await this.historyService.createQuestionHistory(oldQuestion, userId);
+
     if (userId != oldQuestion.user.id) {
       await this.notificationService.create(
         notificationText.QUESTION.UPDATE,
@@ -384,5 +389,9 @@ export class QuestionService {
     );
 
     return result;
+  }
+
+  async getQuestionHistory(query: PaginateQuery, questionId: string) {
+    return this.historyService.getQuestionHistory(query, questionId);
   }
 }
