@@ -28,6 +28,26 @@ export class BookmarkService {
   }
 
   /**
+   * Find bookmark based on userId and paginate the results.
+   * @param query
+   * @param userId
+   * @param collectionId
+   */
+  async getBookmarkCollection(
+    query: PaginateQuery,
+    userId: string,
+    collectionId: string,
+  ) {
+    const queryBuilder = this.bookmarkRepository.createQueryBuilder("bookmark");
+    queryBuilder.leftJoinAndSelect("bookmark.user", "user");
+    queryBuilder.leftJoinAndSelect("bookmark.collection", "collection");
+
+    queryBuilder.where({ user: { id: userId } });
+    queryBuilder.andWhere({ collection: { id: collectionId } });
+    return paginate<Bookmark>(query, queryBuilder, bookmarkPaginateConfig);
+  }
+
+  /**
    * Create a new bookmark.
    * @param createBookmarkDto
    * @param userId
@@ -56,7 +76,12 @@ export class BookmarkService {
    * @param bookmark
    */
   async update(bookmark: Bookmark, collection_id: string) {
-    bookmark.collection = { id: collection_id } as unknown as Collection;
+    if (collection_id != null) {
+      bookmark.collection = { id: collection_id } as unknown as Collection;
+    } else {
+      bookmark.collection = null;
+    }
+
     return this.bookmarkRepository.save(bookmark);
   }
 

@@ -44,6 +44,24 @@ export class BookmarkController {
   }
 
   @ApiOperation({
+    summary: "get all bookmark by collection id",
+  })
+  @Get("collection/:id")
+  @UseGuards(AccessTokenGuard)
+  async getBookmarkCollection(
+    @Paginate() query: PaginateQuery,
+    @Req() req: Request,
+    @Param("id") collectionId: string,
+  ) {
+    const userId = req["user"]["sub"];
+    return this.bookmarkService.getBookmarkCollection(
+      query,
+      userId,
+      collectionId,
+    );
+  }
+
+  @ApiOperation({
     summary: "create bookmark",
   })
   @Post()
