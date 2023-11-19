@@ -25,7 +25,6 @@ import { Roles } from "../auth/decorator/roles.decorator";
 import { Role } from "../enums/role.enum";
 import { userPaginateConfig } from "../config/pagination/user-pagination";
 import { User } from "./entity/users.entity";
-import { UpdateUserAdminDto } from "./dto/update-user-admin.dto";
 import { CreateUserAdminDto } from "./dto/create-user-admin.dto";
 
 @ApiTags("user")
@@ -62,7 +61,7 @@ export class UsersController {
   })
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
-  @Patch()
+  @Patch("profile")
   async update(@Request() req, @Body() updateUserDto: UpdateUserDto) {
     const id = req.user["sub"];
     const user = await this.usersService.updateProfile(id, updateUserDto);
@@ -144,9 +143,9 @@ export class UsersController {
   @Roles(Role.ADMIN)
   async updateUserForAdmin(
     @Param("id") id: string,
-    @Body() updateUserDto: UpdateUserAdminDto,
+    @Body() updateUserDto: UpdateUserDto,
   ) {
-    const user = await this.usersService.updateUserForAdmin(id, updateUserDto);
+    const user = await this.usersService.updateProfile(id, updateUserDto);
     return plainToClass(UserDto, user, {
       excludeExtraneousValues: true,
     });
