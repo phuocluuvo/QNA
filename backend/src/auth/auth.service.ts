@@ -307,10 +307,10 @@ export class AuthService {
           message.PLEASE_ALLOW_AT_LEAST_5_MINUTES_BEFORE_MAKING_ANOTHER_REQUEST,
         );
       } else {
-        await this.updateUuid(user);
+        return this.updateUuid(user);
       }
     } else {
-      await this.updateUuid(user);
+      return this.updateUuid(user);
     }
   }
 
@@ -320,7 +320,7 @@ export class AuthService {
     await this.usersService.update(user.id, user);
     return this.emailService.sendEmailResetPassword(
       user.email,
-      `${process.env.URL_WEB}/reset-password/` + user.uuid,
+      `${process.env.URL_WEB}/reset-password?uuid=${user.uuid}`,
     );
   }
 

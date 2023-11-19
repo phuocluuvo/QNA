@@ -27,7 +27,11 @@ export class EmailService {
       await this.mailerService.sendMail(mailOptions);
       console.log("Email sent successfully!");
       return {
-        data: "success",
+        data: {
+          status: "success",
+          message: "Email sent successfully!",
+          email: receiverEmail,
+        },
       };
     } catch (error) {
       console.error("Error sending email:", error);
