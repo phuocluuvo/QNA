@@ -12,6 +12,7 @@ import { User } from "../../users/entity/users.entity";
 import { Answer } from "../../answer/entity/answer.entity";
 import { Activity } from "../../activity/entity/activity.entity";
 import { Question } from "../../question/entity/question.entity";
+import { History } from "../../history/entity/history.entity";
 import { CommentTypeEnum } from "../../enums/comment-type.enum";
 
 @Entity()
@@ -59,4 +60,7 @@ export class Comment {
 
   @OneToMany(() => Activity, (activity) => activity.comment)
   activity: Activity[];
+
+  @OneToMany(() => History, (history) => history.comment)
+  histories: History[];
 }

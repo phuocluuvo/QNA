@@ -9,6 +9,7 @@ import { VoteModule } from "../vote/vote.module";
 import { TagModule } from "../tag/tag.module";
 import { ActivityModule } from "../activity/activity.module";
 import { NotificationModule } from "../notification/notification.module";
+import { HistoryModule } from "../history/history.module";
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { NotificationModule } from "../notification/notification.module";
     CaslModule,
     ActivityModule,
     NotificationModule,
+    HistoryModule,
   ],
   controllers: [QuestionController],
   providers: [...questionProviders, QuestionService],
