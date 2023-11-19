@@ -320,7 +320,7 @@ export class AuthService {
     await this.usersService.update(user.id, user);
     return this.emailService.sendEmailResetPassword(
       user.email,
-      `${process.env.URL_WEB}/reset-password?uuid=${user.uuid}`,
+      `${process.env.URL_WEB}/auth/signin?uuid=${user.uuid}`,
     );
   }
 
