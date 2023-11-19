@@ -128,4 +128,9 @@ export class AuthController {
   ) {
     return this.authService.resetPassword(uuid, password);
   }
+
+  @Get("/exists")
+  async checkUserExists(@Query("username") username: string) {
+    return this.authService.checkUserExists(username);
+  }
 }
