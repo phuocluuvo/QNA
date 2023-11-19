@@ -8,6 +8,7 @@ import { AuthController } from "./auth.controller";
 import { RolesGuard } from "./guards/roles.guard";
 import { AccessTokenStrategy } from "./strategies/accessToken.strategy";
 import { RefreshTokenStrategy } from "./strategies/refreshToken.strategy";
+import { EmailModule } from "src/email/email.module";
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { RefreshTokenStrategy } from "./strategies/refreshToken.strategy";
       signOptions: { expiresIn: "23d" },
     }),
     forwardRef(() => UsersModule),
+    EmailModule,
   ],
   providers: [
     AuthService,

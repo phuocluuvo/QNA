@@ -62,6 +62,12 @@ export class User {
   })
   state: UserState;
 
+  @Column({ type: "varchar", length: 255, nullable: true })
+  uuid: string;
+
+  @Column({ type: "datetime", nullable: true })
+  uuid_created_at: Date;
+
   // This is the virtual column.
 
   @VirtualColumn({
