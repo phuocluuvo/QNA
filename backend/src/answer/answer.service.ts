@@ -22,6 +22,7 @@ import {
   notificationTextDesc,
 } from "../constants/notification.constants";
 import { NotificationService } from "../notification/notification.service";
+import { HistoryService } from "../history/history.service";
 
 @Injectable()
 export class AnswerService {
@@ -31,6 +32,7 @@ export class AnswerService {
     private readonly voteService: VoteService,
     private readonly activityService: ActivityService,
     private readonly notificationService: NotificationService,
+    private readonly historyService: HistoryService,
   ) {}
 
   /**
@@ -49,6 +51,12 @@ export class AnswerService {
       "answer.vote",
       "vote",
       "vote.user_id = :userId AND vote.answer_id = answer.id",
+      { userId },
+    );
+    queryBuilder.leftJoinAndSelect(
+      "answer.bookmarks",
+      "bookmark",
+      "bookmark.user_id = :userId AND bookmark.answer_id = answer.id",
       { userId },
     );
     queryBuilder.leftJoinAndSelect("answer.comments", "comment");
@@ -239,6 +247,9 @@ export class AnswerService {
       userId,
       oldAnswer.user.id,
     );
+
+    await this.historyService.createAnswerHistory(oldAnswer, userId);
+
     if (userId != oldAnswer.user.id) {
       await this.notificationService.create(
         notificationText.ANSWER.UPDATE,
@@ -311,5 +322,9 @@ export class AnswerService {
     );
 
     return answerApprove;
+  }
+
+  async getAnswerHistory(query: PaginateQuery, answerId: string) {
+    return this.historyService.getAnswerHistory(query, answerId);
   }
 }

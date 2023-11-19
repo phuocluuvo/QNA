@@ -53,16 +53,21 @@ export class UsersController {
   /**
    * Get all user.
    * @param query - Pagination query.
+   * @param state
+   * @param role
    */
   @ApiOperation({
     summary: "get all user for admin",
   })
   @ApiOkPaginatedResponse(User, userPaginateConfig)
   @ApiPaginationQuery(userPaginateConfig)
-  @ApiBearerAuth()
   @Get()
-  async getAllUser(@Query() query: PaginateQuery) {
-    return this.usersService.getAllUser(query);
+  async getAllUser(
+    @Query() query: PaginateQuery,
+    @Query("filter.state") state: string,
+    @Query("filter.role") role: string,
+  ) {
+    return this.usersService.getAllUser(query, state, role);
   }
 
   /**

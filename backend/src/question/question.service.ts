@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  forwardRef,
   Inject,
   Injectable,
   NotFoundException,
@@ -31,6 +32,8 @@ import { Role } from "../enums/role.enum";
 import { QuestionState } from "../enums/question-state.enum";
 import { QuestionTimeTypeEnum } from "src/enums/question-type.enum";
 import { UsersService } from "src/users/users.service";
+import { HistoryService } from "../history/history.service";
+import { BookmarkService } from "../bookmark/bookmark.service";
 
 @Injectable()
 export class QuestionService {
@@ -42,6 +45,9 @@ export class QuestionService {
     private readonly activityService: ActivityService,
     private readonly notificationService: NotificationService,
     private readonly userService: UsersService,
+    private readonly historyService: HistoryService,
+    @Inject(forwardRef(() => BookmarkService))
+    private readonly bookmarkService: BookmarkService,
   ) {}
 
   /**
@@ -244,11 +250,19 @@ export class QuestionService {
         user: { id: userId },
         question: { id: question.id },
       });
-
       if (voteInfo) {
         result.vote.push(voteInfo);
       }
+
+      const bookmark = await this.bookmarkService.checkQuestionIsBookmark(
+        question.id,
+        userId,
+      );
+      if (bookmark) {
+        result["bookmarks"] = [bookmark];
+      }
     }
+
     return result;
   }
 
@@ -296,6 +310,9 @@ export class QuestionService {
       userId,
       oldQuestion.user.id,
     );
+
+    await this.historyService.createQuestionHistory(oldQuestion, userId);
+
     if (userId != oldQuestion.user.id) {
       await this.notificationService.create(
         notificationText.QUESTION.UPDATE,
@@ -477,5 +494,9 @@ export class QuestionService {
       .limit(5);
 
     return queryBuilder.getMany();
+  }
+
+  async getQuestionHistory(query: PaginateQuery, questionId: string) {
+    return this.historyService.getQuestionHistory(query, questionId);
   }
 }

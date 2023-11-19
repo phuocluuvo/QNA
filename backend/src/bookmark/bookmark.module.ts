@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { BookmarkController } from "./bookmark.controller";
 import { BookmarkService } from "./bookmark.service";
 import { DatabaseModule } from "../database/database.module";
@@ -11,12 +11,13 @@ import { CollectionModule } from "../collection/collection.module";
 @Module({
   imports: [
     DatabaseModule,
-    QuestionModule,
-    AnswerModule,
+    forwardRef(() => QuestionModule),
+    forwardRef(() => AnswerModule),
     CaslModule,
     CollectionModule,
   ],
   controllers: [BookmarkController],
   providers: [...bookmarkProviders, BookmarkService],
+  exports: [BookmarkService],
 })
 export class BookmarkModule {}

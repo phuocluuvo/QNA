@@ -21,6 +21,7 @@ import { AccessTokenGuard } from "../auth/guards/accessToken.guard";
 import { Action } from "../enums/action.enum";
 import { message } from "../constants/message.constants";
 import { CaslAbilityFactory } from "../casl/casl-ability.factory";
+import { CollectionService } from "../collection/collection.service";
 
 @Controller("bookmark")
 @ApiTags("bookmark")
@@ -29,7 +30,7 @@ export class BookmarkController {
     private readonly bookmarkService: BookmarkService,
     private readonly questionService: QuestionService,
     private readonly answerService: AnswerService,
-    private readonly collectionService: BookmarkService,
+    private readonly collectionService: CollectionService,
     private readonly caslAbilityFactory: CaslAbilityFactory,
   ) {}
 
@@ -41,6 +42,19 @@ export class BookmarkController {
   async find(@Paginate() query: PaginateQuery, @Req() req: Request) {
     const userId = req["user"]["sub"];
     return this.bookmarkService.find(query, userId);
+  }
+
+  @ApiOperation({
+    summary: "get all bookmark by collection for later",
+  })
+  @Get("collection/later")
+  @UseGuards(AccessTokenGuard)
+  async getBookmarkCollectionForLater(
+    @Paginate() query: PaginateQuery,
+    @Req() req: Request,
+  ) {
+    const userId = req["user"]["sub"];
+    return this.bookmarkService.getBookmarkCollectionForLater(query, userId);
   }
 
   @ApiOperation({
@@ -98,11 +112,7 @@ export class BookmarkController {
     const bookmark = await this.bookmarkService.findOneById(id);
 
     if (collectionId != null) {
-      const checkCollection =
-        await this.collectionService.findOne(collectionId);
-      if (checkCollection) {
-        throw new BadRequestException(message.NOT_FOUND.COLLECTION);
-      }
+      await this.collectionService.findOneById(collectionId);
     }
 
     if (ability.can(Action.Update, bookmark)) {
