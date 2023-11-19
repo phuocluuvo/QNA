@@ -40,6 +40,13 @@ services:
       MYSQL_USER: root
       MYSQL_PASSWORD: pass
       MYSQL_DATABASE: QNA_database
+      GOOGLE_CLIENT_ID: 408074599990-tsmj1qpfc5okviescmhk49m89qno1hmg.apps.googleusercontent.com
+      GOOGLE_CLIENT_SECRET: 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
+      URL_WEB: http://localhost:3000
+      URL_API: http://localhost:3001
+      GMAIL_USER: questionandanswerit@gmail.com
+      GMAIL_PASSWORD: cksy vmya goao qwne
+      MAIL_HOST: smtp.gmail.com
     ports:
       - "3001:3001"
     networks:
