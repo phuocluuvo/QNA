@@ -51,6 +51,8 @@ async function refreshToken(
     data.statusCode === STATUS.BAD_REQUEST ||
     data.statusCode === STATUS.ACCESS_DENIED
   ) {
+    sessionStorage.removeItem("next-auth.session-token");
+
     signIn();
   } else {
     console.log("refreshToken:", data);
@@ -58,14 +60,14 @@ async function refreshToken(
   return data;
 }
 export async function AuthApi(
-  method: "GET" | "POST" | "DELETE" | "UPDATE",
+  method: "GET" | "POST" | "DELETE" | "UPDATE" | "PATCH",
   url: string,
   data: any = null
 ) {
   const sessionData =
-    sessionStorage.getItem("next-auth.session-token")?.toString() ?? "{}";
+    sessionStorage.getItem("next-auth.session-token")?.toString() ?? null;
   let sessionUser = null;
-  if (!_.isEmpty(JSON.parse(sessionData))) {
+  if (sessionData != "undefined" && sessionData) {
     sessionUser = JSON.parse(sessionData);
   } else {
     let _s = await getSession();

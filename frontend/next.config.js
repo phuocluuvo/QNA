@@ -10,6 +10,14 @@ const nextConfig = {
       "https://i.pravatar.cc",
       "https://res.cloudinary.com/",
     ],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com",
+        port: "",
+        pathname: "/u/**",
+      },
+    ],
   },
   experimental: {
     serverActions: true,

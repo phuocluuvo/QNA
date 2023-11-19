@@ -21,6 +21,7 @@ import { Dimensions } from "@/assets/constant/Dimensions";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
+import NotificationBell from "@/components/Header/NotificationBell";
 
 function Header() {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -68,16 +69,17 @@ function Header() {
               base: colorMode === "dark" ? "rgba(17, 25, 40, 0.75)" : "white",
               md: "transparent",
             }}
-            backdropFilter="blur(16px) saturate(180%)"
+            backdropFilter={{ base: "blur(16px) saturate(180%)", md: "none" }}
             height={Dimensions.HEADER_HEIGHT}
           >
             <SearchBar getTranslate={getTranslate} />
             <Button
-              as={Link}
               variant="main_button"
               display={routes.pathname === "/question/create" ? "none" : "flex"}
               color={"white"}
-              href={"/question/create"}
+              onClick={() => {
+                routes.push("/question/create");
+              }}
             >
               {getTranslate("CREATE")}
             </Button>
@@ -87,6 +89,7 @@ function Header() {
             translate={getTranslate}
             listLanguage={getListLanguage()}
           />
+          <NotificationBell />
           <IconButton
             aria-label="Toggle dark mode"
             icon={colorMode === "dark" ? <SunIcon /> : <MoonIcon />}
@@ -95,10 +98,7 @@ function Header() {
             color="current"
             p={0}
           />
-          <Navigator
-            getTranslate={getTranslate}
-            isMobile={isMobile}
-          />
+          <Navigator getTranslate={getTranslate} isMobile={isMobile} />
         </HStack>
       </VStack>
       <Box height={32} />

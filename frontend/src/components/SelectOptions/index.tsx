@@ -1,3 +1,4 @@
+import { QUESTION_SORT_BY } from "@/util/type/Question.type";
 import { Select, SelectProps } from "@chakra-ui/react";
 import React from "react";
 const defaultOptions = [
@@ -38,18 +39,35 @@ type SelectOptionsProps = {
    */
   optionStyle?: React.CSSProperties;
   onSelect?: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  getTranslate?: (key: string) => string;
+  defaultValues?: string;
 };
 
 const SelectOptions = ({
   data = defaultOptions,
   defaultIndex = 0,
+  defaultValues = "",
   containerStyle = {},
   optionStyle = {},
   onSelect = () => {},
+  getTranslate = (key) => key,
 }: SelectOptionsProps) => {
+  let hardData = [
+    {
+      label: getTranslate("UNANSWERED"),
+      value: QUESTION_SORT_BY.NO_ANSWER as string,
+    },
+    {
+      label: getTranslate("UNAPPROVED"),
+      value: QUESTION_SORT_BY.NO_APPROVED as string,
+    },
+  ];
+  if (data !== defaultOptions) {
+    hardData = data;
+  }
   return (
     <Select {...containerStyle} onChange={(e) => onSelect(e)}>
-      {data.map((_data, index) => (
+      {hardData.map((_data, index) => (
         <option
           style={optionStyle}
           key={index}

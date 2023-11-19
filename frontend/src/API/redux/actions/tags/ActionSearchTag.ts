@@ -12,7 +12,7 @@ export default function actionSearchTags(
 ): any {
   return (dispatch: any) => {
     dispatch(requesting());
-    api.getTagByName(name).then((res: any) => {
+    api.searchTags(name).then((res: any) => {
       console.log("searchTags:", res);
       dispatch(requesting());
       dispatch(

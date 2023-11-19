@@ -1,44 +1,64 @@
 import Head from "next/head";
 import { Fragment, useEffect, useState } from "react";
 import { clientNamespaces } from "ni18n";
-import QuestionDataList from "../../util/mock/QuestionDataList.mock";
-import {
-  Flex,
-  HStack,
-  Text,
-  VStack,
-  useColorMode,
-} from "@chakra-ui/react";
+import { Flex, HStack, Text, VStack, useColorMode } from "@chakra-ui/react";
 import QuestionItem from "@/components/QuestionItem";
 import { useRouter } from "next/router";
-import { QuestionType } from "@/util/type/Question.type";
+import { QuestionListType, QuestionType } from "@/util/type/Question.type";
 import TabsQuestion from "@/components/TabsQuestion";
+import { LanguageHelper } from "@/util/Language/Language.util";
+import { Pages } from "@/assets/constant/Pages";
+import { useDispatch } from "react-redux";
+import actionGetQuestionList from "@/API/redux/actions/question/ActionGetQuestionList";
 export default function Search() {
   const { colorMode } = useColorMode();
   const router = useRouter();
   const [hydrated, setHydrated] = useState(false);
-  const [questions, setQuestions] = useState<Array<QuestionType>>([]);
+  const [questions, setQuestions] = useState<QuestionListType | null>(null);
   const [isNotFound, setIsNotFound] = useState(false);
+  const { getTranslate } = LanguageHelper(Pages.HOME);
+  const dispatch = useDispatch();
   useEffect(() => {
-    if (router.query.q) {
-      let questions = QuestionDataList.items.filter((question) =>
-        question.title
-          .toLocaleLowerCase()
-          .includes(router.query.q?.toString().toLocaleLowerCase() || "")
+    let search = router.query.q as string;
+    if (search) {
+      dispatch(
+        // @ts-ignore
+        actionGetQuestionList(
+          {
+            limit: 10,
+            page: 1,
+            search: search,
+          },
+          (res) => {
+            if (res.data.length === 0) {
+              setIsNotFound(true);
+              setQuestions(null);
+            } else {
+              setIsNotFound(false);
+              setQuestions(res);
+            }
+          },
+          () => {}
+        )
       );
-      if (questions.length === 0) {
-        //get random 3 question
-        let randomQuestion = QuestionDataList.items
-          .sort(() => Math.random() - Math.random())
-          .slice(0, 3);
-        setIsNotFound(true);
-        setQuestions(randomQuestion);
-      } else {
-        setIsNotFound(false);
-        setQuestions(questions);
-      }
     }
-  }, [router.query.q]);
+
+    if (isNotFound) {
+      dispatch(
+        // @ts-ignore
+        actionGetQuestionList(
+          {
+            limit: 3,
+            page: 1,
+          },
+          (res) => {
+            setQuestions(res);
+          },
+          () => {}
+        )
+      );
+    }
+  }, [router.query.q, isNotFound]);
   useEffect(() => {
     setHydrated(true);
   }, []);
@@ -82,7 +102,8 @@ export default function Search() {
             w={"full"}
             paddingLeft={{ base: 1, md: 10 }}
           >
-            Result for "{router.query.q}" ({questions.length} results)
+            Result for "{router.query.q}" (
+            {questions ? questions.data.length : 0} results)
           </Text>
         )}
         <HStack
@@ -98,16 +119,18 @@ export default function Search() {
             wrap={"wrap"}
             flex={{ base: 1, md: 0.8 }}
           >
-            {questions.map((question, index) => (
+            {questions?.data.map((question, index) => (
               <QuestionItem
                 key={index}
                 question={question}
-                isLast={index === questions.length - 1}
+                isLast={index === questions.data.length - 1}
                 isDarkMode={colorMode === "dark"}
               />
             ))}
           </Flex>
           <TabsQuestion
+            router={router}
+            getTranslate={getTranslate}
             containerStyles={{
               pos: "sticky",
               top: "11%",
@@ -137,7 +160,7 @@ export async function getServerSideProps({ params, query, ...props }) {
   const items = undefined;
   return {
     props: {
-      items: items ? items : [],
+      data: items ? items : [],
       pagination: {
         current_page: 1,
         limit: 10,
