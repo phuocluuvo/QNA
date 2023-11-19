@@ -303,11 +303,11 @@ const checkExplictWords = (htmlString: string) => {
   };
 };
 function gaurdsRouteRoles(
-  userRole: "admin" | "user" | "monitor",
+  userRole: "admin" | "user" | "moderator",
   callback: () => void,
   callbackError: () => void
 ) {
-  let roles = ["admin", "monitor"];
+  let roles = ["admin", "moderator"];
   if (roles.includes(userRole)) {
     callback();
   } else {

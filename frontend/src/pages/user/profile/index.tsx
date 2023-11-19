@@ -29,6 +29,7 @@ import { BiCake } from "react-icons/bi";
 import { useDispatch } from "react-redux";
 import TabActivity from "./(TabAcivity)";
 import TabProfile from "./(TabProfile)";
+import SavesQuestion from "./(TabSaves)";
 const DEFAULT_USER: UserType = {
   fullname: "",
   email: "",
@@ -91,7 +92,7 @@ function DashBoard() {
         () => {}
       )
     );
-  }, [query]);
+  }, []);
   return (
     <Box
       style={{
@@ -204,17 +205,53 @@ function DashBoard() {
           </Stack>
         </VStack>
       </Stack>
-      <Tabs variant="enclosed">
+      <Tabs
+        variant="enclosed"
+        defaultIndex={
+          query.tab === "profile" ? 1 : query.tab === "saves" ? 2 : 0
+        }
+      >
         <TabList>
-          <Tab>{getTranslate("ACITVITY")}</Tab>
-          <Tab>{getTranslate("PROFILE")}</Tab>
+          <Tab
+            onClickCapture={() => {
+              router.push({
+                pathname: "/user/profile",
+                query: { ...router.query, tab: "activity" },
+              });
+            }}
+          >
+            {getTranslate("ACTIVITY")}
+          </Tab>
+          <Tab
+            onClickCapture={() => {
+              router.push({
+                pathname: "/user/profile",
+                query: null,
+              });
+            }}
+          >
+            {getTranslate("PROFILE")}
+          </Tab>
+          <Tab
+            onClickCapture={() => {
+              router.push({
+                pathname: "/user/profile",
+                query: { ...router.query, tab: "saves" },
+              });
+            }}
+          >
+            {getTranslate("SAVED")}
+          </Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
-            <TabActivity />
+          <TabActivity />
           </TabPanel>
           <TabPanel>
-            <TabProfile user={state} />
+             <TabProfile user={state} />
+          </TabPanel>
+          <TabPanel>
+            <SavesQuestion user={state} />
           </TabPanel>
         </TabPanels>
       </Tabs>

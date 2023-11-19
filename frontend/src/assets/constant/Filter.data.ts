@@ -20,6 +20,66 @@ export const SORT_DATA_EN = [
     value: "createdAt",
   },
 ];
+export const SORT_DATA_USER_EN = [
+  {
+    label: "Fullname",
+    value: "fullname",
+  },
+  {
+    label: "Username",
+    value: "username",
+  },
+  {
+    label: "Email",
+    value: "email",
+  },
+  {
+    label: "Role",
+    value: "role",
+  },
+  {
+    label: "Activity Point",
+    value: "activityPoint",
+  },
+  {
+    label: "Created Time",
+    value: "createdAt",
+  },
+  {
+    label: "Updated Time",
+    value: "updatedAt",
+  },
+];
+export const SORT_DATA_USER_VI = [
+  {
+    label: "Họ tên",
+    value: "fullname",
+  },
+  {
+    label: "Tên đăng nhập",
+    value: "username",
+  },
+  {
+    label: "Email",
+    value: "email",
+  },
+  {
+    label: "Vai trò",
+    value: "role",
+  },
+  {
+    label: "Điểm hoạt động",
+    value: "activityPoint",
+  },
+  {
+    label: "Thời gian tạo",
+    value: "createdAt",
+  },
+  {
+    label: "Thời gian cập nhật",
+    value: "updatedAt",
+  },
+];
 
 export const SORT_ORDER_DATA_EN = [
   {

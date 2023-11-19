@@ -1,3 +1,4 @@
+import { Colors } from "@/assets/constant/Colors";
 import { UserType } from "@/util/type/User.type";
 import {
   Avatar,
@@ -8,21 +9,23 @@ import {
   Spacer,
   Text,
   VStack,
+  useColorMode,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import React from "react";
 
 function UserItem({ user }: { user: UserType }) {
   const router = useRouter();
+  const { colorMode } = useColorMode();
   return (
     <HStack
       w={{ base: "100%", md: "48%", xl: "23%" }}
       key={user.id}
       style={{
-        border: "1px solid #ccc",
         padding: "10px",
         borderRadius: "5px",
       }}
+      bgColor={Colors(colorMode === "dark").PRIMARY_BG}
       _hover={{
         boxShadow: "0 0 0 2px orange",
         transition: "all 0.2s ease-in-out",
@@ -42,7 +45,7 @@ function UserItem({ user }: { user: UserType }) {
         <Button
           variant={"link"}
           onClick={() => {
-            router.push(`/users/${user.id}`);
+            router.push(`/user/${user.id}`);
           }}
           noOfLines={1}
           style={{
@@ -55,7 +58,13 @@ function UserItem({ user }: { user: UserType }) {
         <Text colorScheme="orange" fontSize={"sm"} fontWeight={"bold"}>
           {user.activityPoint}
         </Text>
-        {user?.role === "admin" ? <Badge>Admin</Badge> : <Spacer />}
+        {user?.role !== "user" ? (
+          <Badge colorScheme={user.role === "admin" ? "red" : "blue"}>
+            {user?.role}
+          </Badge>
+        ) : (
+          <Spacer />
+        )}
       </VStack>
     </HStack>
   );

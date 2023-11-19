@@ -242,6 +242,7 @@ function AnswerItem({
               alignItems={"flex-start"}
             >
               <Author
+              type="simple"
                 sizeAvatar={"xs"}
                 user={answer.user}
                 nameStyle={{

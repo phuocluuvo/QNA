@@ -91,5 +91,7 @@
   "AUTHOR": "Author",
   "QUESTION": "Question",
   "TAG": "Tag",
-  "CRATED_AT": "Created at"
+  "CRATED_AT": "Created at",
+  "SAVED": "Saved",
+  "ACTIVITY": "Activity"
 }

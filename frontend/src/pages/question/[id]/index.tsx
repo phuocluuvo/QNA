@@ -13,14 +13,13 @@ import { QuestionListType, QuestionType } from "@/util/type/Question.type";
 import { UserType } from "@/util/type/User.type";
 import { ChatIcon, ViewIcon } from "@chakra-ui/icons";
 import {
-  BiBookBookmark,
-  BiBookmarkPlus,
   BiDotsVerticalRounded,
   BiPencil,
   BiSolidBookmarkPlus,
   BiSolidShare,
 } from "react-icons/bi";
 import {
+  Badge,
   Box,
   Button,
   Container,
@@ -36,10 +35,12 @@ import {
   MenuList,
   Spacer,
   Spinner,
+  Stack,
   Text,
   VStack,
   useColorMode,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -54,7 +55,8 @@ import { FormVote } from "@/API/type/Form.type";
 import { useSession } from "next-auth/react";
 import useStateWithCallback from "@/hooks/useStateWithCallback";
 import actionGetQuestionList from "@/API/redux/actions/question/ActionGetQuestionList";
-import { RiBookMarkLine } from "react-icons/ri";
+import AlertContent from "@/components/AlertContent";
+import actionSaveToCollection from "@/API/redux/actions/question/ActionSaveToCollection";
 
 function Question() {
   const { getTranslate } = LanguageHelper(Pages.HOME);
@@ -266,6 +268,7 @@ function Question() {
     isVoted: false,
     voteType: VOTE.UPVOTE,
   });
+  const toast = useToast();
   // @ts-ignore
   const [editQuestion, setEditQuestion] = useState<QuestionType>({
     title: "",
@@ -280,7 +283,39 @@ function Question() {
     // Returns null on first render, so the client and server match
     return null;
   }
-  function saveQuestionToCollection(question: QuestionType) {}
+  function saveQuestionToCollection(question: QuestionType) {
+    dispatch(
+      actionSaveToCollection(
+        question.id,
+        (res) => {
+          console.log(res);
+          toast({
+            title: "Success",
+            description: "Question saved to collection",
+            status: "success",
+            icon: "success",
+            duration: 3000,
+            position: "top-right",
+            variant: "subtle",
+            isClosable: true,
+          });
+        },
+        // @ts-ignore
+        (err) => {
+          toast({
+            title: "Error",
+            description: "Something went wrong",
+            status: "error",
+            icon: "error",
+            duration: 3000,
+            position: "top-right",
+            variant: "subtle",
+            isClosable: true,
+          });
+        }
+      )
+    );
+  }
   return (
     <>
       {state.question ? (
@@ -309,6 +344,7 @@ function Question() {
                   >
                     {/* up vote */}
                     <VoteButton
+                      isDisabled={state.question.state === "blocked"}
                       isVoted={state.isVoted && state.voteType === VOTE.UPVOTE}
                       isDarkMode={isDarkMode}
                       type="up"
@@ -318,6 +354,7 @@ function Question() {
                       {helper.numberFormat(state.count)}
                     </Heading>
                     <VoteButton
+                      isDisabled={state.question.state === "blocked"}
                       isVoted={
                         state.isVoted && state.voteType === VOTE.DOWNVOTE
                       }
@@ -340,6 +377,9 @@ function Question() {
                         aria-label="Save"
                         icon={<BiSolidBookmarkPlus />}
                         title="Save question"
+                        onClick={() => {
+                          saveQuestionToCollection(state.question);
+                        }}
                       />
                     </VStack>
                   </VStack>
@@ -360,6 +400,7 @@ function Question() {
                       />
                       <Flex w={"full"} direction={"column"}>
                         <Box width={"full"}>
+                          <AlertContent type={state.question.state} />
                           <HStack
                             pos={"relative"}
                             alignItems={"start"}
@@ -396,33 +437,33 @@ function Question() {
                               </MenuList>
                             </Menu>
                           </HStack>
-                          <HStack>
-                            {state.question.tags?.map((tag) => (
-                              <TagQuestion key={tag.id} tag={tag} />
-                            ))}
-                          </HStack>
+                          <Stack direction={{ base: "column", md: "row" }}>
+                            <HStack flexWrap={"wrap"}>
+                              {state.question.tags?.map((tag) => (
+                                <TagQuestion key={tag.id} tag={tag} />
+                              ))}
+                            </HStack>
+                            <Spacer />
+                            <Author
+                              type="simple"
+                              user={state.question.user}
+                              headingText={getTranslate("ASKED_AT").replace(
+                                "{0}",
+                                helper.formatDate(
+                                  state.question.createdAt,
+                                  false,
+                                  "H:mm A - ddd, DD/MM/YYYY"
+                                )
+                              )}
+                              nameStyle={{
+                                color: "gray.500",
+                                _hover: {
+                                  textDecoration: "underline",
+                                },
+                              }}
+                            />
+                          </Stack>
                         </Box>
-                        <Spacer />
-                        {/* author */}
-                        <HStack rounded={"md"} py={1} height={20}>
-                          <Author
-                            user={state.question.user}
-                            headingText={getTranslate("ASKED_AT").replace(
-                              "{0}",
-                              helper.formatDate(
-                                state.question.createdAt,
-                                false,
-                                "H:mm A - ddd, DD/MM/YYYY"
-                              )
-                            )}
-                            nameStyle={{
-                              color: "gray.500",
-                              _hover: {
-                                textDecoration: "underline",
-                              },
-                            }}
-                          />
-                        </HStack>
                       </Flex>
                     </Box>
                     <Box
@@ -459,15 +500,17 @@ function Question() {
                                   `/question/edit?questionId=${state.question.id}`
                               );
                             }}
+                            isDisabled={state.question.state === "blocked"}
                           >
-                            Edit
+                            {getTranslate("EDIT")}
                           </Button>
                           <Button
                             colorScheme="orange"
                             size={"sm"}
                             variant="link"
+                            isDisabled={state.question.state === "blocked"}
                           >
-                            Remove
+                            {getTranslate("DELETE")}
                           </Button>
                         </HStack>
                       ) : null

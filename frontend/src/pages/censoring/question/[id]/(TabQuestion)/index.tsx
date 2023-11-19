@@ -7,7 +7,6 @@ import {
   HStack,
   Flex,
   VStack,
-  Spacer,
   Divider,
   Button,
   Text,
@@ -15,21 +14,45 @@ import {
   styled,
   Stack,
   Collapse,
+  useDisclosure,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
+import useStateWithCallback from "@/hooks/useStateWithCallback";
+import AlertCensoreQuesiton from "./(AlertCensoreQuesiton)";
+import { useDispatch } from "react-redux";
+import actionVerifyQuesiton from "@/API/redux/actions/question/ActionVerifyQuestion";
 
 function TabQuestionCensoring({ question }: { question: QuestionType }) {
   const { getTranslate } = LanguageHelper(Pages.HOME);
+  const dispacth = useDispatch();
   const [isCheckExplict, setIsCheckExplict] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [isShowEditor, setIsShowEditor] = useState(false);
-
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isVerifyItem, setIsVerifyItem] = useStateWithCallback<Boolean | null>(
+    false
+  );
+  const cancelRef = React.useRef();
   useEffect(() => {
     setHydrated(true);
   }, []);
   if (!hydrated) {
     // Returns null on first render, so the client and server match
     return null;
+  }
+  function verifyquesiton() {
+    dispacth(
+      actionVerifyQuesiton(
+        question.id as string,
+        (data) => {
+          console.log("data: ", data);
+        },
+        // @ts-ignore
+        (error) => {
+          console.log("error: ", error);
+        }
+      )
+    );
   }
   return (
     <Stack
@@ -86,7 +109,6 @@ function TabQuestionCensoring({ question }: { question: QuestionType }) {
           </Flex>
         </Box>
         <Text>{getTranslate("CONTENT")}:</Text>
-
         <Box
           dangerouslySetInnerHTML={{
             __html: question.content
@@ -113,6 +135,11 @@ function TabQuestionCensoring({ question }: { question: QuestionType }) {
           <CensoringQuestionEditor
             questionId={question.id}
             getTranslate={getTranslate}
+            onConfirmCallBack={() => {
+              setIsVerifyItem(false, () => {
+                onOpen();
+              });
+            }}
             getResult={(res) => {
               console.log("res: ", res);
             }}
@@ -120,7 +147,15 @@ function TabQuestionCensoring({ question }: { question: QuestionType }) {
         </Collapse>
         <VStack alignItems={"start"}>
           <HStack py={2} divider={<Divider orientation="vertical" />}>
-            <Button colorScheme="green" size={"sm"} onClick={() => {}}>
+            <Button
+              colorScheme="green"
+              size={"sm"}
+              onClick={() => {
+                setIsVerifyItem(true, () => {
+                  onOpen();
+                });
+              }}
+            >
               {getTranslate("CENSORE")}
             </Button>
             <Button
@@ -176,6 +211,17 @@ function TabQuestionCensoring({ question }: { question: QuestionType }) {
           )}
         </VStack>
       </Box>
+      <AlertCensoreQuesiton
+        cancelRef={cancelRef}
+        isOpen={isOpen}
+        onClose={() => {
+          onClose();
+        }}
+        type={"verify"}
+        onClick={() => {
+          verifyquesiton();
+        }}
+      />
     </Stack>
   );
 }

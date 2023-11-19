@@ -160,7 +160,12 @@ export default function Home() {
                 onSelect={(e) => {
                   router.push({
                     pathname: router.pathname,
-                    query: { ...router.query, select: e.target.value },
+                    query: {
+                      ...router.query,
+                      select: e.target.value,
+                      limit: 10,
+                      page: 1,
+                    },
                   });
                 }}
               />

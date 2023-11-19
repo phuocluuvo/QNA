@@ -29,6 +29,7 @@ interface Post {
   tagNames?: Array<string>;
   vote: VoteType;
   type: "no_answer" | "no_approved" | "normal";
+  state: "verified" | "blocked" | "pending";
 }
 
 interface QuestionList {

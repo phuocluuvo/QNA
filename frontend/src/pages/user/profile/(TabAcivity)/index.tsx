@@ -66,21 +66,21 @@ function TabActivity() {
         ? `${router.query.sortBy}:${router.query.orderBy || defaultOrderBy}`
         : `${defaultSortBy}:${defaultOrderBy}`,
     };
-
-    dispatch(
-      // @ts-ignore
-      ActionGetUserHistory(
-        queryParams,
+    if (router.query.tab === "activity")
+      dispatch(
         // @ts-ignore
-        (res) => {
-          setHistory(res);
-        },
-        // @ts-ignore
-        (err) => {
-          console.log(err);
-        }
-      )
-    );
+        ActionGetUserHistory(
+          queryParams,
+          // @ts-ignore
+          (res) => {
+            setHistory(res);
+          },
+          // @ts-ignore
+          (err) => {
+            console.log(err);
+          }
+        )
+      );
   }, [query]);
   return (
     <>

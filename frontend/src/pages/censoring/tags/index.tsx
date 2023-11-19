@@ -1,6 +1,7 @@
 import actionGetTagList from "@/API/redux/actions/tags/ActionGetTagList";
 import { Colors } from "@/assets/constant/Colors";
 import { Pages } from "@/assets/constant/Pages";
+import SelectOptions from "@/components/SelectOptions";
 import TagItem from "@/components/TagItem";
 import useStateWithCallback from "@/hooks/useStateWithCallback";
 import { LanguageHelper } from "@/util/Language/Language.util";
@@ -57,7 +58,7 @@ function TagsPage() {
       limit: limit || defaultLimit,
       page: pageNumber || defaultPage,
       ...(router.query.select && {
-        "filter.type": `$eq:${router.query.select}`,
+        "filter.state": `${router.query.select}`,
       }),
     };
 
@@ -125,6 +126,35 @@ function TagsPage() {
         <Heading size={"lg"} fontWeight={"medium"}>
           {getTranslate("ALL_TAGS")}
         </Heading>
+        <SelectOptions
+          defaultValues="pending"
+          getTranslate={getTranslate}
+          data={[
+            {
+              value: "pending",
+              label: getTranslate("PENDING"),
+            },
+            {
+              value: "verified",
+              label: getTranslate("VERIFIED"),
+            },
+            {
+              value: "blocked",
+              label: getTranslate("BLOCKED"),
+            },
+          ]}
+          containerStyle={{
+            fontSize: "xs",
+            variant: "filled",
+            w: "fit-content",
+          }}
+          onSelect={(e) => {
+            router.push({
+              pathname: router.pathname,
+              query: { ...router.query, select: e.target.value },
+            });
+          }}
+        />
         <HStack
           w={{
             base: "100%",
@@ -172,7 +202,9 @@ function TagsPage() {
           gap={5}
         >
           {state.tags?.data.map((tag) => {
-            return <TagItem key={tag.id} tag={tag} />;
+            return <TagItem key={tag.id} tag={tag} onClick={() => {
+              router.push(`tags/${tag.name}`);
+            }} />;
           })}
           <Flex
             alignItems={"center"}

@@ -35,9 +35,12 @@ const getQuestion = (form: FormQuestion) => {
 };
 
 const getQuestionList = (params: GetQuesionParams) => {
-  return api.get(url.QUESTION_LIST, {
-    params: params,
-  });
+  let paramToURL = url.QUESTION_LIST + "?";
+  for (let key in params) {
+    // @ts-ignore
+    paramToURL += key + "=" + params[key] + "&";
+  }
+  return AuthApi("GET", paramToURL);
 };
 
 const createQuestion = (form: FormCreateQuestion | null) => {
@@ -187,7 +190,7 @@ const getAllUsers = (params: CommonParams) => {
     // @ts-ignore
     urlString += key + "=" + params[key] + "&";
   }
-  return api.get(urlString);
+  return AuthApi(REQUEST_METHOD.GET, urlString);
 };
 
 const verifyQuesiton = (id: string) => {
@@ -203,7 +206,13 @@ const verifyTag = (tagId: string) => {
 };
 
 const bookmarkQuestion = (questionId: string) => {
-  return AuthApi(REQUEST_METHOD.POST, url.BOOKMARK, { questionId });
+  return AuthApi(REQUEST_METHOD.POST, url.BOOKMARK, {
+    question_id: questionId,
+  });
+};
+
+const getUserById = (userId: string) => {
+  return api.get(url.USER + "/" + userId);
 };
 export default {
   requestSignUp,
@@ -237,4 +246,5 @@ export default {
   verifyTag,
   updateProfile,
   bookmarkQuestion,
+  getUserById,
 };

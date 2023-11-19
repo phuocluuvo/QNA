@@ -1,6 +1,8 @@
 import { TagType } from "@/util/type/Tag.type";
 import {
+  Badge,
   Box,
+  HStack,
   Popover,
   PopoverArrow,
   PopoverBody,
@@ -15,7 +17,7 @@ import {
 import router from "next/router";
 import React, { useEffect, useState } from "react";
 
-function TagItem({ tag }: { tag: TagType }) {
+function TagItem({ tag, onClick }: { tag: TagType; onClick?: () => void }) {
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
   const [mouseIn, setMouseIn] = useState(false);
   useEffect(() => {
@@ -47,7 +49,9 @@ function TagItem({ tag }: { tag: TagType }) {
             borderRadius: "5px",
           }}
           onClick={() => {
-            router.push(`search/tag/${tag.name}`);
+            typeof onClick === "function"
+              ? onClick()
+              : router.push(`search/tag/${tag.name}`);
           }}
           _hover={{
             boxShadow: "0 0 0 2px orange",
@@ -56,15 +60,28 @@ function TagItem({ tag }: { tag: TagType }) {
           transition={"all 0.2s ease-in-out"}
           cursor={"pointer"}
         >
-          <Tag
-            style={{
-              fontSize: "14px",
-              marginTop: "5px",
-              marginBottom: "10px",
-            }}
-          >
-            {tag.name}
-          </Tag>
+          <HStack justifyContent={"space-between"}>
+            <Tag
+              style={{
+                fontSize: "14px",
+                marginTop: "5px",
+                marginBottom: "10px",
+              }}
+            >
+              {tag.name}
+            </Tag>
+            <Badge
+              colorScheme={
+                tag.state === "verified"
+                  ? "green"
+                  : tag.state === "blocked"
+                  ? "red"
+                  : "gray"
+              }
+            >
+              {tag.state}
+            </Badge>
+          </HStack>
           <Text
             style={{
               fontSize: "14px",

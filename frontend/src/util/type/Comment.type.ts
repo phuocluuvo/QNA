@@ -1,3 +1,5 @@
+import { AnswerType } from "./Answer.type";
+import { QuestionType } from "./Question.type";
 import { UserType } from "./User.type";
 
 type Comment = {
@@ -6,6 +8,8 @@ type Comment = {
   id: string;
   updatedAt: string;
   user: UserType;
+  answer?: AnswerType;
+  question?: QuestionType;
 };
 
 export type CommentType = Comment;

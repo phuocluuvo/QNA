@@ -44,7 +44,9 @@
     "react-quill": "^2.0.0",
     "react-redux": "^8.1.2",
     "redux-logger": "^3.0.6",
-    "typescript": "5.1.6"
+    "typescript": "5.1.6",
+    "naughty-words": "^1.2.0",
+    "string-similarity-js": "^2.1.4"
   },
   "peerDependencies": {
     "react": "^17.0.0 || ^18.0.0",

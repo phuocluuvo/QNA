@@ -10,7 +10,7 @@ declare module "next-auth" {
       avatar: string;
       dob: string;
       email: string;
-      role: "admin" | "user" | "monitor";
+      role: "admin" | "user" | "moderator";
       createdAt: string;
       updatedAt: string;
       accessToken: string;

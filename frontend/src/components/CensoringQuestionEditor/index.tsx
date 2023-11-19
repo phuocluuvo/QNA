@@ -1,6 +1,7 @@
 import actionCreateCommentAnswer from "@/API/redux/actions/answer/actionCreateCommentAnswer";
-import actionVerifyQuesiton from "@/API/redux/actions/question/ActionVerifyQuestion";
-import actionVerifyTag from "@/API/redux/actions/tags/ActionVerifyTag";
+import actionBlockQuestion from "@/API/redux/actions/question/ActionRejectQuestion";
+import useStateWithCallback from "@/hooks/useStateWithCallback";
+import AlertCensoreQuesiton from "@/pages/censoring/question/[id]/(TabQuestion)/(AlertCensoreQuesiton)";
 import helper from "@/util/helper";
 import {
   FormControl,
@@ -9,10 +10,16 @@ import {
   HStack,
   Button,
   useColorMode,
-  useMediaQuery,
-  Input,
+  useDisclosure,
 } from "@chakra-ui/react";
-import { Formik, Form, Field, FormikHelpers } from "formik";
+import {
+  Formik,
+  Form,
+  Field,
+  FormikHelpers,
+  FormikProps,
+  FormikValues,
+} from "formik";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import React, { useState } from "react";
@@ -22,15 +29,23 @@ type State = {
   id: string;
   content: string;
 };
+
 function CensoringQuestionEditor({
   getTranslate,
   questionId,
   getResult,
+  onConfirmCallBack,
 }: {
   questionId: string;
   getTranslate: (key: string) => string;
   getResult: (key: any) => any;
+  onConfirmCallBack: () => void;
 }) {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isVerifyItem, setIsVerifyItem] = useStateWithCallback<Boolean | null>(
+    false
+  );
+  const cancelRef = React.useRef<State>();
   const sessions = useSession();
   const [state, setState] = useState({
     id: "123",
@@ -42,13 +57,16 @@ function CensoringQuestionEditor({
     // @ts-ignore
     setState((oldState) => helper.mappingState(oldState, { content: value }));
   };
-  const [isMobile] = useMediaQuery("(max-width: 768px)");
-  const [isMouseIn, setIsMouseIn] = useState(false);
-  const submitVerify = (values: State, actions: FormikHelpers<State>) => {
+  const formRef = React.useRef<FormikProps<FormikValues>>();
+  const submitVerify = (
+    values: FormikValues,
+    actions: FormikHelpers<FormikValues>
+  ) => {
     let form = {
       question_id: questionId as string,
       content: state.content,
     };
+
     dispatch(
       // @ts-ignore
       actionCreateCommentAnswer(
@@ -56,7 +74,7 @@ function CensoringQuestionEditor({
         (res) => {
           console.log("comment created: ", res);
           getResult(res);
-          verifyQuestion(questionId);
+          blockQuestion(questionId);
           // @ts-ignore
           setState((oldState) =>
             helper.mappingState(oldState, { content: "" })
@@ -71,10 +89,10 @@ function CensoringQuestionEditor({
       )
     );
   };
-  function verifyQuestion(questionId: string) {
+  function blockQuestion(questionId: string) {
     dispatch(
       // @ts-ignore
-      actionVerifyQuesiton(
+      actionBlockQuestion(
         questionId,
         (res) => {
           console.log("question verified: ", res);
@@ -93,6 +111,8 @@ function CensoringQuestionEditor({
       onSubmit={(values, actions) => {
         submitVerify(values, actions);
       }}
+      // @ts-ignore
+      innerRef={formRef}
     >
       {(props) => (
         <Form>
@@ -144,7 +164,10 @@ function CensoringQuestionEditor({
           </Field>
           <HStack justifyContent={"flex-end"} w={"full"} pb={5}>
             <Button
-              type="submit"
+              // type="submit"
+              onClick={() => {
+                onOpen();
+              }}
               mt={"5"}
               background={colorMode === "light" ? "gray.100" : "gray.700"}
               border={"none"}
@@ -154,6 +177,17 @@ function CensoringQuestionEditor({
               {getTranslate("CONFIRM")}
             </Button>
           </HStack>
+          <AlertCensoreQuesiton
+            cancelRef={cancelRef}
+            isOpen={isOpen}
+            onClose={() => {
+              onClose();
+            }}
+            type={"reject"}
+            onClick={() => {
+              formRef.current?.submitForm();
+            }}
+          />
         </Form>
       )}
     </Formik>

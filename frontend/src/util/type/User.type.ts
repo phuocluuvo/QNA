@@ -11,7 +11,7 @@ interface User {
   createdAt: string;
   username: string;
   activityPoint: number;
-  role: "admin" | "user" | "monitor";
+  role: "admin" | "user" | "moderator";
 }
 
 // github user type

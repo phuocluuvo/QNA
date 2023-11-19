@@ -1,8 +1,10 @@
 import { ActionGetAllNotification } from "@/API/redux/actions/user/ActionGetAllNotification";
+import { ActionReadAllNotification } from "@/API/redux/actions/user/ActionReadAllNotification";
 import { CommonParams } from "@/API/type/params/Common.params";
 import { Colors } from "@/assets/constant/Colors";
 import { Pages } from "@/assets/constant/Pages";
 import NotificationItem from "@/components/NotifcationItem";
+import { LayoutContext } from "@/provider/LayoutProvider";
 import { LanguageHelper } from "@/util/Language/Language.util";
 import { NotificationListType } from "@/util/type/Notification.type";
 import {
@@ -11,14 +13,29 @@ import {
   Flex,
   HStack,
   Heading,
+  Select,
   Spacer,
   Text,
   useColorMode,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 const limitations = [5, 10, 15, 20];
+const filterData = [
+  {
+    label: "All",
+    value: null,
+  },
+  {
+    label: "Unread",
+    value: "false",
+  },
+  {
+    label: "Read",
+    value: "true",
+  },
+];
 
 function NotificationPage() {
   const dispatch = useDispatch();
@@ -30,24 +47,24 @@ function NotificationPage() {
   const { colorMode } = useColorMode();
   const router = useRouter();
   const query = router.query;
+  const { badgeNumber, setBadgeNumber } = React.useContext(LayoutContext);
   const pageNumber = Number(query.page);
   const limit = Number(query.limit)
     ? Number(query.limit)
     : (notifcation?.meta.itemsPerPage as number);
   const numberOfPages: number[] = [...Array(notifcation?.meta.totalPages)];
-
+  const [isRead, setIsRead] = React.useState("");
   function getNotifcation() {
     const defaultLimit = 10;
     const defaultPage = 1;
-    const defaultSortBy = "title";
+    const defaultSortBy = "createdAt";
     const defaultOrderBy = "ASC";
 
     const queryParams: CommonParams = {
       limit: limit || defaultLimit,
       page: pageNumber || defaultPage,
-      ...(router.query.select && {
-        "filter.type": `$eq:${router.query.select}`,
-      }),
+      // @ts-ignore
+      "filter.isRead": router.query.select,
       sortBy: router.query.sortBy
         ? `${router.query.sortBy}:${router.query.orderBy || defaultOrderBy}`
         : `${defaultSortBy}:${defaultOrderBy}`,
@@ -65,7 +82,22 @@ function NotificationPage() {
       )
     );
   }
-
+  function readAllNotifcation() {
+    dispatch(
+      // @ts-ignore
+      ActionReadAllNotification(
+        (res) => {
+          setBadgeNumber(0);
+        },
+        (err) => {
+          console.log(err);
+        }
+      )
+    );
+  }
+  useEffect(() => {
+    getNotifcation();
+  }, [router.query]);
   const pageNumClick = (pageNumber: number, limit: number) => {
     router.push({
       pathname: router.pathname,
@@ -153,6 +185,48 @@ function NotificationPage() {
       flex={1}
     >
       <Heading>{getTranslate("NOTIFICATIONS")}</Heading>
+      <HStack>
+        <Select
+          variant="filled"
+          size={"sm"}
+          w={"fit-content"}
+          style={{
+            fontSize: "xs",
+          }}
+          onChange={(e) => {
+            router.push({
+              pathname: router.pathname,
+              query: {
+                ...router.query,
+                select: e.target.value,
+                limit: 10,
+                page: 1,
+              },
+            });
+          }}
+        >
+          {
+            //@ts-ignore
+            filterData.map((item) => (
+              <option
+                value={item.value ? item.value : ""}
+              >
+                <Text as={"span"} flex={1}>
+                  {getTranslate("NOTIFICATIONS") + `(${item.label})`}
+                </Text>
+              </option>
+            ))
+          }
+        </Select>
+        <Spacer />
+        <Button
+          size={"xs"}
+          variant={"link"}
+          onClick={() => readAllNotifcation()}
+        >
+          {getTranslate("MARK_ALL_AS_READ")}
+        </Button>
+      </HStack>
       {renderPagination()}
       {notifcation?.data.map((item, index) => (
         <NotificationItem

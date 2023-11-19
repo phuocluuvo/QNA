@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -40,12 +40,15 @@ function NotificationItem({
   itemSize?: number;
 }) {
   const { colorMode } = useColorMode();
+
+  const [hydrated, setHydrated] = useState(false);
   const [item, setItem] = React.useState<NotificationType>(notification);
   const [isShowDetail, setIsShowDetail] = React.useState(false);
   const { isOpen, onClose, onOpen } = useDisclosure();
   const { setBadgeNumber } = React.useContext(LayoutContext);
   const router = useRouter();
   const dispatch = useDispatch();
+
   const getContentBasedOnType = () => {
     let itemRender = <></>;
     let type = item.activity.objectType;
@@ -161,7 +164,58 @@ function NotificationItem({
       }
       case OBJECT_ACTIVITY_TYPE.COMMENT: {
         let itemObject = item.activity.comment;
-        itemRender = <Text>{itemObject?.content} </Text>;
+        let question = itemObject?.question;
+
+        itemRender = (
+          <Box
+            style={{
+              height: 100,
+              width: "100%",
+              position: "relative",
+            }}
+          >
+            <Heading size={"sm"}>{question?.title} </Heading>
+            <Box
+              dangerouslySetInnerHTML={{
+                __html: question?.content as string,
+              }}
+            />
+            <Box
+              style={{
+                position: "absolute",
+                bottom: "-10px",
+                height: 50,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                left: "50%",
+                width: "100%",
+                transform: "translateX(-50%)",
+                background: `linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0),
+               ${
+                 colorMode === "dark"
+                   ? "rgba(0, 0, 0, 1)"
+                   : "rgba(255, 255, 255, 1)"
+               }
+              )`,
+              }}
+            >
+              <Text
+                style={{
+                  color: "blue",
+                  cursor: "pointer",
+                }}
+                onClick={() => {
+                  // router.push(`/question/${itemObject?.id}`);
+                }}
+              >
+                show more
+              </Text>
+            </Box>
+          </Box>
+        );
         break;
       }
       default:
@@ -185,6 +239,12 @@ function NotificationItem({
         () => {}
       )
     );
+  }
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+  if (!hydrated) {
+    return null;
   }
   return (
     <>

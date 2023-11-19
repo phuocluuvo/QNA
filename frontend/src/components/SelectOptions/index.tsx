@@ -62,7 +62,7 @@ const SelectOptions = ({
       value: QUESTION_SORT_BY.NO_APPROVED as string,
     },
   ];
-  if (data) {
+  if (data !== defaultOptions) {
     hardData = data;
   }
   return (

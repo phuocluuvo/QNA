@@ -9,6 +9,7 @@ type VoteButtonProps = {
   onClick?: () => void;
   size?: string | number;
   isVoted?: boolean;
+  isDisabled?: boolean;
 };
 function VoteButton(props: VoteButtonProps) {
   const session = useSession();
@@ -30,7 +31,7 @@ function VoteButton(props: VoteButtonProps) {
         onClick={props.onClick}
         py={0}
         my={0}
-        isDisabled={!session.data?.user?.id}
+        isDisabled={!session.data?.user?.id || props.isDisabled}
         icon={
           props.type === "up" ? (
             <ChevronUpIcon

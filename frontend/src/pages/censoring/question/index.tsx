@@ -51,8 +51,6 @@ function QuestionCensoring() {
   const { isOpen, onToggle } = useDisclosure();
   const session = useSession();
 
-  function getPendingQuesiton() {}
-
   useEffect(() => {
     const defaultLimit = 10;
     const defaultPage = 1;
@@ -144,7 +142,12 @@ function QuestionCensoring() {
               onSelect={(e) => {
                 router.push({
                   pathname: router.pathname,
-                  query: { ...router.query, select: e.target.value },
+                  query: {
+                    ...router.query,
+                    select: e.target.value,
+                    limit: 10,
+                    page: 1,
+                  },
                 });
               }}
             />

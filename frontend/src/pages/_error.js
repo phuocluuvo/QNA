@@ -2,10 +2,12 @@ import { ArrowBackIcon } from "@chakra-ui/icons";
 import { Button, Container, Heading, Text } from "@chakra-ui/react";
 import React from "react";
 import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
 function CustomError({ statusCode }) {
   const [countdown, setCountdown] = React.useState(5);
   const [message, setMessage] = React.useState("");
   const router = useRouter();
+  const session = useSession();
   React.useEffect(() => {
     if (statusCode === 404) {
       setMessage("Page not found");
@@ -21,7 +23,9 @@ function CustomError({ statusCode }) {
 
   React.useEffect(() => {
     if (countdown === 0) {
-      router.push("/");
+      session.data?.user?.role === "admin"
+        ? router.push("/question")
+        : router.push("/");
     }
   }, [countdown]);
 

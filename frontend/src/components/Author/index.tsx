@@ -35,6 +35,7 @@ type AuthorProps = {
   sizeAvatar?: ResponsiveValue<
     (string & {}) | "sm" | "md" | "lg" | "xl" | "2xl" | "xs" | "full" | "2xs"
   >;
+  type?: "simple" | "normal";
 };
 
 function Author({
@@ -47,6 +48,7 @@ function Author({
   bottomText,
   bottomTextStyle,
   sizeAvatar,
+  type = "normal",
 }: AuthorProps) {
   const { colorMode } = useColorMode();
   const router = useRouter();
@@ -67,12 +69,12 @@ function Author({
         src={user.avatar}
       />
       <VStack alignItems={"start"} spacing={0}>
-        {user.role !== "user" ? (
+        {user.role !== "user" && type !== "simple" ? (
           <Badge
             colorScheme={
               user.role === "admin"
                 ? "red"
-                : user.role === "monitor"
+                : user.role === "moderator"
                 ? "blue"
                 : "whatsapp"
             }
@@ -99,6 +101,19 @@ function Author({
           >
             {user.activityPoint}
           </Heading>
+          {user.role !== "user" && type === "simple" ? (
+            <Badge
+              colorScheme={
+                user.role === "admin"
+                  ? "red"
+                  : user.role === "moderator"
+                  ? "blue"
+                  : "whatsapp"
+              }
+            >
+              {user.role}
+            </Badge>
+          ) : null}
         </HStack>
         {/* @ts-ignore */}
         {headingText ? (
@@ -106,6 +121,7 @@ function Author({
             {headingText}
           </Text>
         ) : null}
+
         {bottomText ? (
           <Text {...bottomTextStyle} fontSize={sizeAvatar ?? "xs"}>
             {bottomText}

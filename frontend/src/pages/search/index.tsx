@@ -42,7 +42,23 @@ export default function Search() {
         )
       );
     }
-  }, [router.query.q]);
+
+    if (isNotFound) {
+      dispatch(
+        // @ts-ignore
+        actionGetQuestionList(
+          {
+            limit: 3,
+            page: 1,
+          },
+          (res) => {
+            setQuestions(res);
+          },
+          () => {}
+        )
+      );
+    }
+  }, [router.query.q, isNotFound]);
   useEffect(() => {
     setHydrated(true);
   }, []);

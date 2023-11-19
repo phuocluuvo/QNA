@@ -88,6 +88,8 @@ function QuestionItem({
           ...(isMobile && {
             borderRight: "none",
             gap: "20px",
+            borderTop: "1px solid " + Colors(isDarkMode).BORDER,
+            paddingTop: "10px",
           }),
         }}
       >
@@ -205,40 +207,38 @@ function QuestionItem({
           maxW={{ base: "xs", md: "md" }}
           noOfLines={2}
         />
-        <HStack>
-          {question.tagNames?.map((tag) => (
-            <TagQuestion tag={tag} key={tag} />
-          ))}
-        </HStack>
-        <HStack w={"full"}>
-          <VStack spacing={0} alignItems={"flex-start"}>
-            <Spacer />
-            <Author
-              user={question.user}
-              nameStyle={{
-                fontWeight: "bold",
-                fontSize: "sm",
-                noOfLines: { base: 1, md: 2 },
-                _hover: {
-                  textDecoration: "underline",
-                },
-              }}
-              headingText={getTranslate("ASKED_AT").replace(
-                "{0}",
-                helper.formatDate(
-                  question.createdAt,
-                  false,
-                  "H:mm A - ddd, DD/MM/YYYY"
-                )
-              )}
-              bottomTextStyle={{
-                color: "gray.500",
-                fontSize: "xs",
-                noOfLines: { base: 1, md: 2 },
-              }}
-            />
-          </VStack>
+        <HStack w={"full"} alignItems={"flex-end"}>
+          <HStack flexWrap={"wrap"}>
+            {question.tagNames?.map((tag) => (
+              <TagQuestion tag={tag} key={tag} />
+            ))}
+          </HStack>
           <Spacer />
+          <Author
+            type="simple"
+            user={question.user}
+            nameStyle={{
+              fontWeight: "bold",
+              fontSize: "sm",
+              noOfLines: { base: 1, md: 2 },
+              _hover: {
+                textDecoration: "underline",
+              },
+            }}
+            headingText={getTranslate("ASKED_AT").replace(
+              "{0}",
+              helper.formatDate(
+                question.createdAt,
+                false,
+                "H:mm A - ddd, DD/MM/YYYY"
+              )
+            )}
+            bottomTextStyle={{
+              color: "gray.500",
+              fontSize: "xs",
+              noOfLines: { base: 1, md: 2 },
+            }}
+          />
         </HStack>
       </VStack>
     </Stack>
