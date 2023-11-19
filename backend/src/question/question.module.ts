@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { QuestionController } from "./question.controller";
 import { QuestionService } from "./question.service";
 import { questionProviders } from "./providers/question.providers";
@@ -10,6 +10,7 @@ import { TagModule } from "../tag/tag.module";
 import { ActivityModule } from "../activity/activity.module";
 import { NotificationModule } from "../notification/notification.module";
 import { HistoryModule } from "../history/history.module";
+import { BookmarkModule } from "../bookmark/bookmark.module";
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { HistoryModule } from "../history/history.module";
     ActivityModule,
     NotificationModule,
     HistoryModule,
+    forwardRef(() => BookmarkModule),
   ],
   controllers: [QuestionController],
   providers: [...questionProviders, QuestionService],

@@ -13,6 +13,7 @@ import { Answer } from "../../answer/entity/answer.entity";
 import { Activity } from "../../activity/entity/activity.entity";
 import { Question } from "../../question/entity/question.entity";
 import { History } from "../../history/entity/history.entity";
+import { CommentTypeEnum } from "../../enums/comment-type.enum";
 
 @Entity()
 export class Comment {
@@ -21,6 +22,15 @@ export class Comment {
 
   @Column("text")
   content: string;
+
+  @Column({
+    type: "enum",
+    enum: CommentTypeEnum,
+    default: CommentTypeEnum.NORMAL,
+  })
+  type: CommentTypeEnum;
+
+  // Relationship
 
   @ManyToOne(() => Answer, (answer) => answer.comments, {
     onDelete: "CASCADE",

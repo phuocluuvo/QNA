@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  forwardRef,
   Inject,
   Injectable,
   NotFoundException,
@@ -32,6 +33,7 @@ import { QuestionState } from "../enums/question-state.enum";
 import { QuestionTimeTypeEnum } from "src/enums/question-type.enum";
 import { UsersService } from "src/users/users.service";
 import { HistoryService } from "../history/history.service";
+import { BookmarkService } from "../bookmark/bookmark.service";
 
 @Injectable()
 export class QuestionService {
@@ -44,6 +46,8 @@ export class QuestionService {
     private readonly notificationService: NotificationService,
     private readonly userService: UsersService,
     private readonly historyService: HistoryService,
+    @Inject(forwardRef(() => BookmarkService))
+    private readonly bookmarkService: BookmarkService,
   ) {}
 
   /**
@@ -246,11 +250,19 @@ export class QuestionService {
         user: { id: userId },
         question: { id: question.id },
       });
-
       if (voteInfo) {
         result.vote.push(voteInfo);
       }
+
+      const bookmark = await this.bookmarkService.checkQuestionIsBookmark(
+        question.id,
+        userId,
+      );
+      if (bookmark) {
+        result["bookmarks"] = [bookmark];
+      }
     }
+
     return result;
   }
 

@@ -53,6 +53,12 @@ export class AnswerService {
       "vote.user_id = :userId AND vote.answer_id = answer.id",
       { userId },
     );
+    queryBuilder.leftJoinAndSelect(
+      "answer.bookmarks",
+      "bookmark",
+      "bookmark.user_id = :userId AND bookmark.answer_id = answer.id",
+      { userId },
+    );
     queryBuilder.leftJoinAndSelect("answer.comments", "comment");
     queryBuilder.leftJoinAndSelect("comment.user", "commentUser");
 
