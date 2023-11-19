@@ -23,8 +23,17 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async getAllUser(query: PaginateQuery) {
+  async getAllUser(query: PaginateQuery, state: string, role: string) {
     const queryBuilder = await this.userRepository.createQueryBuilder("user");
+
+    if (state) {
+      queryBuilder.andWhere({ state: state });
+    }
+
+    if (role) {
+      queryBuilder.andWhere({ role: role });
+    }
+
     return paginate<User>(query, queryBuilder, userPaginateConfig);
   }
 

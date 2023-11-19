@@ -12,7 +12,7 @@ export const questionPaginateConfig: PaginateConfig<Question> = {
   ],
   defaultSortBy: [["title", "ASC"]],
   searchableColumns: ["title", "content"],
-  relations: ["user"],
+  relations: ["user", "comments", "comments.user"],
   filterableColumns: {
     type: [FilterOperator.EQ],
     state: [FilterOperator.EQ],
