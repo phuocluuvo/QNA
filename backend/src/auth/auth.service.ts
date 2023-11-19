@@ -340,4 +340,11 @@ export class AuthService {
     user.password = hash;
     return this.usersService.update(user.id, user);
   }
+
+  async checkUserExists(username: string) {
+    const user = await this.usersService.findOne(username);
+    if (!user) throw new BadRequestException(message.NOT_EXITS_USER);
+    delete user.password;
+    return user;
+  }
 }
