@@ -109,10 +109,10 @@ export class AuthController {
     const info = await this.authService.signInWithGoogle(req.user);
     if (info.refreshToken) {
       res.redirect(
-        `${process.env.URL_WEB}/login/success?refreshToken=${info.refreshToken}`,
+        `${process.env.URL_WEB}/auth/signin/?refreshToken=${info.refreshToken}`,
       );
     } else {
-      res.redirect(`${process.env.URL_WEB}/login/failure`);
+      res.redirect(`${process.env.URL_WEB}/auth/signin/?error=1`);
     }
   }
 
