@@ -145,7 +145,7 @@ export class UsersController {
     @Param("id") id: string,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    const user = await this.usersService.updateProfile(id, updateUserDto);
+    const user = await this.usersService.updateUserForAdmin(id, updateUserDto);
     return plainToClass(UserDto, user, {
       excludeExtraneousValues: true,
     });

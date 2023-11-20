@@ -279,6 +279,7 @@ export class UsersService {
     const userTrans = plainToClass(CreateUserAdminDto, createUserDto, {
       excludeExtraneousValues: true,
     });
+    userTrans["password"] = await argon2.hash(createUserDto["password"]);
 
     return this.userRepository.save(userTrans);
   }
@@ -296,8 +297,11 @@ export class UsersService {
     const userTrans = plainToClass(UpdateUserAdminDto, userDto, {
       excludeExtraneousValues: true,
     });
-    userTrans["password"] = await argon2.hash(userDto["password"]);
+    if (userTrans["password"]) {
+      userTrans["password"] = await argon2.hash(userDto["password"]);
+    }
     delete userTrans.username;
+    delete userTrans.email;
 
     return await this.update(id, userTrans);
   }
