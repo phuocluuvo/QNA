@@ -134,16 +134,24 @@ export default function TagPage() {
     );
   };
   const pageNumClick = (pageNumber: number, limit: number) => {
-    router.push({
-      pathname: router.pathname,
-      query: { ...router.query, limit: limit, page: pageNumber },
-    });
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, limit: limit, page: pageNumber },
+      },
+      undefined,
+      { shallow: true }
+    );
   };
   const applyFilter = () => {
-    router.push({
-      pathname: router.pathname,
-      query: { ...router.query, sortBy: valueSort, orderBy: isDecending },
-    });
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, sortBy: valueSort, orderBy: isDecending },
+      },
+      undefined,
+      { shallow: true }
+    );
   };
   return (
     <Fragment>
@@ -207,10 +215,14 @@ export default function TagPage() {
                     w: "fit-content",
                   }}
                   onSelect={(e) => {
-                    router.push({
-                      pathname: router.pathname,
-                      query: { ...router.query, select: e.target.value },
-                    });
+                    router.push(
+                      {
+                        pathname: router.pathname,
+                        query: { ...router.query, select: e.target.value },
+                      },
+                      undefined,
+                      { shallow: true }
+                    );
                   }}
                 />
                 <Button

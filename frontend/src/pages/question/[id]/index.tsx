@@ -293,10 +293,8 @@ function Question() {
             title: "Success",
             description: "Question saved to collection",
             status: "success",
-            icon: "success",
             duration: 3000,
             position: "top-right",
-            variant: "subtle",
             isClosable: true,
           });
         },
@@ -479,10 +477,6 @@ function Question() {
                           ),
                       }}
                       fontSize={"sm"}
-                      maxW={{
-                        base: "100%",
-                        md: "80%",
-                      }}
                     />
                     {userData ? (
                       state.question.user.id === userData?.id ? (

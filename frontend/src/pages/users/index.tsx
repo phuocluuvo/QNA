@@ -128,16 +128,24 @@ function UsersListPage() {
     );
   }, [router.query]);
   const pageNumClick = (pageNumber: number, limit: number) => {
-    router.push({
-      pathname: router.pathname,
-      query: { ...router.query, limit: limit, page: pageNumber },
-    });
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, limit: limit, page: pageNumber },
+      },
+      undefined,
+      { shallow: true }
+    );
   };
   const applyFilter = () => {
-    router.push({
-      pathname: router.pathname,
-      query: { ...router.query, sortBy: valueSort, orderBy: isDecending },
-    });
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, sortBy: valueSort, orderBy: isDecending },
+      },
+      undefined,
+      { shallow: true }
+    );
   };
   return (
     <>
@@ -180,15 +188,19 @@ function UsersListPage() {
                 },
               ]}
               onSelect={(e) => {
-                router.push({
-                  pathname: router.pathname,
-                  query: {
-                    ...router.query,
-                    select: e.target.value,
-                    limit: limitations[0],
-                    page: 1,
+                router.push(
+                  {
+                    pathname: router.pathname,
+                    query: {
+                      ...router.query,
+                      select: e.target.value,
+                      limit: limitations[0],
+                      page: 1,
+                    },
                   },
-                });
+                  undefined,
+                  { shallow: true }
+                );
               }}
             />
             <Button

@@ -108,10 +108,14 @@ function TagsPage() {
     );
   }
   const pageNumClick = (pageNumber: number, limit: number) => {
-    router.push({
-      pathname: router.pathname,
-      query: { ...router.query, limit: limit, page: pageNumber },
-    });
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, limit: limit, page: pageNumber },
+      },
+      undefined,
+      { shallow: true }
+    );
   };
   return (
     <>
