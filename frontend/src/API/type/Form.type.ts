@@ -75,4 +75,8 @@ export type FormUpdateProfile = {
   fullname?: string;
   email?: string;
   avatar?: string;
+  title?: string;
+  facebookLink?: string;
+  twitterLink?: string;
+  websiteLink?: string;
 };

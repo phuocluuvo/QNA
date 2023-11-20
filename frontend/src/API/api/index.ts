@@ -211,9 +211,42 @@ const bookmarkQuestion = (questionId: string) => {
   });
 };
 
+const getAllBookmarks = () => {
+  return AuthApi(REQUEST_METHOD.GET, url.BOOKMARK);
+};
+
+const getBookmarksFromCollections = (id: string) => {
+  return AuthApi(
+    REQUEST_METHOD.GET,
+    url.BOOKMARK_COLLECTION.replace("{id}", id)
+  );
+};
+
 const getUserById = (userId: string) => {
   return api.get(url.USER + "/" + userId);
 };
+
+const loginWithGoogle = (refreshToken: string) => {
+  return api.post(url.GOOGLE_LOGIN, { refreshToken });
+};
+const checkUsernameExisted = (username: string) => {
+  return api.get(url.CHECK_USERNAME, { params: { username } });
+};
+const forgotPassword = (username: string) => {
+  return api.post(url.FORGOT_PASSWORD + "?username=" + username);
+};
+const resetPassword = (form: { password: string; uuid: string }) => {
+  return api.post(url.RESET_PASSWORD, form);
+};
+
+const getAllCollections = () => {
+  return AuthApi(REQUEST_METHOD.GET, url.COLLECTION);
+};
+
+const createCollection = (collectionName: string) => {
+  return AuthApi(REQUEST_METHOD.POST, url.COLLECTION, { name: collectionName });
+};
+
 export default {
   requestSignUp,
   getQuestion,
@@ -247,4 +280,12 @@ export default {
   updateProfile,
   bookmarkQuestion,
   getUserById,
+  getAllBookmarks,
+  loginWithGoogle,
+  checkUsernameExisted,
+  forgotPassword,
+  resetPassword,
+  getBookmarksFromCollections,
+  getAllCollections,
+  createCollection,
 };

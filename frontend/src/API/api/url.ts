@@ -3,8 +3,8 @@ export const url = {
   SIGN_IN: "/api/auth/signin",
   SIGN_IN_NEW: "/api/auth/login-new",
   SIGN_UP: "/api/auth/signup",
-  FORGOT_PASSWORD: "/api/user/ask-to-reset-password",
-  RESET_PASSWORD: "/api/user/do-reset-password",
+  FORGOT_PASSWORD: "/api/auth/forgot-password",
+  RESET_PASSWORD: "/api/auth/reset-password",
   CHECK_EXISTS_USER: "/api/user/check-exists-user",
   USER: "/api/user",
   QUESTION: "/api/question",
@@ -25,4 +25,7 @@ export const url = {
   BOOKMARK: "/api/bookmark",
   BOOKMARK_COLLECTION: "/api/bookmark/collection/{id}",
   UPDATE_BOOKMARK: "/api/bookmark/{id}",
+  GOOGLE_LOGIN: "/api/auth/refresh-v2",
+  CHECK_USERNAME: "/api/auth/exists",
+  COLLECTION: "/api/collection",
 };
