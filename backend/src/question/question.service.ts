@@ -181,7 +181,7 @@ export class QuestionService {
     try {
       const question = await this.questionRepository.findOne({
         where: { id: questionId },
-        relations: ["user", "tags"],
+        relations: ["user", "tags", "comments"],
       });
       if (!question) {
         throw new NotFoundException(message.NOT_FOUND.QUESTION);
