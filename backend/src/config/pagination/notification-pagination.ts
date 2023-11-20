@@ -5,7 +5,8 @@ export const notificationPagination: PaginateConfig<Notification> = {
   sortableColumns: ["createdAt", "updatedAt"],
   defaultSortBy: [
     ["isAnnouncement", "DESC"],
-    ["createdAt", "ASC"],
+    ["isRead", "DESC"],
+    ["createdAt", "DESC"],
   ],
   relations: [
     "user",

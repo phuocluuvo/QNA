@@ -91,9 +91,25 @@ export class BookmarkController {
       throw new BadRequestException(
         "Either answer_id or question_id should be provided, not both or none.",
       );
+    } else if (!createBookmarkDto.answer_id && createBookmarkDto.question_id) {
+      await this.questionService.findOneById(createBookmarkDto.question_id);
+      const checkQuestionBookmark =
+        await this.bookmarkService.checkQuestionIsBookmark(
+          createBookmarkDto.question_id,
+          req["user"]["sub"],
+        );
+      if (checkQuestionBookmark)
+        throw new BadRequestException(message.EXISTED.BOOKMARK);
+    } else if (createBookmarkDto.answer_id && !createBookmarkDto.question_id) {
+      await this.answerService.findOneById(createBookmarkDto.answer_id);
+      const checkAnswerBookmark =
+        await this.bookmarkService.checkAnswerIsBookmark(
+          createBookmarkDto.answer_id,
+          req["user"]["sub"],
+        );
+      if (checkAnswerBookmark)
+        throw new BadRequestException(message.EXISTED.BOOKMARK);
     }
-    await this.answerService.findOneById(createBookmarkDto.answer_id);
-    await this.questionService.findOneById(createBookmarkDto.question_id);
 
     return this.bookmarkService.create(createBookmarkDto, req["user"]["sub"]);
   }

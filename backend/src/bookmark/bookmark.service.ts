@@ -127,8 +127,14 @@ export class BookmarkService {
   }
 
   async checkQuestionIsBookmark(questionId: string, userId: string) {
-    return this.bookmarkRepository.findOne({
+    return await this.bookmarkRepository.findOne({
       where: { question: { id: questionId }, user: { id: userId } },
+    });
+  }
+
+  async checkAnswerIsBookmark(questionId: string, userId: string) {
+    return await this.bookmarkRepository.findOne({
+      where: { answer: { id: questionId }, user: { id: userId } },
     });
   }
 }
