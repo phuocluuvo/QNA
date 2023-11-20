@@ -93,5 +93,7 @@
   "TAG": "Tag",
   "CRATED_AT": "Created at",
   "SAVED": "Saved",
-  "ACTIVITY": "Activity"
+  "FOR_LATER": "For later",
+  "ACTIVITY": "Activity",
+  "ALL": "All"
 }
