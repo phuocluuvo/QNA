@@ -115,16 +115,24 @@ export default function Home() {
     );
   };
   const pageNumClick = (pageNumber: number, limit: number) => {
-    router.push({
-      pathname: router.pathname,
-      query: { ...router.query, limit: limit, page: pageNumber },
-    });
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, limit: limit, page: pageNumber },
+      },
+      undefined,
+      { shallow: true }
+    );
   };
   const applyFilter = () => {
-    router.push({
-      pathname: router.pathname,
-      query: { ...router.query, sortBy: valueSort, orderBy: isDecending },
-    });
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, sortBy: valueSort, orderBy: isDecending },
+      },
+      undefined,
+      { shallow: true }
+    );
   };
   return (
     <Fragment>
@@ -166,7 +174,9 @@ export default function Home() {
                       limit: 10,
                       page: 1,
                     },
-                  });
+                  },
+                  undefined,
+                  { shallow: true });
                 }}
               />
               <Button

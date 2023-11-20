@@ -92,16 +92,24 @@ function QuestionCensoring() {
     );
   }, [router.query]);
   const pageNumClick = (pageNumber: number, limit: number) => {
-    router.push({
-      pathname: router.pathname,
-      query: { ...router.query, limit: limit, page: pageNumber },
-    });
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, limit: limit, page: pageNumber },
+      },
+      undefined,
+      { shallow: true }
+    );
   };
   const applyFilter = () => {
-    router.push({
-      pathname: router.pathname,
-      query: { ...router.query, sortBy: valueSort, orderBy: isDecending },
-    });
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, sortBy: valueSort, orderBy: isDecending },
+      },
+      undefined,
+      { shallow: true }
+    );
   };
   return (
     <VStack alignItems={"end"} flex={{ base: 1, md: 1 }}>
@@ -140,15 +148,19 @@ function QuestionCensoring() {
                 w: "fit-content",
               }}
               onSelect={(e) => {
-                router.push({
-                  pathname: router.pathname,
-                  query: {
-                    ...router.query,
-                    select: e.target.value,
-                    limit: 10,
-                    page: 1,
+                router.push(
+                  {
+                    pathname: router.pathname,
+                    query: {
+                      ...router.query,
+                      select: e.target.value,
+                      limit: 10,
+                      page: 1,
+                    },
                   },
-                });
+                  undefined,
+                  { shallow: true }
+                );
               }}
             />
             <Button
