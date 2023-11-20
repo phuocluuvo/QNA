@@ -216,4 +216,21 @@ export class VoteService {
       }
     }
   }
+
+  async getVoteInfoByUser(userId: string) {
+    return await this.voteRepository
+      .createQueryBuilder("vote")
+      .select([
+        "COALESCE((SELECT COUNT(*) FROM vote WHERE vote.vote_type = :upvote AND vote.user_id = :userId),0) as upVoteNumber",
+        "COALESCE((SELECT COUNT(*) FROM vote WHERE vote.vote_type = :downvote AND vote.user_id = :userId),0) as downVoteNumber",
+        "COALESCE((SELECT COUNT(*) FROM vote WHERE vote.question_id IS NOT NULL AND vote.user_id = :userId),0) as voteQuestionNumber",
+        "COALESCE((SELECT COUNT(*) FROM vote WHERE vote.answer_id  IS NOT NULL AND vote.user_id = :userId),0) as voteAnswerNumber",
+      ])
+      .setParameters({
+        upvote: "up_vote",
+        downvote: "down_vote",
+        userId: userId ? userId : "no_id",
+      })
+      .getRawOne();
+  }
 }
