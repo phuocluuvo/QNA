@@ -15,6 +15,7 @@ import { userPaginateConfig } from "../config/pagination/user-pagination";
 import { plainToClass } from "class-transformer";
 import { UpdateUserAdminDto } from "./dto/update-user-admin.dto";
 import { CreateUserAdminDto } from "./dto/create-user-admin.dto";
+import { QuestionTimeTypeEnum } from "src/enums/question-type.enum";
 
 @Injectable()
 export class UsersService {
@@ -234,6 +235,118 @@ export class UsersService {
   }
 
   /**
+   * Find a user by ID.
+   *
+   * @param id ID of the user to search for.
+   * @returns Promise<Partial<User> | undefined> The found user or undefined if not found.
+   * @throws Error if there's an error during the search process.
+   */
+  async getMoreProfileForAdmin(
+    id: string,
+    timeType?: QuestionTimeTypeEnum,
+  ): Promise<any> {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1;
+    const currentQuarter = Math.ceil(currentMonth / 3);
+    try {
+      const queryBuilder = await this.userRepository
+        .createQueryBuilder("user")
+        .select([
+          "COUNT(DISTINCT question.id) AS questionCount",
+          "COUNT(DISTINCT answer.id) AS answerCount",
+          "COUNT(DISTINCT vote.id) AS voteCount",
+          "COUNT(DISTINCT tag.id) AS tagCount",
+        ])
+        .leftJoin("user.questions", "question")
+        .leftJoin("user.answers", "answer")
+        .leftJoin("user.votes", "vote")
+        .leftJoin("user.tags", "tag")
+        .where("user.id = :id", { id })
+        .groupBy("user.id");
+      switch (timeType) {
+        case QuestionTimeTypeEnum.MONTH:
+          queryBuilder
+            .where("YEAR(question.createdAt) = :year", { year: currentYear })
+            .andWhere("MONTH(question.createdAt) = :month", {
+              month: currentMonth,
+            })
+            .andWhere("YEAR(answer.createdAt) = :year", { year: currentYear })
+            .andWhere("MONTH(answer.createdAt) = :month", {
+              month: currentMonth,
+            })
+            .andWhere("YEAR(vote.createdAt) = :year", { year: currentYear })
+            .andWhere("MONTH(vote.createdAt) = :month", {
+              month: currentMonth,
+            })
+            .andWhere("YEAR(tag.createdAt) = :year", { year: currentYear })
+            .andWhere("MONTH(tag.createdAt) = :month", {
+              month: currentMonth,
+            });
+          break;
+        case QuestionTimeTypeEnum.QUARTER:
+          queryBuilder
+            .where("YEAR(question.createdAt) = :year", { year: currentYear })
+            .andWhere("QUARTER(question.createdAt) = :quarter", {
+              quarter: currentQuarter,
+            })
+            .andWhere("YEAR(answer.createdAt) = :year", { year: currentYear })
+            .andWhere("QUARTER(answer.createdAt) = :quarter", {
+              quarter: currentQuarter,
+            })
+            .andWhere("YEAR(vote.createdAt) = :year", { year: currentYear })
+            .andWhere("QUARTER(vote.createdAt) = :quarter", {
+              quarter: currentQuarter,
+            })
+            .andWhere("YEAR(tag.createdAt) = :year", { year: currentYear })
+            .andWhere("QUARTER(tag.createdAt) = :quarter", {
+              quarter: currentQuarter,
+            });
+          break;
+        case QuestionTimeTypeEnum.YEAR:
+          queryBuilder
+            .where("YEAR(question.createdAt) = :year", {
+              year: currentYear,
+            })
+            .andWhere("YEAR(answer.createdAt) = :year", { year: currentYear })
+            .andWhere("YEAR(vote.createdAt) = :year", { year: currentYear })
+            .andWhere("YEAR(tag.createdAt) = :year", { year: currentYear });
+          break;
+        default:
+          break;
+      }
+      const result = await queryBuilder.getRawOne();
+      return result;
+    } catch (err) {
+      throw new Error(`Error finding ${err} user ${err.message}`);
+    }
+  }
+
+  async getProlifeForAdmin(id: string) {
+    try {
+      const queryBuilder = await this.userRepository
+        .createQueryBuilder("user")
+        .select([
+          "user.id as id",
+          "user.username as username",
+          "user.fullname as fullname",
+          "user.avatar as avatar",
+          "user.dob as dob",
+          "user.email as email",
+          "user.role as role",
+          "user.activityPoint as activityPoint",
+          "user.createdAt as createdAt",
+          "user.updatedAt as updatedAt",
+          "user.state as state",
+        ])
+        .where("user.id = :id", { id });
+      return queryBuilder.getRawOne();
+    } catch (err) {
+      throw new Error(`Error finding ${err} user ${err.message}`);
+    }
+  }
+
+  /**
    * Update user profile for controller.
    *
    * @param id ID of the user to update.
@@ -371,5 +484,14 @@ export class UsersService {
       .limit(5);
 
     return queryBuilder.getRawMany();
+  }
+
+  getOneById(userId: string) {
+    const queryBuilder = this.userRepository
+      .createQueryBuilder("user")
+      .select("user.password", "password")
+      .where("user.id = :userId", { userId });
+
+    return queryBuilder.getRawOne();
   }
 }

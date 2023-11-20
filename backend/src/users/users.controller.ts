@@ -26,6 +26,7 @@ import { Role } from "../enums/role.enum";
 import { userPaginateConfig } from "../config/pagination/user-pagination";
 import { User } from "./entity/users.entity";
 import { CreateUserAdminDto } from "./dto/create-user-admin.dto";
+import { QuestionTimeTypeEnum } from "src/enums/question-type.enum";
 
 @ApiTags("user")
 @Controller("user")
@@ -101,6 +102,36 @@ export class UsersController {
   async getInfoUser(@Param("id") id: string) {
     const user = await this.usersService.getProfile(id);
     return plainToClass(UserDto, user, { excludeExtraneousValues: true });
+  }
+
+  /**
+   * Get all user.
+   * @param id
+   */
+  @ApiOperation({
+    summary: "get one user for admin",
+  })
+  @ApiBearerAuth()
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.MONITOR)
+  @Get("info/:id")
+  async getInfoUserForAdmin(@Param("id") id: string) {
+    return {
+      ...(await this.usersService.getProlifeForAdmin(id)),
+      month: await this.usersService.getMoreProfileForAdmin(
+        id,
+        QuestionTimeTypeEnum.MONTH,
+      ),
+      quarter: await this.usersService.getMoreProfileForAdmin(
+        id,
+        QuestionTimeTypeEnum.QUARTER,
+      ),
+      year: await this.usersService.getMoreProfileForAdmin(
+        id,
+        QuestionTimeTypeEnum.YEAR,
+      ),
+      all: await this.usersService.getMoreProfileForAdmin(id),
+    };
   }
 
   /**

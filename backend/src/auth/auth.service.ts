@@ -347,4 +347,23 @@ export class AuthService {
     delete user.password;
     return user;
   }
+
+  /**
+   * Confirm password
+   * @param user
+   * @param passwordConfirm
+   * @returns
+   * @throws BadRequestException
+   */
+
+  async confirmPassword(userId: string, password: string) {
+    if (!password) throw new BadRequestException(message.PASSWORD_IS_EMPTY);
+    const user = await this.usersService.getOneById(userId);
+    const passwordMatches = await argon2.verify(user.password, password);
+    if (!passwordMatches)
+      throw new BadRequestException(message.PASSWORD_IS_INCORRECT);
+    return {
+      status: "success",
+    };
+  }
 }
