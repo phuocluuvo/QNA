@@ -14,6 +14,7 @@ export const questionPaginateConfig: PaginateConfig<Question> = {
   searchableColumns: ["title", "content"],
   relations: ["user", "comments", "comments.user"],
   filterableColumns: {
+    "user.id": [FilterOperator.EQ],
     type: [FilterOperator.EQ],
     state: [FilterOperator.EQ],
     createdAt: [
