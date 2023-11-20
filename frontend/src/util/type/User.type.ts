@@ -12,6 +12,11 @@ interface User {
   username: string;
   activityPoint: number;
   role: "admin" | "user" | "moderator";
+  githubLink?: string;
+  twitterLink?: string;
+  facebookLink?: string;
+  websiteLink?: string;
+  title?: string;
 }
 
 // github user type
