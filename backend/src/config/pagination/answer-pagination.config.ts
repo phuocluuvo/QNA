@@ -6,6 +6,7 @@ export const answerPaginateConfig: PaginateConfig<Answer> = {
   defaultSortBy: [["isApproved", "DESC"]],
   searchableColumns: ["content"],
   filterableColumns: {
+    "user.id": [FilterOperator.EQ],
     createdAt: [
       FilterOperator.BTW,
       FilterOperator.LTE,

@@ -62,7 +62,7 @@ export class QuestionController {
     @Req() req: Request,
   ) {
     const user = req.user ? req.user : null;
-    return this.questionService.findWithRole(query, tagNames, user);
+    return this.questionService.find(query, tagNames, user);
   }
 
   @ApiOkPaginatedResponse(Question, questionPaginateConfig)

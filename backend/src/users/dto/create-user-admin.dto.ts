@@ -56,6 +56,37 @@ export class CreateUserAdminDto {
   @ApiProperty()
   @Expose()
   @IsOptional()
+  title: string;
+
+  //Social links
+  @ApiProperty()
+  @Expose()
+  @IsOptional()
+  @IsUrl()
+  facebookLink: string;
+
+  @ApiProperty()
+  @Expose()
+  @IsOptional()
+  @IsUrl()
+  githubLink: string;
+
+  @ApiProperty()
+  @Expose()
+  @IsOptional()
+  @IsUrl()
+  twitterLink: string;
+
+  @ApiProperty()
+  @Expose()
+  @IsOptional()
+  @IsUrl()
+  websiteLink: string;
+  //
+
+  @ApiProperty()
+  @Expose()
+  @IsOptional()
   @IsDate()
   dob: Date;
 

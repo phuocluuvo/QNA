@@ -243,19 +243,17 @@ export class UsersService {
    * @throws Error if there's an error during the update process.
    */
   async updateProfile(id: string, userDto: UpdateUserDto) {
-    try {
-      const userTrans = plainToClass(UpdateUserDto, userDto, {
-        excludeExtraneousValues: true,
-      });
-
+    const userTrans = plainToClass(UpdateUserDto, userDto, {
+      excludeExtraneousValues: true,
+    });
+    if (userTrans["password"]) {
       userTrans["password"] = await argon2.hash(userDto["password"]);
-      delete userTrans.username;
-      delete userTrans.email;
-      delete userTrans.refreshToken;
-      return await this.update(id, userTrans);
-    } catch (e) {
-      throw new BadRequestException(message.EXISTED.EMAIL);
     }
+    delete userTrans.username;
+    delete userTrans.email;
+    delete userTrans.refreshToken;
+
+    return await this.update(id, userTrans);
   }
 
   async createUserForAdmin(createUserDto: CreateUserAdminDto) {
@@ -281,6 +279,7 @@ export class UsersService {
     const userTrans = plainToClass(CreateUserAdminDto, createUserDto, {
       excludeExtraneousValues: true,
     });
+    userTrans["password"] = await argon2.hash(createUserDto["password"]);
 
     return this.userRepository.save(userTrans);
   }
@@ -295,17 +294,16 @@ export class UsersService {
    * @throws Error if there's an error during the update process.
    */
   async updateUserForAdmin(id: string, userDto: UpdateUserAdminDto) {
-    try {
-      const userTrans = plainToClass(UpdateUserAdminDto, userDto, {
-        excludeExtraneousValues: true,
-      });
+    const userTrans = plainToClass(UpdateUserAdminDto, userDto, {
+      excludeExtraneousValues: true,
+    });
+    if (userTrans["password"]) {
       userTrans["password"] = await argon2.hash(userDto["password"]);
-      delete userTrans.username;
-
-      return await this.update(id, userTrans);
-    } catch (e) {
-      throw new BadRequestException(message.EXISTED.EMAIL);
     }
+    delete userTrans.username;
+    delete userTrans.email;
+
+    return await this.update(id, userTrans);
   }
 
   /**
