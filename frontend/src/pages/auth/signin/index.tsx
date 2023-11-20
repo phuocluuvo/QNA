@@ -9,13 +9,22 @@ import {
   Heading,
   IconButton,
   Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Spacer,
   Text,
   VStack,
   useColorMode,
+  useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 import { Field, Form, Formik } from "formik";
-import React from "react";
+import React, { useEffect } from "react";
 import { LanguageHelper } from "@/util/Language/Language.util";
 import { Pages } from "@/assets/constant/Pages";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
@@ -26,7 +35,16 @@ import LoginButton from "@/components/LoginButton";
 import { useDispatch } from "react-redux";
 import { ActionGetBadgeNotification } from "@/API/redux/actions/user/ActionGetNotificationBadge";
 import { LayoutContext } from "@/provider/LayoutProvider";
+import { Colors } from "@/assets/constant/Colors";
+import api from "@/API/api";
+import { actionCheckUserExisted } from "@/API/redux/actions/user/ActionCheckUserExisted";
+import { actionForgetPassword } from "@/API/redux/actions/user/ActionForgotPassword";
+import { UserType } from "@/util/type/User.type";
+import { actionRestPassword } from "@/API/redux/actions/user/ActionResetPassword";
+import helper from "@/util/helper";
 export default function SignIn() {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [showResetPassword, setShowResetPassword] = React.useState(false);
   const { colorMode } = useColorMode();
   const [show, setShow] = React.useState(false);
   const toast = useToast();
@@ -34,7 +52,12 @@ export default function SignIn() {
   const dispatch = useDispatch();
   const { getTranslate } = LanguageHelper(Pages.HOME);
   const { setBadgeNumber } = React.useContext(LayoutContext);
+  const [username, setUsername] = React.useState<string>("");
   const usernameRef = React.useRef<HTMLInputElement>(null);
+  const [statePassword, setStatePassword] = React.useState({
+    newPassword: "",
+    confirmPassword: "",
+  });
   function validatePassword(value = "") {
     let error = "";
     const charLength = 8;
@@ -85,9 +108,11 @@ export default function SignIn() {
             )
           );
           if (router.query.callbackUrl) {
-            router.push(router.query.callbackUrl as string);
+            router.push(router.query.callbackUrl as string, undefined, {
+              shallow: true,
+            });
           } else {
-            router.push("/");
+            router.push("/", undefined, { shallow: true });
           }
         } else {
           toast({ title: getTranslate("LOGIN_ERROR"), status: "error" });
@@ -99,18 +124,126 @@ export default function SignIn() {
     }, 1000);
   }
   function LoginGithubHandle(type: "github" | "google") {
-    signIn(type).then((response) => {
-      if (response && response.ok) {
-        if (router.query.callbackUrl) {
-          router.push(router.query.callbackUrl as string);
+    if (type === "google") {
+      const baseURL = "http://localhost:3001";
+      // redirect to google login page
+      window.location.href = `${baseURL}/api/auth/${type}`;
+    } else
+      signIn(type).then((response) => {
+        if (response && response.ok) {
+          if (router.query.callbackUrl) {
+            router.push(router.query.callbackUrl as string, undefined, {
+              shallow: true,
+            });
+          } else {
+            router.push("/", undefined, { shallow: true });
+          }
         } else {
-          router.push("/");
+          toast({ title: getTranslate("LOGIN_ERROR"), status: "error" });
         }
-      } else {
-        toast({ title: getTranslate("LOGIN_ERROR"), status: "error" });
-      }
-    });
+      });
   }
+
+  function ResetPassword({
+    uuid,
+    password,
+  }: {
+    uuid: string;
+    password: string;
+  }) {
+    const form = {
+      uuid: uuid,
+      password: password,
+    };
+    dispatch(
+      // @ts-ignore
+      actionRestPassword(
+        form,
+        (res: UserType) => {
+          if (res.id) {
+            toast({
+              title: getTranslate("RESET_PASSWORD_SUCCESS"),
+              status: "success",
+            });
+            signIn();
+          }
+        },
+        () => {}
+      )
+    );
+  }
+  const token = router.query.refreshToken;
+  console.log("__________token", token);
+
+  useEffect(() => {
+    if (router.query.refreshToken) {
+      signIn("credentials", {
+        token: decodeURIComponent(
+          router.query.refreshToken as string
+        ).replaceAll(" ", "+"),
+        callbackUrl: "/",
+        redirect: false,
+      }).then((response) => {
+        console.log(response);
+        if (response && response.ok) {
+          if (router.query.callbackUrl) {
+            router.push(router.query.callbackUrl as string, undefined, {
+              shallow: true,
+            });
+          } else {
+            router.push("/", undefined, { shallow: true });
+          }
+        } else {
+          toast({
+            title: getTranslate("LOGIN_ERROR"),
+            status: "error",
+          });
+        }
+      });
+    }
+  }, [router.query.refreshToken]);
+  useEffect(() => {
+    if (router.query.uuid) {
+      setShowResetPassword(true);
+    }
+  }, [router.query.uuid]);
+  function handleCheckExist(value: string) {
+    dispatch(
+      // @ts-ignore
+      actionCheckUserExisted(
+        value,
+        (res: UserType) => {
+          console.log(res);
+
+          if (res.username)
+            dispatch(
+              // @ts-ignore
+              actionForgetPassword(
+                res.username,
+                (res) => {
+                  toast({
+                    title: getTranslate("EMAIL_SENT"),
+                    status: "success",
+                  });
+                  console.log(res);
+                },
+                (err) => {}
+              )
+            );
+          onClose();
+        },
+        () => {
+          toast({
+            title: getTranslate("USER_NOT_FOUND"),
+            status: "error",
+          });
+          onClose();
+          // router.push(`/auth/reset-password?username=${value}`);
+        }
+      )
+    );
+  }
+
   return (
     <Container>
       <Box bg={"whiteAlpha.100"} p={10} rounded="md">
@@ -139,7 +272,9 @@ export default function SignIn() {
             }}
             type="google"
             getTranslate={getTranslate}
-            onLogin={() => LoginGithubHandle("google")}
+            onLogin={() => {
+              LoginGithubHandle("google");
+            }}
           />
           <Box mt={5} mb={5} w={"100%"} h={"1px"} bg={"gray.300"}></Box>
           {/* Facebook  */}
@@ -168,12 +303,6 @@ export default function SignIn() {
                     <FormControl
                       isInvalid={form.errors.username && form.touched.username}
                     >
-                      {/* <input
-                      name="csrfToken"
-                      type="hidden"
-                      defaultValue={csrfToken}
-                    /> */}
-
                       <FormLabel>{getTranslate("USERNAME")}</FormLabel>
                       <Input
                         ref={usernameRef}
@@ -221,7 +350,7 @@ export default function SignIn() {
                     </FormControl>
                   )}
                 </Field>
-                <HStack>
+                <HStack justifyContent={"center"} alignItems={"center"}>
                   <Button
                     type="submit"
                     mt={"5"}
@@ -231,25 +360,118 @@ export default function SignIn() {
                   >
                     {getTranslate("LOGIN")}
                   </Button>
-                  {/* <Icon as={}/> */}
+                  <Spacer />
+                  <Button variant={"link"} size={"sm"} onClick={onOpen}>
+                    {getTranslate("FORGOT_PASSWORD")}
+                  </Button>
                 </HStack>
               </Form>
             )}
           </Formik>
         </VStack>
       </Box>
+      <Modal isOpen={isOpen} onClose={onClose} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Enter your username</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Input
+              placeholder="Enter your username"
+              value={username ?? usernameRef.current?.value}
+              required
+              onChange={(e) => {
+                setUsername(e.target.value);
+              }}
+            />
+          </ModalBody>
+
+          <ModalFooter>
+            <Button
+              type="submit"
+              colorScheme="green"
+              mr={3}
+              onClick={() => {
+                handleCheckExist(username);
+              }}
+            >
+              {getTranslate("SUBMIT")}
+            </Button>
+            <Button variant="ghost" onClick={onClose}>
+              {getTranslate("CANCEL")}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <Modal
+        isOpen={showResetPassword}
+        onClose={() => {
+          setShowResetPassword(false);
+        }}
+        isCentered
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Reset your password</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Input
+              placeholder="Enter your username"
+              value={statePassword.newPassword}
+              required
+              onChange={(e) => {
+                // @ts-ignore
+                setStatePassword((oldState) =>
+                  helper.mappingState(oldState, {
+                    newPassword: e.target.value,
+                  })
+                );
+              }}
+            />
+            <Input
+              placeholder="Enter your username"
+              value={statePassword.confirmPassword}
+              required
+              onChange={(e) => {
+                // @ts-ignore
+                setStatePassword((oldState) =>
+                  helper.mappingState(oldState, {
+                    confirmPassword: e.target.value,
+                  })
+                );
+              }}
+            />
+            {statePassword.newPassword !== statePassword.confirmPassword && (
+              <Text color={Colors(true).DOWN_VOTE_RED_HOVER}>
+                {getTranslate("ERROR_PASSWORD_NOT_MATCH")}
+              </Text>
+            )}
+          </ModalBody>
+
+          <ModalFooter>
+            <Button
+              type="submit"
+              colorScheme="green"
+              mr={3}
+              isDisabled={
+                statePassword.newPassword !== statePassword.confirmPassword
+              }
+              onClick={() => {
+                const form = {
+                  uuid: router.query.uuid as string,
+                  password: statePassword.newPassword,
+                };
+                ResetPassword(form);
+              }}
+            >
+              {getTranslate("SUBMIT")}
+            </Button>
+            <Button variant="ghost" onClick={onClose}>
+              {getTranslate("CANCEL")}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Container>
   );
 }
-// export async function getServerSideProps(context: GetServerSidePropsContext) {
-//   const csrfToken = await getCsrfToken(context);
-//   const { req } = context;
-//   const session = await getSession({ req });
-//   if (session) {
-//     return {
-//       redirect: { destination: "/" },
-//     };
-//   }
-
-//   return { props: { csrfToken } };
-// }
