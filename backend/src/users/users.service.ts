@@ -122,6 +122,48 @@ export class UsersService {
   }
 
   /**
+   * Find a user by refresh token.
+   * @param refreshToken Refresh token to search for.
+   * @returns Promise<User | undefined> The found user or undefined if not found.
+   * @throws Error if there's an error during the search process.
+   */
+
+  async findOneByRefreshToken(refreshToken: string): Promise<User | undefined> {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { refreshToken },
+      });
+
+      if (user) {
+        return user;
+      }
+    } catch (err) {
+      throw new Error(`Error finding ${err} user ${err.message}`);
+    }
+  }
+
+  /**
+   * Find a user by uuid.
+   *
+   * @param email Email to search for.
+   * @returns Promise<User | undefined> The found user or undefined if not found.
+   * @throws Error if there's an error during the search process.
+   */
+  async findOneByUuid(uuid: string): Promise<User | undefined> {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { uuid },
+      });
+
+      if (user) {
+        return user;
+      }
+    } catch (err) {
+      throw new Error(`Error finding ${err} user ${err.message}`);
+    }
+  }
+
+  /**
    * Find a user by ID.
    *
    * @param id ID of the user to search for.

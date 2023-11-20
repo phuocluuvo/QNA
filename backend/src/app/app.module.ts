@@ -16,6 +16,8 @@ import { BookmarkModule } from "../bookmark/bookmark.module";
 import { CollectionModule } from "../collection/collection.module";
 import { DashboardModule } from "src/dashboard/dashboard.module";
 import { HistoryModule } from "../history/history.module";
+import { PassportModule } from "@nestjs/passport";
+import { GoogleStrategy } from "src/auth/google.strategy";
 
 @Module({
   imports: [
@@ -34,8 +36,9 @@ import { HistoryModule } from "../history/history.module";
     CollectionModule,
     DashboardModule,
     HistoryModule,
+    PassportModule.register({ defaultStrategy: "google" }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, GoogleStrategy],
 })
 export class AppModule {}
