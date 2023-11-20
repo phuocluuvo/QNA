@@ -19,8 +19,17 @@ export const authOptions: AuthOptions = {
       credentials: {
         username: { label: "Username", type: "text", placeholder: "jsmith" },
         password: { label: "Password", type: "password" },
+        token: { label: "Token", type: "text" },
       },
       async authorize(credentials, req) {
+        if (credentials?.token) {
+          console.log("credentials__:", credentials);
+          const user = await api.loginWithGoogle(credentials?.token as string);
+          console.log("user__:", user);
+          if (!user) return null;
+          return user.data;
+        }
+
         const form = {
           username: credentials?.username as string,
           password: credentials?.password as string,
