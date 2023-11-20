@@ -23,13 +23,18 @@ import {
   HStack,
   Spacer,
   useColorMode,
+  Text,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import React from "react";
 import { useDispatch } from "react-redux";
 const limitations = [5, 10, 15, 20];
 
-function TabActivity() {
+function TabActivity({
+  getTranslate,
+}: {
+  getTranslate: (label: string) => string;
+}) {
   const [history, setHistory] = React.useState<HistoryActivityListType | null>(
     null
   );
@@ -93,12 +98,12 @@ function TabActivity() {
           }}
         >
           <TableCaption>
-            {history?.meta.itemCount} activities in {history?.meta.itemCount}{" "}
+            {history?.meta.totalItems} activities in {history?.meta.totalPages}{" "}
             pages
           </TableCaption>
           <Thead>
             <Tr>
-              <Th>Activity</Th>
+              <Th>{getTranslate("ACTIVITY")}</Th>
               <Th>Date</Th>
               <Th isNumeric>Point Received</Th>
             </Tr>
@@ -138,34 +143,57 @@ function TabActivity() {
         <HStack spacing={3}>
           {history
             ? history?.meta.totalPages > 1 &&
-              numberOfPages.map((_, index) => (
-                <Button
-                  key={index}
-                  size={"xs"}
-                  variant={"outline"}
-                  bg={
-                    pageNumber
-                      ? pageNumber === index + 1
-                        ? "orange.500"
-                        : Colors(colorMode === "dark").PRIMARY_BG
-                      : index == 0
-                      ? "orange.500"
-                      : Colors(colorMode === "dark").PRIMARY_BG
-                  }
-                  color={
-                    pageNumber
-                      ? pageNumber === index + 1
-                        ? "white"
-                        : Colors(colorMode === "dark").BORDER
-                      : index == 0
-                      ? "white"
-                      : Colors(colorMode === "dark").BORDER
-                  }
-                  onClick={() => pageNumClick(index + 1, limit)}
-                >
-                  {index + 1}
-                </Button>
-              ))
+              numberOfPages.map((_, index) => {
+                if (
+                  index < 2 || // first 2 pages
+                  index > numberOfPages.length - 3 || // last 2 pages
+                  (pageNumber && Math.abs(pageNumber - index - 1) <= 2) // 2 pages around current page
+                ) {
+                  return (
+                    <Button
+                      key={index}
+                      size={"xs"}
+                      variant={"outline"}
+                      bg={
+                        pageNumber
+                          ? pageNumber === index + 1
+                            ? "orange.500"
+                            : Colors(colorMode === "dark").PRIMARY_BG
+                          : index == 0
+                          ? "orange.500"
+                          : Colors(colorMode === "dark").PRIMARY_BG
+                      }
+                      color={
+                        pageNumber
+                          ? pageNumber === index + 1
+                            ? "white"
+                            : Colors(colorMode === "dark").BORDER
+                          : index == 0
+                          ? "white"
+                          : Colors(colorMode === "dark").BORDER
+                      }
+                      onClick={() => pageNumClick(index + 1, limit)}
+                    >
+                      {index + 1}
+                    </Button>
+                  );
+                } else if (
+                  (index === 2 && pageNumber > 4) || // after first 2 pages and current page is greater than 4
+                  (index === numberOfPages.length - 3 &&
+                    pageNumber < numberOfPages.length - 3) // before last 2 pages and current page is less than total pages - 3
+                ) {
+                  return (
+                    <Button
+                      onClick={() => pageNumClick(index + 1, limit)}
+                      key={index}
+                    >
+                      ...
+                    </Button>
+                  );
+                } else {
+                  return null;
+                }
+              })
             : null}
         </HStack>
         <Spacer />

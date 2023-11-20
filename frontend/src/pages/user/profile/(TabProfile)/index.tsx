@@ -21,10 +21,11 @@ import {
 } from "@chakra-ui/react";
 import { Field, Form, Formik, useFormik } from "formik";
 import Image from "next/image";
+import { NextRouter } from "next/router";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 
-function TabProfile({ user }: { user: UserType }) {
+function TabProfile({ user, router }: { user: UserType; router: NextRouter }) {
   const { getTranslate, getListLanguage, getCurrentLanguage } = LanguageHelper(
     Pages.HOME
   );
@@ -86,6 +87,10 @@ function TabProfile({ user }: { user: UserType }) {
         {
           fullname: values.name,
           // location: values.location,
+          title: values.title,
+          facebookLink: values.facebookLink,
+          twitterLink: values.twitterLink,
+          websiteLink: values.websiteLink,
           // introduce: values.introduce,
           avatar: pic ?? user.avatar,
         },
@@ -202,8 +207,10 @@ function TabProfile({ user }: { user: UserType }) {
           <Formik
             initialValues={{
               name: user.fullname ?? "",
-              location: "",
-              introduce: "",
+              title: user.title ?? "",
+              facebookLink: user.facebookLink ?? "",
+              twitterLink: user.twitterLink ?? "",
+              websiteLink: user.websiteLink ?? "",
             }}
             onSubmit={(values, actions) => {
               onSubmit(values, actions);
@@ -230,34 +237,16 @@ function TabProfile({ user }: { user: UserType }) {
                     </FormControl>
                   )}
                 </Field>
-                <Field name="location">
-                  {/* @ts-ignore */}
-                  {({ field, form }) => (
-                    <FormControl
-                      isInvalid={form.errors.location && form.touched.location}
-                    >
-                      <FormLabel>Location</FormLabel>
-                      <Input {...field} placeholder="Location" />
-                      <FormErrorMessage>
-                        {form.errors.location}
-                      </FormErrorMessage>
-                    </FormControl>
-                  )}
-                </Field>
 
-                <Field name="introduce">
+                <Field name="title">
                   {/* @ts-ignore */}
                   {({ field, form }) => (
                     <FormControl
-                      isInvalid={
-                        form.errors.introduce && form.touched.introduce
-                      }
+                      isInvalid={form.errors.title && form.touched.title}
                     >
-                      <FormLabel>Introduce</FormLabel>
+                      <FormLabel>title</FormLabel>
                       <Input {...field} placeholder="Introduce" />
-                      <FormErrorMessage>
-                        {form.errors.introduce}
-                      </FormErrorMessage>
+                      <FormErrorMessage>{form.errors.title}</FormErrorMessage>
                     </FormControl>
                   )}
                 </Field>

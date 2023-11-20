@@ -99,10 +99,14 @@ function NotificationPage() {
     getNotifcation();
   }, [router.query]);
   const pageNumClick = (pageNumber: number, limit: number) => {
-    router.push({
-      pathname: router.pathname,
-      query: { ...router.query, limit: limit, page: pageNumber },
-    });
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, limit: limit, page: pageNumber },
+      },
+      undefined,
+      { shallow: true }
+    );
   };
   function renderPagination() {
     return (
@@ -202,15 +206,15 @@ function NotificationPage() {
                 limit: 10,
                 page: 1,
               },
-            });
+            },
+            undefined,
+            { shallow: true });
           }}
         >
           {
             //@ts-ignore
             filterData.map((item) => (
-              <option
-                value={item.value ? item.value : ""}
-              >
+              <option value={item.value ? item.value : ""}>
                 <Text as={"span"} flex={1}>
                   {getTranslate("NOTIFICATIONS") + `(${item.label})`}
                 </Text>
