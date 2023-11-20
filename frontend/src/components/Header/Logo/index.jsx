@@ -40,7 +40,10 @@ function Logo() {
       <Image src="/images/favicon.ico" alt="logo" width={50} height={50} />
       <VStack spacing={0} justifyContent={"start"} alignItems={"start"}>
         <Text
-          fontSize="xl"
+          fontSize={{
+            base: "sm",
+            md: "xl",
+          }}
           fontWeight="bold"
           minW={150}
           color={Colors(colorMode === "dark").PRIMARY}
@@ -52,7 +55,10 @@ function Logo() {
           QuestionDanIT
         </Text>
         <Text
-          fontSize="sm"
+          fontSize={{
+            base: "xs",
+            md: "sm",
+          }}
           fontWeight="bold"
           color={Colors(colorMode === "dark").DOWN_VOTE_RED}
           _hover={{

@@ -160,7 +160,6 @@ function AnswerEditor({
                     "clean",
                   ]}
                   bounds={".app"}
-                  i18nIsDynamicList={false}
                   readOnly={!sessions.data?.user?.id}
                   placeholder={getTranslate("ANSWER_PLACEHOLDER")}
                   tabIndex={1}

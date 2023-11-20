@@ -56,7 +56,7 @@ function Navigator({ getTranslate, isMobile }) {
     }
   }, [isMobile]);
   const DashboardHandle = () => {
-    routes.push("/user/profile");
+    routes.push("/user/profile?tab=activity");
   };
   return isMobile ? (
     <>

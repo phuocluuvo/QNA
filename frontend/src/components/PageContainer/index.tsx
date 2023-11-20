@@ -34,7 +34,7 @@ function PageContainer({ children }: Props) {
     };
   }, []);
   return (
-    <Container maxW={{ base: "fit-content", md: "100%" }} display={"flex"}>
+    <Container maxW={{ base: "100%", md: "90%" }} display={"flex"}>
       <SideRightMenu />
       <Flex
         gap={3}

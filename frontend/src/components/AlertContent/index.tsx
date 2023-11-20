@@ -14,6 +14,7 @@ function AlertContent({
   verifier?: UserType;
 }) {
   const { getTranslate } = LanguageHelper(Pages.HOME);
+
   const renderItemBaseOnType = (type: string) => {
     switch (type) {
       case "blocked":
