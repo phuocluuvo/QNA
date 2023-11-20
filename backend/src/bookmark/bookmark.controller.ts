@@ -126,13 +126,14 @@ export class BookmarkController {
   ) {
     const ability = this.caslAbilityFactory.createForUser(req["user"]);
     const bookmark = await this.bookmarkService.findOneById(id);
+    let collection = null;
 
     if (collectionId != null) {
-      await this.collectionService.findOneById(collectionId);
+      collection = await this.collectionService.findOneById(collectionId);
     }
 
     if (ability.can(Action.Update, bookmark)) {
-      return this.bookmarkService.update(bookmark, collectionId);
+      return this.bookmarkService.update(bookmark, collection);
     } else {
       throw new ForbiddenException(message.NOT_AUTHOR.BOOKMARK);
     }
