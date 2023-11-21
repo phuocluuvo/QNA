@@ -1,5 +1,4 @@
 import {
-  IsDate,
   IsEmail,
   IsNotEmpty,
   IsOptional,
@@ -42,7 +41,6 @@ export class CreateUserDto {
   @ApiProperty()
   @Expose()
   @IsOptional()
-  @IsDate()
   dob: Date;
 
   @ApiProperty()
