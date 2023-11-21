@@ -1,4 +1,4 @@
-import { Controller, Get, Request, UseGuards } from "@nestjs/common";
+import { Controller, Get, Param, Request, UseGuards } from "@nestjs/common";
 import { ActivityService } from "./activity.service";
 import {
   ApiOkPaginatedResponse,
@@ -32,5 +32,21 @@ export class ActivityController {
   async getActivityHistory(@Paginate() query: PaginateQuery, @Request() req) {
     const userId = req.user["sub"];
     return this.activityService.findByUserId(query, userId);
+  }
+
+  /**
+   * get activity history userId
+   * @param query
+   * @param req
+   */
+  @ApiOperation({
+    summary: "get activity history userId",
+  })
+  @Get("history/:id")
+  async getActivityHistoryByUser(
+    @Paginate() query: PaginateQuery,
+    @Param("id") id: string,
+  ) {
+    return this.activityService.findByUserId(query, id);
   }
 }
