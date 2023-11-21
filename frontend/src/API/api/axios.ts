@@ -4,6 +4,8 @@ import { getSession, signIn } from "next-auth/react";
 import _ from "lodash";
 import { STATUS } from "../constant/StatusCode.enum";
 const BASE_URL = "http://localhost:3001";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 export const apiFormData = axios.create({
   baseURL: BASE_URL,
   headers: {
@@ -101,6 +103,7 @@ export async function AuthApi(
       (error.response.status == STATUS.UNAUTHORIZED ||
         error.response.status == STATUS.BAD_REQUEST)
     ) {
+      toast.error(getErrorMessageFromCodeString(error.response.data.message));
       console.log("error.response.status", error.response.status);
       console.log("error.response.data", error.response);
       if (sessionUser) {
@@ -127,4 +130,12 @@ export async function AuthApi(
       return res;
     }
   }
+}
+
+function getErrorMessageFromCodeString(code: string) {
+  if (code === "NOT_VOTE_MY_SELF")
+    return "You cannot vote for your question/answer";
+  if (code === "Unauthorized")
+    return "You need to be logged in to perform this action";
+  return code;
 }

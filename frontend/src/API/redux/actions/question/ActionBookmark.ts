@@ -83,3 +83,32 @@ export function actionCreateCollection(
     });
   };
 }
+
+export function actionAddBookmarkToCollection(
+  form: {
+    collectionId: string;
+    bookmarkId: string;
+  },
+  callbackSuccess: (res: any) => void,
+  callbackError: () => void
+): any {
+  return (dispatch: any) => {
+    dispatch(requesting());
+    api
+      .addBookmarkToCollection(form.collectionId, form.bookmarkId)
+      .then((res: any) => {
+        console.log("addBookmarkToCollection:", res);
+        dispatch(requesting());
+        dispatch(
+          responseHandler(
+            res,
+            callbackSuccess,
+            callbackError,
+            false,
+            null,
+            null
+          )
+        );
+      });
+  };
+}

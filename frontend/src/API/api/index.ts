@@ -105,6 +105,10 @@ const getUserDashBoard = () => {
   return AuthApi(REQUEST_METHOD.GET, url.USER_PROFILE);
 };
 
+const getUserDashBoardById = (id: string) => {
+  return AuthApi(REQUEST_METHOD.GET, url.USER + "/info/" + id);
+};
+
 const voteAnswer = (form: FormVoteAnswer) => {
   return AuthApi(REQUEST_METHOD.POST, url.VOTE_ANSWER, form);
 };
@@ -238,7 +242,6 @@ const forgotPassword = (username: string) => {
 const resetPassword = (form: { password: string; uuid: string }) => {
   return api.post(url.RESET_PASSWORD, form);
 };
-
 const getAllCollections = () => {
   return AuthApi(REQUEST_METHOD.GET, url.COLLECTION);
 };
@@ -247,6 +250,38 @@ const createCollection = (collectionName: string) => {
   return AuthApi(REQUEST_METHOD.POST, url.COLLECTION, { name: collectionName });
 };
 
+const addBookmarkToCollection = (collectionId: string, bookmarkId: string) => {
+  if (collectionId !== "null") {
+    console.log("__collectionId", collectionId);
+    return AuthApi(REQUEST_METHOD.PATCH, url.BOOKMARK + "/" + bookmarkId, {
+      collection_id: collectionId,
+    });
+  }
+
+  return AuthApi(REQUEST_METHOD.PATCH, url.BOOKMARK + "/" + bookmarkId, {
+    bookmarkId,
+  });
+};
+
+const getQuestionHistory = (questionId: string) => {
+  return AuthApi(
+    REQUEST_METHOD.GET,
+    url.QUESTION + "/" + questionId + "/history"
+  );
+};
+const deleteCollection = (collectionId: string) => {
+  return AuthApi(
+    REQUEST_METHOD.DELETE,
+    url.COLLECTION + "/" + collectionId,
+    {}
+  );
+};
+
+const updateColectionName = (collectionId: string, name: string) => {
+  return AuthApi(REQUEST_METHOD.PATCH, url.COLLECTION + "/" + collectionId, {
+    name,
+  });
+};
 export default {
   requestSignUp,
   getQuestion,
@@ -288,4 +323,9 @@ export default {
   getBookmarksFromCollections,
   getAllCollections,
   createCollection,
+  addBookmarkToCollection,
+  getQuestionHistory,
+  getUserDashBoardById,
+  deleteCollection,
+  updateColectionName,
 };

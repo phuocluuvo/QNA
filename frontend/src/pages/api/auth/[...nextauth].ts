@@ -3,6 +3,7 @@ import CredentialProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import api from "@/API/api";
+import axios from "@/API/api/axios";
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -24,7 +25,10 @@ export const authOptions: AuthOptions = {
       async authorize(credentials, req) {
         if (credentials?.token) {
           console.log("credentials__:", credentials);
-          const user = await api.loginWithGoogle(credentials?.token as string);
+          const user = await axios.post("/api/auth/refresh-v2", {
+            refreshToken: credentials?.token,
+          });
+
           console.log("user__:", user);
           if (!user) return null;
           return user.data;
@@ -75,6 +79,7 @@ export const authOptions: AuthOptions = {
   secret: process.env.NEXTAUTH_SECRET as string,
   pages: {
     signIn: "/auth/signin",
+    error: "/auth/error",
   },
 };
 

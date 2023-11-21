@@ -1,8 +1,10 @@
 import { VOTE } from "@/API/constant/Vote.enum";
-import { AnswerListType } from "./Answer.type";
+import { AnswerListType, AnswerType } from "./Answer.type";
 import { PartialBy } from "./CustomType";
 import { TagType } from "./Tag.type";
 import { UserType } from "./User.type";
+import { CommentType } from "./Comment.type";
+import { BookmarkType } from "./Bookmark.type";
 
 type VoteType = Array<{
   createdAt: string;
@@ -30,8 +32,13 @@ interface Post {
   vote: VoteType;
   type: "no_answer" | "no_approved" | "normal";
   state: "verified" | "blocked" | "pending";
+  comments: Array<CommentType>;
+  bookmarks: Array<BookmarkType>;
 }
-
+type QuestionHistory<T extends QuestionType & AnswerType> = T & {
+  question: QuestionType;
+  answer: AnswerListType;
+};
 interface QuestionList {
   data: Array<QuestionType>;
   meta: {
@@ -55,6 +62,24 @@ export enum QUESTION_SORT_BY {
    */
   NORMAL = "normal",
 }
+type QuestionHistoryList = {
+  data: Array<QuestionHistoryType>;
+  meta: {
+    currentPage: number;
+    itemCount: number;
+    itemsPerPage: number;
+    totalItems: number;
+    totalPages: number;
+  };
+  links: {
+    current: string;
+    last: string;
+    next: string;
+  };
+};
+
+export type QuestionHistoryListType = QuestionHistoryList;
 
 export type QuestionType = PartialBy<Post, "tags" | "images">;
 export type QuestionListType = QuestionList;
+export type QuestionHistoryType = QuestionHistory<QuestionType & AnswerType>;

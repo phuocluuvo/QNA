@@ -52,3 +52,31 @@ type UserList = {
 export type UserType = User;
 export type UserListType = UserList;
 export type UserGithubType = GithubUser;
+
+type DashBoardUser<T extends UserType> = T & {
+  month: {
+    questionCount: string;
+    answerCount: string;
+    voteCount: string;
+    tagCount: string;
+  };
+  quarter: {
+    questionCount: string;
+    answerCount: string;
+    voteCount: string;
+    tagCount: string;
+  };
+  year: {
+    questionCount: string;
+    answerCount: string;
+    voteCount: string;
+    tagCount: string;
+  };
+  all: {
+    questionCount: string;
+    answerCount: string;
+    voteCount: string;
+    tagCount: string;
+  };
+};
+export type DashBoardUserType = DashBoardUser<UserType>;

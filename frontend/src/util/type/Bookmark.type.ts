@@ -1,3 +1,4 @@
+import { CollectionType } from "./Collection.type";
 import { QuestionType } from "./Question.type";
 import { UserType } from "./User.type";
 
@@ -8,7 +9,7 @@ type Bookmark = {
   type: "question" | "answer";
   updatedAt: string;
   user: UserType;
-  collection?: string;
+  collection: CollectionType | null;
 };
 
 type BookmarkList = {

@@ -53,7 +53,8 @@ function SavesQuestion({ user }: { user: UserType }) {
     collectionName: "",
     collection: [],
   });
-  const toast = useToast();
+  const [selectedCollection, setSelectedCollection] =
+    useState<CollectionType | null>(null);
   const { getTranslate } = LanguageHelper(Pages.HOME);
   const dispacth = useDispatch();
   useEffect(() => {
@@ -79,7 +80,7 @@ function SavesQuestion({ user }: { user: UserType }) {
         state?.collectionName as string,
         (res) => {
           let newCollection = state?.collection ? [...state?.collection] : [];
-          newCollection.push(res.data);
+          newCollection.push(res);
           // @ts-ignore
           setState((oldState) =>
             // @ts-ignore
@@ -120,16 +121,17 @@ function SavesQuestion({ user }: { user: UserType }) {
               backgroundColor: Colors(colorMode === "dark").PRIMARY,
             }}
             onClick={() => {
-              router.push(
-                {
-                  pathname: `/user/profile`,
-                  query: {
-                    tab: "saves",
-                  },
-                },
-                undefined,
-                { shallow: true }
-              );
+              setSelectedCollection(null);
+              //   router.push(
+              //     {
+              //       pathname: `/user/profile`,
+              //       query: {
+              //         tab: "saves",
+              //       },
+              //     },
+              //     undefined,
+              //     { shallow: true }
+              //   );
             }}
           >
             {getTranslate("ALL")}
@@ -140,16 +142,17 @@ function SavesQuestion({ user }: { user: UserType }) {
               backgroundColor: Colors(colorMode === "dark").PRIMARY,
             }}
             onClick={() => {
-              router.push(
-                {
-                  pathname: `/user/profile`,
-                  query: {
-                    tab: "for-later",
-                  },
-                },
-                undefined,
-                { shallow: true }
-              );
+              setSelectedCollection(null);
+              //   router.push(
+              //     {
+              //       pathname: `/user/profile`,
+              //       query: {
+              //         tab: "for-later",
+              //       },
+              //     },
+              //     undefined,
+              //     { shallow: true }
+              //   );
             }}
           >
             {getTranslate("FOR_LATER")}
@@ -187,19 +190,14 @@ function SavesQuestion({ user }: { user: UserType }) {
                 backgroundColor: Colors(colorMode === "dark").PRIMARY,
               }}
               onClick={() => {
-                router.push(
-                  {
-                    pathname: `/user/profile`,
-                    query: {
-                      tab: collection.name,
-                    },
-                  },
-                  undefined,
-                  { shallow: true }
-                );
+                setSelectedCollection(collection);
               }}
             >
-              {collection.name ?? "No name"}
+              <Text textAlign={"left"} noOfLines={1}>
+                {collection?.name?.trim() === ""
+                  ? getTranslate("NO_NAME")
+                  : collection?.name}
+              </Text>
             </TabCustom>
           ))}
         </TabList>
@@ -219,8 +217,14 @@ function SavesQuestion({ user }: { user: UserType }) {
               md: "10px",
             }}
             w={"full"}
+            onClick={() => {
+              setSelectedCollection(null);
+            }}
           >
-            <ForLaterTab collections={state?.collection ?? []} />
+            <ForLaterTab
+              collections={state?.collection ?? []}
+              collection={selectedCollection ?? null}
+            />
           </TabPanel>
           {state?.collection?.map((collection) => (
             <TabPanel
@@ -230,10 +234,20 @@ function SavesQuestion({ user }: { user: UserType }) {
                 md: "10px",
               }}
               w={"full"}
+              onClick={() => {
+                setSelectedCollection(collection);
+              }}
             >
               <OtherTab
                 collections={state.collection}
-                collection={collection}
+                collection={selectedCollection ?? collection}
+                updateCollections={(collections) => {
+                  setState((oldState) =>
+                    helper.mappingState(oldState, {
+                      collection: collections,
+                    })
+                  );
+                }}
               />
             </TabPanel>
           ))}

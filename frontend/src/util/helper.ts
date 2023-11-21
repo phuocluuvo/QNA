@@ -13,7 +13,7 @@ const formatDate = (date: string, useCount = false, formarter?: string) => {
   return useCount ? days : datetime.format(_formater);
 };
 
-const mappingState = (oldState: object, updateObject: object) => {
+const mappingState = <T, U>(oldState: T, updateObject: U): T & U => {
   const newState = { ...oldState, ...updateObject };
   return newState;
 };

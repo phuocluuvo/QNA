@@ -79,4 +79,5 @@ export type FormUpdateProfile = {
   facebookLink?: string;
   twitterLink?: string;
   websiteLink?: string;
+  dob?: string;
 };

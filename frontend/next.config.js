@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+
+const removeImports = require("next-remove-imports")();
 const nextConfig = {
   i18n: {
     defaultLocale: "vi",
@@ -24,5 +26,4 @@ const nextConfig = {
     appDir: false,
   },
 };
-
-module.exports = nextConfig;
+module.exports = removeImports(nextConfig);
