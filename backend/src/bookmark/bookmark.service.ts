@@ -6,7 +6,6 @@ import { bookmarkPaginateConfig } from "../config/pagination/bookmark-pagination
 import { message } from "../constants/message.constants";
 import { CreateBookmarkDto } from "./dto/create-bookmark.dto";
 import { ObjectActivityTypeEnum } from "../enums/reputation.enum";
-import { Collection } from "../collection/enity/collection.entity";
 
 @Injectable()
 export class BookmarkService {
@@ -87,12 +86,12 @@ export class BookmarkService {
   /**
    * Update a bookmark.
    * @param id
-   * @param collection_id
+   * @param collection
    * @param bookmark
    */
-  async update(bookmark: Bookmark, collection_id: string) {
-    if (collection_id != null) {
-      bookmark.collection = { id: collection_id } as unknown as Collection;
+  async update(bookmark: Bookmark, collection: any) {
+    if (collection != null) {
+      bookmark.collection = collection;
     } else {
       bookmark.collection = null;
     }
@@ -127,8 +126,14 @@ export class BookmarkService {
   }
 
   async checkQuestionIsBookmark(questionId: string, userId: string) {
-    return this.bookmarkRepository.findOne({
+    return await this.bookmarkRepository.findOne({
       where: { question: { id: questionId }, user: { id: userId } },
+    });
+  }
+
+  async checkAnswerIsBookmark(questionId: string, userId: string) {
+    return await this.bookmarkRepository.findOne({
+      where: { answer: { id: questionId }, user: { id: userId } },
     });
   }
 }

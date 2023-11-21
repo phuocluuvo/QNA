@@ -37,6 +37,23 @@ export class User {
   @Column({ nullable: false, unique: true })
   email: string;
 
+  @Column({ nullable: true })
+  title: string;
+
+  //Social links
+  @Column({ nullable: true, name: "facebook_link" })
+  facebookLink: string;
+
+  @Column({ nullable: true, name: "github_link" })
+  githubLink: string;
+
+  @Column({ nullable: true, name: "linkedin_link" })
+  twitterLink: string;
+
+  @Column({ nullable: true, name: "website_link" })
+  websiteLink: string;
+  //
+
   @Column({ nullable: false, select: false })
   password: string;
 
@@ -65,7 +82,7 @@ export class User {
   @Column({ type: "varchar", length: 255, nullable: true })
   uuid: string;
 
-  @Column({ type: "datetime", nullable: true })
+  @Column({ name: "uuid_created_at", type: "datetime", nullable: true })
   uuid_created_at: Date;
 
   // This is the virtual column.

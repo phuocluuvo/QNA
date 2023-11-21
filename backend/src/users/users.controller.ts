@@ -25,8 +25,8 @@ import { Roles } from "../auth/decorator/roles.decorator";
 import { Role } from "../enums/role.enum";
 import { userPaginateConfig } from "../config/pagination/user-pagination";
 import { User } from "./entity/users.entity";
-import { UpdateUserAdminDto } from "./dto/update-user-admin.dto";
 import { CreateUserAdminDto } from "./dto/create-user-admin.dto";
+import { QuestionTimeTypeEnum } from "src/enums/question-type.enum";
 
 @ApiTags("user")
 @Controller("user")
@@ -62,7 +62,7 @@ export class UsersController {
   })
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
-  @Patch()
+  @Patch("profile")
   async update(@Request() req, @Body() updateUserDto: UpdateUserDto) {
     const id = req.user["sub"];
     const user = await this.usersService.updateProfile(id, updateUserDto);
@@ -105,6 +105,36 @@ export class UsersController {
   }
 
   /**
+   * Get all user.
+   * @param id
+   */
+  @ApiOperation({
+    summary: "get one user for admin",
+  })
+  @ApiBearerAuth()
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.MONITOR)
+  @Get("info/:id")
+  async getInfoUserForAdmin(@Param("id") id: string) {
+    return {
+      ...(await this.usersService.getProlifeForAdmin(id)),
+      month: await this.usersService.getMoreProfileForAdmin(
+        id,
+        QuestionTimeTypeEnum.MONTH,
+      ),
+      quarter: await this.usersService.getMoreProfileForAdmin(
+        id,
+        QuestionTimeTypeEnum.QUARTER,
+      ),
+      year: await this.usersService.getMoreProfileForAdmin(
+        id,
+        QuestionTimeTypeEnum.YEAR,
+      ),
+      all: await this.usersService.getMoreProfileForAdmin(id),
+    };
+  }
+
+  /**
    * Update the profile of a user.
    *
    * @param id ID of the user to update.
@@ -144,7 +174,7 @@ export class UsersController {
   @Roles(Role.ADMIN)
   async updateUserForAdmin(
     @Param("id") id: string,
-    @Body() updateUserDto: UpdateUserAdminDto,
+    @Body() updateUserDto: UpdateUserDto,
   ) {
     const user = await this.usersService.updateUserForAdmin(id, updateUserDto);
     return plainToClass(UserDto, user, {

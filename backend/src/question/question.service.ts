@@ -57,7 +57,7 @@ export class QuestionService {
    * @param tagNames - The tag names to filter questions by.
    * @returns A paginated list of questions.
    */
-  async findWithRole(query: PaginateQuery, tagNames: string, loginUser: any) {
+  async find(query: PaginateQuery, tagNames: string, loginUser: any) {
     const tags = tagNames ? tagNames.split(",") : [];
     const queryBuilder = this.questionRepository.createQueryBuilder("question");
 
@@ -181,7 +181,7 @@ export class QuestionService {
     try {
       const question = await this.questionRepository.findOne({
         where: { id: questionId },
-        relations: ["user", "tags"],
+        relations: ["user", "tags", "comments"],
       });
       if (!question) {
         throw new NotFoundException(message.NOT_FOUND.QUESTION);

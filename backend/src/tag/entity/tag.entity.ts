@@ -43,7 +43,7 @@ export class Tag {
 
   // This is the foreign key column for the relationship entities.
 
-  @ManyToOne(() => User, (user) => user.questions, { nullable: true })
+  @ManyToOne(() => User, (user) => user.tags, { nullable: true })
   @JoinColumn({ name: "user_id" })
   user: User;
 

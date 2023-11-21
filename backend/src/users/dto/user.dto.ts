@@ -28,6 +28,23 @@ export class UserDto {
   role: Role;
 
   @Expose()
+  title: string;
+
+  //Social links
+  @Expose()
+  facebookLink: string;
+
+  @Expose()
+  githubLink: string;
+
+  @Expose()
+  twitterLink: string;
+
+  @Expose()
+  websiteLink: string;
+  //
+
+  @Expose()
   state: UserState;
 
   @Expose()

@@ -7,6 +7,7 @@ export const tagPaginateConfig: PaginateConfig<Tag> = {
   searchableColumns: ["name", "content"],
   relations: ["user"],
   filterableColumns: {
+    "user.id": [FilterOperator.EQ],
     state: [FilterOperator.EQ],
     createdAt: [
       FilterOperator.BTW,

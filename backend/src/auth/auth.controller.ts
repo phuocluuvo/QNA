@@ -133,4 +133,15 @@ export class AuthController {
   async checkUserExists(@Query("username") username: string) {
     return this.authService.checkUserExists(username);
   }
+
+  @ApiBearerAuth()
+  @UseGuards(AccessTokenGuard)
+  @Get("/confirm-password")
+  async confirmPassword(
+    @Req() req: Request,
+    @Query("password") password: string,
+  ) {
+    const userId = req.user["sub"];
+    return this.authService.confirmPassword(userId, password);
+  }
 }
