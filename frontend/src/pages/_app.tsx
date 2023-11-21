@@ -20,9 +20,9 @@ import "./index.css";
 import { CacheProvider } from "@chakra-ui/next-js";
 import PageContainer from "@/components/PageContainer";
 import LayoutProvider from "@/provider/LayoutProvider";
+import { ToastContainer } from "react-toastify";
 // @ts-ignore
 function App({ Component, pageProps: { session, ...pageProps } }) {
-  
   return (
     <SessionProvider session={pageProps.session}>
       <Provider store={store}>
@@ -59,6 +59,7 @@ function App({ Component, pageProps: { session, ...pageProps } }) {
                       data-i18n-is-dynamic-list={true}
                       {...pageProps}
                     />
+                    <ToastContainer />
                   </PageContainer>
                 </LayoutProvider>
               </ThemeProvider>

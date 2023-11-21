@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { Fragment, useEffect, useState, useContext } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { clientNamespaces } from "ni18n";
 import {
   Button,
@@ -33,11 +33,8 @@ import {
   SORT_ORDER_DATA_VI,
 } from "@/assets/constant/Filter.data";
 import TagList from "@/components/TagList";
-import SideRightMenu from "@/components/SideRightMenu";
-import PageContainer from "@/components/PageContainer";
 import { useSession } from "next-auth/react";
-import { LayoutContext } from "@/provider/LayoutProvider";
-import { ActionGetBadgeNotification } from "@/API/redux/actions/user/ActionGetNotificationBadge";
+
 const limitations = [5, 10, 15, 20];
 
 export default function Home() {
@@ -58,14 +55,14 @@ export default function Home() {
   const session = useSession();
   const { getTranslate, getCurrentLanguage } = LanguageHelper(Pages.HOME);
   const [valueSort, setValueSort] = useState("title");
-  const [isDecending, setIsDecending] = useState("ASC");
+  const [isDecending, setIsDecending] = useState("DESC");
   const { isOpen, onToggle } = useDisclosure();
 
   useEffect(() => {
     const defaultLimit = 10;
     const defaultPage = 1;
     const defaultSortBy = "title";
-    const defaultOrderBy = "ASC";
+    const defaultOrderBy = "DESC";
 
     const queryParams: GetQuesionParams = {
       limit: limit || defaultLimit,
@@ -79,7 +76,7 @@ export default function Home() {
     };
 
     setValueSort((router.query.sortBy as string) ?? "title");
-    setIsDecending((router.query.orderBy as string) ?? "ASC");
+    setIsDecending((router.query.orderBy as string) ?? "DESC");
 
     dispatch(
       // @ts-ignore
