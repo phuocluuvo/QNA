@@ -109,11 +109,9 @@ export class UsersController {
    * @param id
    */
   @ApiOperation({
-    summary: "get one user for admin",
+    summary: "get one user",
   })
   @ApiBearerAuth()
-  @UseGuards(AccessTokenGuard, RolesGuard)
-  @Roles(Role.ADMIN, Role.MONITOR)
   @Get("info/:id")
   async getInfoUserForAdmin(@Param("id") id: string) {
     return {
