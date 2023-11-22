@@ -334,6 +334,8 @@ export class UsersService {
           "user.dob as dob",
           "user.email as email",
           "user.role as role",
+          "user.location as location",
+          "user.about as about",
           "user.activityPoint as activityPoint",
           "user.createdAt as createdAt",
           "user.updatedAt as updatedAt",

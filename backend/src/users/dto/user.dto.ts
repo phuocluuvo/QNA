@@ -52,4 +52,10 @@ export class UserDto {
 
   @Expose()
   updatedAt: Date;
+
+  @Expose()
+  location: string;
+
+  @Expose()
+  about: string;
 }
