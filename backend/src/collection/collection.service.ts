@@ -19,6 +19,7 @@ export class CollectionService {
   async findOneById(id: string) {
     const collection = await this.collectionRepository.findOne({
       where: { id },
+      relations: ["user"],
     });
 
     if (!collection) {

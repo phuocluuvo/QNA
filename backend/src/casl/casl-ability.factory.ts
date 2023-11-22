@@ -45,7 +45,7 @@ type FlatBookmark = Bookmark & {
 };
 
 type FlatCollection = Collection & {
-  "user.id": Bookmark["user"]["id"];
+  "user.id": Collection["user"]["id"];
 };
 
 @Injectable()
