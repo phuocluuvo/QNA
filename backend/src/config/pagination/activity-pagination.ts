@@ -21,5 +21,4 @@ export const activityPaginateConfig: PaginateConfig<Activity> = {
       FilterOperator.GT,
     ],
   },
-
 };

@@ -67,7 +67,6 @@ export class NotificationController {
     summary: "get announcement",
   })
   @Get("announcement")
-  @UseGuards(AccessTokenGuard)
   async getAnnouncement() {
     return this.notificationService.findAnnouncement();
   }

@@ -33,7 +33,7 @@ export class NotificationService {
         isRead: isRead,
       });
     } else {
-      queryBuidler.orWhere({ isAnnouncement: true });
+      queryBuidler.orWhere({ isAnnouncement: false });
     }
 
     return paginate<Notification>(query, queryBuidler, notificationPagination);

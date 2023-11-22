@@ -100,4 +100,14 @@ export class CreateUserDto {
   @Expose()
   @ApiProperty()
   refreshToken: string;
+
+  @ApiProperty()
+  @Expose()
+  @IsOptional()
+  about: string;
+
+  @ApiProperty()
+  @Expose()
+  @IsOptional()
+  location: string;
 }
