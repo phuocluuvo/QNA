@@ -25,7 +25,7 @@ export class Collection {
   updatedAt: Date;
 
   // Relation
-  @ManyToOne(() => User, (user) => user.answers, {
+  @ManyToOne(() => User, (user) => user.collections, {
     onDelete: "CASCADE",
   })
   @JoinColumn({ name: "user_id" })

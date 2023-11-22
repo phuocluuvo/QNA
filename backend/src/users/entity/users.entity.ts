@@ -16,6 +16,7 @@ import { UserState } from "../../enums/user-state.enum";
 import { Tag } from "../../tag/entity/tag.entity";
 import { Bookmark } from "../../bookmark/entity/bookmark.entity";
 import { History } from "../../history/entity/history.entity";
+import { Collection } from "../../collection/enity/collection.entity";
 
 @Entity()
 export class User {
@@ -121,6 +122,9 @@ export class User {
 
   @OneToMany(() => Bookmark, (bk) => bk.user)
   bookmarks: Bookmark[];
+
+  @OneToMany(() => Collection, (co) => co.user)
+  collections: Collection[];
 
   @OneToMany(() => History, (history) => history.user)
   histories: History[];
