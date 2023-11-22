@@ -95,5 +95,9 @@
   "SAVED": "Saved",
   "FOR_LATER": "For later",
   "ACTIVITY": "Activity",
-  "ALL": "All"
+  "ALL": "All",
+  "EDITED": "Updated",
+  "MODIFIED_AT": "Modified at {0}",
+  "EDIT": "Edit",
+  "FORGOT_PASSWORD": "Forgot password"
 }

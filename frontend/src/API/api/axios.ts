@@ -103,7 +103,7 @@ export async function AuthApi(
       (error.response.status == STATUS.UNAUTHORIZED ||
         error.response.status == STATUS.BAD_REQUEST)
     ) {
-      toast.error(getErrorMessageFromCodeString(error.response.data.message));
+      toast.error(getErrorMessageFromCodeString(error.response.data?.message));
       console.log("error.response.status", error.response.status);
       console.log("error.response.data", error.response);
       if (sessionUser) {

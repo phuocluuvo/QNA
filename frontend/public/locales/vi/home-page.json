@@ -95,5 +95,9 @@
   "SAVED": "Đã lưu",
   "FOR_LATER": "Xem sau",
   "ACTIVITY": "Hoạt động",
-  "ALL": "Tất cả"
+  "ALL": "Tất cả",
+  "EDITED": "Đã chỉnh sửa",
+  "MODIFIED_AT": "Chỉnh sửa lúc {0}",
+  "EDIT": "Chỉnh sửa",
+  "FORGOT_PASSWORD": "Quên mật khẩu"
 }

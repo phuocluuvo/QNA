@@ -282,6 +282,14 @@ const updateColectionName = (collectionId: string, name: string) => {
     name,
   });
 };
+
+const deleteBookmark = (bookmarkId: string) => {
+  return AuthApi(REQUEST_METHOD.DELETE, url.BOOKMARK + "/" + bookmarkId, {});
+};
+
+const getAnouncements = () => {
+  return api.get(url.NOTIFICATION_ANOUNTMENT);
+};
 export default {
   requestSignUp,
   getQuestion,
@@ -328,4 +336,6 @@ export default {
   getUserDashBoardById,
   deleteCollection,
   updateColectionName,
+  deleteBookmark,
+  getAnouncements,
 };
