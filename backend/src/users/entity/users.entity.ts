@@ -86,10 +86,10 @@ export class User {
   @Column({ name: "uuid_created_at", type: "datetime", nullable: true })
   uuid_created_at: Date;
 
-  @Column("text")
+  @Column({ name: "about", nullable: true, type: "text" })
   about: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, type: "text" })
   location: string;
 
   // This is the virtual column.
