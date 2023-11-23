@@ -99,5 +99,6 @@
   "EDITED": "Updated",
   "MODIFIED_AT": "Modified at {0}",
   "EDIT": "Edit",
-  "FORGOT_PASSWORD": "Forgot password"
+  "FORGOT_PASSWORD": "Forgot password",
+  "ASK_QUESTION": "Ask Question"
 }

@@ -31,11 +31,20 @@ const removeEmpty = (obj: { [x: string]: any }) => {
 };
 
 const getQuestion = (form: FormQuestion) => {
-  return AuthApi(REQUEST_METHOD.GET, url.QUESTION + "/" + form.id.toString());
+  return api.get(url.QUESTION + "/" + form.id.toString());
 };
 
 const getQuestionList = (params: GetQuesionParams) => {
   let paramToURL = url.QUESTION_LIST + "?";
+  for (let key in params) {
+    // @ts-ignore
+    paramToURL += key + "=" + params[key] + "&";
+  }
+  return AuthApi("GET", paramToURL);
+};
+
+const getQuestionWithRelatedTags = (params: GetQuesionParams) => {
+  let paramToURL = url.QUESTION_LIST + "/related?";
   for (let key in params) {
     // @ts-ignore
     paramToURL += key + "=" + params[key] + "&";
@@ -290,6 +299,18 @@ const deleteBookmark = (bookmarkId: string) => {
 const getAnouncements = () => {
   return api.get(url.NOTIFICATION_ANOUNTMENT);
 };
+const getAllQuesitonByUser = (userId: string) => {
+  return api.get(
+    url.QUESTION + "?filter.user.id=" + userId + "&limit=10&sortBy=vote:DESC"
+  );
+};
+const getAllAnswerByUser = (userId: string) => {
+  let _url =
+    url.ANSWER + "?filter.user.id=" + userId + "&limit=10&sortBy=vote:DESC";
+  console.log("_url:", _url);
+  return api.get(_url);
+};
+
 export default {
   requestSignUp,
   getQuestion,
@@ -338,4 +359,7 @@ export default {
   updateColectionName,
   deleteBookmark,
   getAnouncements,
+  getQuestionWithRelatedTags,
+  getAllQuesitonByUser,
+  getAllAnswerByUser,
 };
