@@ -112,4 +112,14 @@ export class CreateUserAdminDto {
   @ApiProperty()
   @IsEnum(Role)
   role: Role;
+
+  @ApiProperty()
+  @Expose()
+  @IsOptional()
+  about: string;
+
+  @ApiProperty()
+  @Expose()
+  @IsOptional()
+  location: string;
 }
