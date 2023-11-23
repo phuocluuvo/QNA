@@ -74,7 +74,7 @@ const SelectOptions = ({
           value={_data.value}
           selected={index === defaultIndex}
         >
-          {_data.label}
+          <span>{_data.label}</span>
         </option>
       ))}
     </Select>

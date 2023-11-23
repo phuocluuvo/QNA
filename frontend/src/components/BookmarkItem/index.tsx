@@ -1,6 +1,10 @@
+import api from "@/API/api";
+import { actionAddBookmarkToCollection } from "@/API/redux/actions/question/ActionBookmark";
 import { Colors } from "@/assets/constant/Colors";
 import { Pages } from "@/assets/constant/Pages";
+import { LayoutContext } from "@/provider/LayoutProvider";
 import { LanguageHelper } from "@/util/Language/Language.util";
+import helper from "@/util/helper";
 import { BookmarkType } from "@/util/type/Bookmark.type";
 import { CollectionType } from "@/util/type/Collection.type";
 import {
@@ -34,11 +38,13 @@ import {
   useDisclosure,
   Input,
   Select,
+  useToast,
 } from "@chakra-ui/react";
 import { NextRouter } from "next/router";
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { BiDotsVerticalRounded } from "react-icons/bi";
 import { RiMenu2Line } from "react-icons/ri";
+import { useDispatch } from "react-redux";
 
 function BookmarkItem({
   bookmark,
@@ -57,10 +63,69 @@ function BookmarkItem({
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef();
-  const [newCollectionName, setNewCollectionName] = React.useState("");
+  const dispatch = useDispatch();
+  const [newCollection, setNewCollection] = React.useState({
+    name: "",
+    id: "",
+  });
+  const { moveBookmarkToCollection, removeBookmark } =
+    useContext(LayoutContext);
+  const toast = useToast();
   const { getTranslate } = LanguageHelper(Pages.HOME);
+  const deleteBookmark = () => {
+    api.deleteBookmark(bookmark.id).then((res) => {
+      console.log("Bookmark deleted", res);
+      removeBookmark(bookmark);
+      toast({
+        title: "Success",
+        description: `This question is removed successfully`,
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    });
+  };
   const moveCollection = (collectionName: string) => {
-    console.log(collectionName);
+    let form = newCollection.id
+      ? {
+          bookmarkId: bookmark.id,
+          collectionId: newCollection.id,
+        }
+      : {};
+    dispatch(
+      actionAddBookmarkToCollection(
+        {
+          bookmarkId: bookmark.id,
+          // @ts-ignore
+          collectionId: newCollection
+            ? newCollection.id
+              ? newCollection.id
+              : null
+            : null,
+        },
+        (res: BookmarkType) => {
+          moveBookmarkToCollection(
+            bookmark.collection,
+            res.collection ? res.collection : null,
+            bookmark
+          );
+          toast({
+            title: "Success",
+            description: `Move question to ${
+              newCollection ? newCollection.name : "Save for later"
+            } successfully`,
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+          });
+          onClose();
+        },
+        // @ts-ignore
+        (err) => {
+          console.log(err);
+        }
+      )
+    );
   };
   return (
     <>
@@ -119,9 +184,9 @@ function BookmarkItem({
                   marginLeft: "5px",
                 }}
               >
-                {bookmark.collection === null
-                  ? "For later"
-                  : bookmark.collection}
+                {!bookmark.collection?.name
+                  ? getTranslate("FOR_LATER")
+                  : bookmark.collection?.name}
               </Text>
             </SmallText>
             <Menu>
@@ -132,7 +197,13 @@ function BookmarkItem({
                 variant="ghost"
               />
               <MenuList>
-                <MenuItem>Unsaved</MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    deleteBookmark();
+                  }}
+                >
+                  Unsaved
+                </MenuItem>
                 <MenuItem onClick={onOpen}>Move to...</MenuItem>
               </MenuList>
             </Menu>
@@ -180,14 +251,15 @@ function BookmarkItem({
                 marginLeft: "5px",
               }}
             >
-              {bookmark.collection === null
+              {!bookmark.collection?.name
                 ? getTranslate("FOR_LATER")
-                : bookmark.collection}
+                : bookmark.collection?.name}
             </Text>
           </SmallText>
         </VStack>
         <AlertDialog
           motionPreset="slideInBottom"
+          // @ts-ignore
           leastDestructiveRef={cancelRef}
           onClose={onClose}
           isOpen={isOpen}
@@ -206,29 +278,53 @@ function BookmarkItem({
                   fontWeight: "bold",
                 }}
               >
-                Move current question to {newCollectionName}?
+                Move current question to {newCollection.name}?
               </Text>
               <Select
                 variant={"filled"}
                 placeholder={"Select collection"}
                 onChange={(e) => {
-                  setNewCollectionName(e.target.value);
+                  collections &&
+                    setNewCollection(
+                      // @ts-ignore
+                      (oldState) =>
+                        helper.mappingState(oldState, {
+                          // @ts-ignore
+                          name:
+                            e.target.value == null
+                              ? getTranslate("FOL_LATER")
+                              : collections.find(
+                                  (collection) =>
+                                    collection.id === e.target.value
+                                )?.name,
+                          id: e.target.value,
+                        })
+                    );
                 }}
               >
                 {collections?.map((collection) => (
-                  <option value={collection.name}>
-                    {collection.name ?? "No Name"}
+                  <option value={collection.id}>
+                    <span>{collection.name ?? "No Name"}</span>
                   </option>
                 ))}
-                <option value={"null"}>{"For later"}</option>
+                <option value={"null"}>
+                  <span>{getTranslate("FOR_LATER")}</span>
+                </option>
               </Select>
             </AlertDialogBody>
             <AlertDialogFooter>
+              {/* @ts-ignore */}
               <Button ref={cancelRef} onClick={onClose}>
                 No
               </Button>
-              <Button colorScheme="red" ml={3}>
-                Yes
+              <Button
+                colorScheme="red"
+                ml={3}
+                onClick={() => {
+                  moveCollection(newCollection.name);
+                }}
+              >
+                {getTranslate("CONFIRM")}
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>

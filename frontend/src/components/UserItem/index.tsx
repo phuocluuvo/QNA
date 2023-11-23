@@ -25,7 +25,6 @@ function UserItem({ user }: { user: UserType }) {
         padding: "10px",
         borderRadius: "5px",
       }}
-      bgColor={Colors(colorMode === "dark").PRIMARY_BG}
       _hover={{
         boxShadow: "0 0 0 2px orange",
         transition: "all 0.2s ease-in-out",
@@ -55,6 +54,12 @@ function UserItem({ user }: { user: UserType }) {
         >
           {user.fullname}
         </Button>
+        <Text display={user.title ? "block" : "none"} fontSize={"sm"}>
+          {user.title}
+        </Text>
+        <Text display={user.location ? "block" : "none"} fontSize={"sm"}>
+          {user.location}
+        </Text>
         <Text colorScheme="orange" fontSize={"sm"} fontWeight={"bold"}>
           {user.activityPoint}
         </Text>

@@ -47,19 +47,7 @@ function SideRightMenu() {
   }
   const sesssion = useSession();
   function checkRoute() {
-    return (
-      route.pathname === "/" ||
-      route.pathname === "/tags" ||
-      route.pathname.startsWith("/user/profile") ||
-      route.pathname === "/user/notification" ||
-      route.pathname === "/users" ||
-      route.pathname === "/user/[id]" ||
-      route.pathname === "/question/[id]" ||
-      route.pathname.includes("/censoring/question") ||
-      route.pathname.includes("/censoring/tags") ||
-      route.pathname.includes("/censoring/users") ||
-      route.pathname.includes("/search")
-    );
+    return !route.pathname.startsWith("/auth");
   }
 
   return (

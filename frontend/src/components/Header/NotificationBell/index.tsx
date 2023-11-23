@@ -175,9 +175,9 @@ function NotificationBell() {
                       selected={item.value == isRead}
                       value={item.value ? item.value : ""}
                     >
-                      <Text flex={1}>
+                      <span>
                         {getTranslate("NOTIFICATIONS") + `(${item.label})`}
-                      </Text>
+                      </span>
                     </option>
                   ))
                 }

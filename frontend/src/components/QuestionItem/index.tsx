@@ -138,10 +138,9 @@ function QuestionItem({
       ) : null}
       <VStack
         key={question.id}
-        spacing={1}
         flex={1}
         alignItems={"flex-start"}
-        height={"100%"}
+        justifyContent={"space-between"}
       >
         <Stack
           direction={
@@ -207,6 +206,7 @@ function QuestionItem({
           maxW={{ base: "xs", md: "md" }}
           noOfLines={2}
         />
+        <Spacer />
         <HStack w={"full"} alignItems={"flex-end"}>
           <HStack flexWrap={"wrap"}>
             {question.tagNames?.map((tag) => (

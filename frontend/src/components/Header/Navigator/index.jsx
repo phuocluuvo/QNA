@@ -19,6 +19,7 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import api from "@/API/api";
 import DrawerMenu from "@/components/DrawerMenu";
+import { toast } from "react-toastify";
 function Navigator({ getTranslate, isMobile }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { colorMode } = useColorMode();
@@ -26,7 +27,6 @@ function Navigator({ getTranslate, isMobile }) {
   const userData = useSelector((state) => state.userReducer.data);
   const { data: session } = useSession();
   const routes = useRouter();
-  const toast = useToast();
   const LogoutHandle = async () => {
     await api.signOut().then(async (res) => {
       await signOut({ redirect: false, callbackUrl: "/user/signin" })
@@ -35,12 +35,7 @@ function Navigator({ getTranslate, isMobile }) {
           console.log("logout success", res);
           localStorage.removeItem("userLogin");
           sessionStorage.removeItem("next-auth.session-token");
-          toast({
-            title: "Logout success",
-            status: "success",
-            duration: 3000,
-            isClosable: true,
-          });
+          toast.success("Logout success");
         })
         .catch((err) => {
           console.log("logout failed:", err);

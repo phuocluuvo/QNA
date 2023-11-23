@@ -1,18 +1,28 @@
 import { Pages } from "@/assets/constant/Pages";
 import { LanguageHelper } from "@/util/Language/Language.util";
 import { UserType } from "@/util/type/User.type";
-import { Badge, HStack, Text, VStack } from "@chakra-ui/react";
+import {
+  Badge,
+  Box,
+  HStack,
+  Spacer,
+  Text,
+  VStack,
+  useColorMode,
+} from "@chakra-ui/react";
+import dynamic from "next/dynamic";
 import React from "react";
-
-function AlertContent({
-  type,
-  content,
-  verifier,
-}: {
-  type: "verified" | "blocked" | "pending";
-  content?: string;
-  verifier?: UserType;
-}) {
+import Author from "../Author";
+import { QuestionType } from "@/util/type/Question.type";
+const EditerMarkdown = dynamic(
+  () =>
+    import("@uiw/react-md-editor").then((mod) => {
+      return mod.default.Markdown;
+    }),
+  { ssr: false }
+);
+function AlertContent({ question }: { question: QuestionType }) {
+  const { colorMode } = useColorMode();
   const { getTranslate } = LanguageHelper(Pages.HOME);
 
   const renderItemBaseOnType = (type: string) => {
@@ -29,19 +39,29 @@ function AlertContent({
               borderRadius: "10px",
               padding: "10px",
               marginBlock: "10px",
+              alignItems: "flex-start",
             }}
           >
             <Badge colorScheme="red">{getTranslate("BLOCKED")}</Badge>
-            <Text
-              fontSize="sm"
-              style={{
-                whiteSpace: "pre-line",
-                wordWrap: "break-word",
-                overflowWrap: "break-word",
+            <Box data-color-mode={colorMode}>
+              <EditerMarkdown
+                source={question.comments[0].content}
+                style={{
+                  fontSize: "16px",
+                  backgroundColor: "transparent",
+                }}
+              />
+            </Box>
+            <Spacer />
+            <Author
+              user={question.comments[0].user}
+              nameStyle={{
+                fontSize: "12px",
               }}
-            >
-              {content}
-            </Text>
+              type="simple"
+              sizeAvatar={"xs"}
+              bottomText={"Verified at " + question.comments[0].createdAt}
+            />
           </HStack>
         );
       case "pending":
@@ -59,23 +79,20 @@ function AlertContent({
             }}
           >
             <Badge colorScheme="yellow">{getTranslate("PENDING")}</Badge>
-            <Text
-              fontSize="sm"
+            <Text>This question is pending for review</Text>
+            {/* <EditerMarkdown
+              source={question.comments[0].content}
               style={{
-                whiteSpace: "pre-line",
-                wordWrap: "break-word",
-                overflowWrap: "break-word",
+                fontSize: "12px",
               }}
-            >
-              {content}
-            </Text>
+            /> */}
           </HStack>
         );
       default:
         return <></>;
     }
   };
-  return renderItemBaseOnType(type);
+  return renderItemBaseOnType(question.state);
 }
 
 export default AlertContent;
