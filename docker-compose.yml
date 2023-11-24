@@ -15,11 +15,13 @@ services:
       MYSQL_DATABASE: QNA_database
       MYSQL_CHARSET: utf8mb4
       MYSQL_COLLATION: utf8mb4_unicode_ci
+    volumes:
+      - mysql-data:/var/lib/mysql
     ports:
       - "3306:3306"
     networks:
       - sail
-
+ 
   backend:
     build:
       context: ./backend
@@ -53,26 +55,19 @@ services:
       - sail
     restart: always
 
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #   volumes:
-  #     - ./frontend:/usr/src/app
-  #     - /usr/src/app/node_modules
-  #   working_dir: /usr/src/app
-  #   command: yarn run dev
-  #   depends_on:
-  #     - backend
-  #   environment:
-  #     - WDS_SOCKET_HOST=127.0.0.1
-  #     - CHOKIDAR_USEPOLLING=true
-  #     - WATCHPACK_POLLING=true
-  #   ports:
-  #     - "3000:3000"
-  #   networks:
-  #     - sail
-  #   restart: always
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - backend
+    networks:
+      - sail
+
+volumes:
+  mysql-data:
 
 networks:
   sail:
