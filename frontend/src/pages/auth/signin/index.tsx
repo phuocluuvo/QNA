@@ -126,7 +126,6 @@ export default function SignIn() {
   function LoginGithubHandle(type: "github" | "google") {
     if (type === "google") {
       const baseURL = "http://localhost:3001";
-      // redirect to google login page
       window.location.href = `${baseURL}/api/auth/${type}`;
     } else
       signIn(type).then((response) => {
@@ -173,8 +172,6 @@ export default function SignIn() {
     );
   }
   const token = router.query.refreshToken;
-  console.log("__________token", token);
-
   useEffect(() => {
     if (router.query.refreshToken) {
       signIn("credentials", {
@@ -350,10 +347,13 @@ export default function SignIn() {
                     </FormControl>
                   )}
                 </Field>
-                <HStack justifyContent={"center"} alignItems={"center"}>
+                <HStack
+                  justifyItems={"center"}
+                  alignContent={"center"}
+                  mt={"5"}
+                >
                   <Button
                     type="submit"
-                    mt={"5"}
                     background={colorMode === "light" ? "gray.100" : "gray.700"}
                     border={"none"}
                     isLoading={props.isSubmitting}
@@ -361,7 +361,12 @@ export default function SignIn() {
                     {getTranslate("LOGIN")}
                   </Button>
                   <Spacer />
-                  <Button variant={"link"} size={"sm"} onClick={onOpen}>
+                  <Button
+                    colorScheme="gray"
+                    variant={"link"}
+                    size={"sm"}
+                    onClick={onOpen}
+                  >
                     {getTranslate("FORGOT_PASSWORD")}
                   </Button>
                 </HStack>

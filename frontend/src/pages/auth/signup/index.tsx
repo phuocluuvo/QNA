@@ -260,13 +260,14 @@ function Login() {
           </Formik>
           <Center>
             <Text>{getTranslate("ALREADY_HAVE_ACCOUNT")}</Text>
-            <LinkButton
-              style={{ padding: 0, minW: "unset", maxW: "unset" }}
-              textStyle={{ paddingLeft: 1, minW: "unset", maxW: "unset" }}
-              text={getTranslate("LOGIN")}
-              onClick={signIn}
-              href={router.basePath + "/user/signin"}
-            />
+            <Button
+              variant={"link"}
+              // textStyle={{ paddingLeft: 1, minW: "unset", maxW: "unset" }}
+              colorScheme="gray"
+              onClick={() => signIn()}
+            >
+              {getTranslate("LOGIN")}
+            </Button>
           </Center>
         </VStack>
       </HStack>
