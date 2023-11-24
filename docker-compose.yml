@@ -30,7 +30,7 @@ services:
       - ./backend:/usr/src/app
       - /usr/src/app/node_modules
     working_dir: /usr/src/app
-    command: npm run start:dev
+    command: nest start --prod
     depends_on:
       - redis
       - mysql
