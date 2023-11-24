@@ -11,6 +11,7 @@ RUN npm install -g @nestjs/cli
 # Install app dependencies
 RUN npm install
 
+RUN npm install pm2 -g
 # Bundle app source
 COPY . .
 
@@ -19,3 +20,4 @@ RUN npm run build
 
 # Start the server using the production build
 #CMD [ "node", "dist/main" ]
+CMD ["pm2-runtime", "start", "dist/main.js"]
