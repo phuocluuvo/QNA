@@ -1,4 +1,11 @@
-import { Controller, Get, Param, Request, UseGuards } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Param,
+  Query,
+  Request,
+  UseGuards,
+} from "@nestjs/common";
 import { ActivityService } from "./activity.service";
 import {
   ApiOkPaginatedResponse,
@@ -48,5 +55,21 @@ export class ActivityController {
     @Param("id") id: string,
   ) {
     return this.activityService.findByUserId(query, id);
+  }
+
+  /**
+   * get activity history userId
+   * @param id
+   * @param date
+   */
+  @ApiOperation({
+    summary: "get activity history userId",
+  })
+  @Get("activityPointChange/:id")
+  async getActivityPointChange(
+    @Param("id") id: string,
+    @Query("date") date: string,
+  ) {
+    return this.activityService.getPointChange(id, date);
   }
 }
