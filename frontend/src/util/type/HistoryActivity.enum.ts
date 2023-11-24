@@ -17,6 +17,11 @@ export enum HISTORY_ACTIVITY_TYPE {
   CANCLE_DOWNVOTE = "cancle_down_vote",
   CHANGE_UPVOTE_TO_DOWNVOTE = "change_up_vote_to_down_vote",
   UN_ACCEPT_ANSWER = "un_accept_answer",
+
+  CREATE_TAG = "create_tag",
+  VERIFY_QUESTION = "verify_question",
+  BLOCK_QUESTION = "block_question",
+  VERIFY_TAG = "verify_tag",
 }
 
 export enum OBJECT_ACTIVITY_TYPE {
@@ -25,4 +30,5 @@ export enum OBJECT_ACTIVITY_TYPE {
   COMMENT = "comment",
   VOTE_QUESTION = "vote_question",
   VOTE_ANSWER = "vote_answer",
+  TAG = "tag",
 }

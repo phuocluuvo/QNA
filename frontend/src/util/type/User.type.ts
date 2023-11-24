@@ -17,6 +17,8 @@ interface User {
   facebookLink?: string;
   websiteLink?: string;
   title?: string;
+  location?: string;
+  about?: string;
 }
 
 // github user type

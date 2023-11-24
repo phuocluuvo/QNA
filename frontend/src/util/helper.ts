@@ -5,6 +5,16 @@ import {
   NotificationDesEumn,
   NotificationEumn,
 } from "./type/Notification.enum";
+const removeMd = require("remove-markdown");
+
+export const markdownToPlainText = (markdown: string) => {
+  return removeMd(markdown, {
+    stripListLeaders: true,
+    listUnicodeChar: "",
+    gfm: true,
+    useImgAltText: true,
+  });
+};
 
 const formatDate = (date: string, useCount = false, formarter?: string) => {
   const datetime = moment(date);
@@ -68,6 +78,14 @@ const getTranslationFromHistoryAcitvityVi = (
       return "đã đổi upvote thành downvote";
     case HISTORY_ACTIVITY_TYPE.UN_ACCEPT_ANSWER:
       return "đã hủy câu trả lời được chấp nhận";
+    case HISTORY_ACTIVITY_TYPE.CREATE_TAG:
+      return "đã tạo thẻ";
+    case HISTORY_ACTIVITY_TYPE.VERIFY_QUESTION:
+      return "câu hỏi đã được duyệt";
+    case HISTORY_ACTIVITY_TYPE.VERIFY_TAG:
+      return "thẻ đã được duyệt";
+    case HISTORY_ACTIVITY_TYPE.BLOCK_QUESTION:
+      return "đã bị ẩn vì vi phạm các quy tắc";
     default:
       return "";
   }
@@ -111,6 +129,14 @@ const getTranslationFromHistoryAcitvityEn = (
       return "changed upvote to downvote";
     case HISTORY_ACTIVITY_TYPE.UN_ACCEPT_ANSWER:
       return "unaccepted an answer";
+    case HISTORY_ACTIVITY_TYPE.CREATE_TAG:
+      return "created a tag";
+    case HISTORY_ACTIVITY_TYPE.VERIFY_QUESTION:
+      return "question has been verified";
+    case HISTORY_ACTIVITY_TYPE.VERIFY_TAG:
+      return "tag has been verified";
+    case HISTORY_ACTIVITY_TYPE.BLOCK_QUESTION:
+      return "has been hidden due to violation of the rules";
     default:
       return "";
   }
@@ -313,6 +339,20 @@ function gaurdsRouteRoles(
   } else {
     callbackError();
   }
+}
+
+export function removeVietnameseTones(str: string) {
+  str = str
+    .normalize("NFD") // decompose special characters
+    .replace(/[\u0300-\u036f]/g, "") // remove diacritics
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D") // replace đ and Đ
+    .toLowerCase() // convert to lower case
+    .trim() // remove spaces from both ends
+    .replace(/\s+/g, "-") // replace spaces with hyphens
+    .replace(/[^\w\-]+/g, "") // remove all non-word chars
+    .replace(/\-\-+/g, "-"); // replace multiple hyphens with a single hyphen
+  return str;
 }
 export default {
   numberFormat,
