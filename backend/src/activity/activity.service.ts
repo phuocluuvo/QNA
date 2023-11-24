@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable } from "@nestjs/common";
 import { MoreThanOrEqual, Repository } from "typeorm";
 import { User } from "../users/entity/users.entity";
 import { UsersService } from "../users/users.service";
@@ -127,5 +127,37 @@ export class ActivityService {
     const pointChange = activity.reduce((a, b) => a + b.pointChange, 0);
 
     return this.usersService.updateActivityPoint(userId, -pointChange);
+  }
+
+  async getPointChange(userId: string, date: string) {
+    const user = await this.usersService.find({
+      id: userId,
+    });
+
+    const queryBuiler =
+      await this.activityRepository.createQueryBuilder("activity");
+    queryBuiler.select([
+      "DATE(activity.createdAt) AS activity_date",
+      "SUM(activity.pointChange) AS total_points",
+    ]);
+    queryBuiler.where({ user: { id: userId } });
+    if (date != "all") {
+      const datet = new Date(date);
+
+      if (isNaN(datet.getTime())) {
+        throw new BadRequestException();
+      }
+
+      queryBuiler.andWhere("activity.createdAt >= :date", { date });
+    }
+    queryBuiler.groupBy("activity_date");
+    const result = await queryBuiler.getRawMany();
+    let cur_point = user.activityPoint;
+    for (let i = result.length - 1; i >= 0; i--) {
+      result[i].total_points = cur_point - result[i].total_points;
+      cur_point = result[i].total_points;
+    }
+
+    return result;
   }
 }

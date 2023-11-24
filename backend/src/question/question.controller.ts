@@ -263,4 +263,33 @@ export class QuestionController {
       QuestionState.BLOCKED,
     );
   }
+
+  /**
+   * undelete for a question.
+   *
+   * @param req - The request object.
+   * @param questionId
+   * @returns The result of the vote.
+   */
+  @ApiOperation({
+    summary: "verify question",
+  })
+  @ApiBearerAuth()
+  @Get(":questionId/unblock")
+  @UseGuards(AccessTokenGuard)
+  async undelete(@Req() req: Request, @Param("questionId") questionId: string) {
+    const userId = req.user["sub"];
+    const ability = this.caslAbilityFactory.createForUser(req.user);
+    const question = await this.questionService.findOneById(questionId);
+
+    if (ability.can(Action.Delete, question)) {
+      return this.questionService.censoring(
+        questionId,
+        userId,
+        QuestionState.PENDING,
+      );
+    } else {
+      throw new ForbiddenException(message.NOT_AUTHOR.QUESTION);
+    }
+  }
 }
