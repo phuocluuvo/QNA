@@ -28,6 +28,7 @@ import { useRouter } from "next/router";
 import React, { useContext, useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
 import { useDispatch } from "react-redux";
+import { toast } from "react-toastify";
 
 function OtherTab({
   collection,
@@ -68,18 +69,23 @@ function OtherTab({
     });
   }
   function renameCollection() {
-    api.updateColectionName(collection.id, newCollectionName).then((res) => {
-      if (res && res.status === 200) {
-        const newCollections = collections.map((item) => {
-          if (item.id === collection.id) {
-            item.name = newCollectionName;
-          }
-          return item;
-        });
-        updateCollections(newCollections);
-        onClose();
-      }
-    });
+    api
+      .updateColectionName(collection.id, newCollectionName)
+      .then((res) => {
+        if (res && res.status === 200) {
+          const newCollections = collections.map((item) => {
+            if (item.id === collection.id) {
+              item.name = newCollectionName;
+            }
+            return item;
+          });
+          updateCollections(newCollections);
+          onClose();
+        }
+      })
+      .catch((err) => {
+        toast.error(err.response.data.message);
+      });
   }
   return (
     <VStack alignItems={"flex-start"} flex={1} w={"full"}>

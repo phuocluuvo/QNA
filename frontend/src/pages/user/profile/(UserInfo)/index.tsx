@@ -1,11 +1,12 @@
 import { Colors } from "@/assets/constant/Colors";
 import { UserType } from "@/util/type/User.type";
-import { TimeIcon } from "@chakra-ui/icons";
+import { LinkIcon, TimeIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
   HStack,
   Heading,
+  IconButton,
   Stack,
   Text,
   VStack,
@@ -15,7 +16,8 @@ import {
 import moment from "moment";
 import { useRouter } from "next/router";
 import React from "react";
-import { BiCake } from "react-icons/bi";
+import { BiCake, BiLocationPlus, BiMapPin } from "react-icons/bi";
+import { FaFacebook, FaGithub, FaTwitter } from "react-icons/fa";
 const DEFAULT_USER: UserType = {
   fullname: "",
   email: "",
@@ -116,8 +118,14 @@ function UserInfoProfile({ user }: { user: UserType }) {
               md: "sm",
             }}
           >
-            {user.title ?? "Dev of the year"}
+            {user.title}
           </Text>
+          <BiMapPin
+            style={{
+              display: user.location ? "flex" : "none",
+            }}
+          />
+          <Text>{user.location}</Text>
         </HStack>
         <Heading size={"sm"}>
           {user.activityPoint}{" "}
@@ -126,7 +134,7 @@ function UserInfoProfile({ user }: { user: UserType }) {
               color: Colors(colorMode === "dark").PRIMARY,
             }}
           >
-            contribuite points
+            reputation points
           </span>
         </Heading>
         <Stack
@@ -163,6 +171,44 @@ function UserInfoProfile({ user }: { user: UserType }) {
             </Text>
           </HStack>
         </Stack>
+        <HStack>
+          <IconButton
+            display={user.githubLink ? "flex" : "none"}
+            variant={"ghost"}
+            aria-label="Github"
+            onClick={() => {
+              window.open(user.githubLink, "_blank");
+            }}
+            icon={<FaGithub />}
+          />
+          <IconButton
+            display={user.twitterLink ? "flex" : "none"}
+            variant={"ghost"}
+            aria-label="Twitter"
+            onClick={() => {
+              window.open(user.twitterLink, "_blank");
+            }}
+            icon={<FaTwitter />}
+          />
+          <IconButton
+            display={user.facebookLink ? "flex" : "none"}
+            variant={"ghost"}
+            aria-label="Facebook"
+            onClick={() => {
+              window.open(user.facebookLink, "_blank");
+            }}
+            icon={<FaFacebook />}
+          />
+          <IconButton
+            display={user.websiteLink ? "flex" : "none"}
+            variant={"ghost"}
+            aria-label="Website"
+            onClick={() => {
+              window.open(user.websiteLink, "_blank");
+            }}
+            icon={<LinkIcon />}
+          />
+        </HStack>
       </VStack>
     </Stack>
   );

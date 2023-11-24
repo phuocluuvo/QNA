@@ -1,12 +1,13 @@
 import { actionGetAllBookmarks } from "@/API/redux/actions/question/ActionBookmark";
 import BookmarkItem from "@/components/BookmarkItem";
-import { BookmarkListType } from "@/util/type/Bookmark.type";
+import { LayoutContext } from "@/provider/LayoutProvider";
+import { BookmarkListType, BookmarkType } from "@/util/type/Bookmark.type";
 import { CollectionType } from "@/util/type/Collection.type";
 import { Box, Text, VStack, useColorMode } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { useDispatch } from "react-redux";
-
+let isFirstTime = false;
 function TabBookMarkAll({
   collections,
 }: {
@@ -15,30 +16,43 @@ function TabBookMarkAll({
   const router = useRouter();
 
   const dispacth = useDispatch();
-  const [bookmarks, setBookmarks] = React.useState<BookmarkListType | null>(
+  const [_bookmarks, setBookmarks] = React.useState<BookmarkType[] | null>(
     null
   );
+  const { bookmarks, updateBookmarks } = useContext(LayoutContext);
   const { colorMode } = useColorMode();
+  const fetchBookmarks = () => {
+    isFirstTime = true;
+    dispacth(
+      actionGetAllBookmarks(
+        (res) => {
+          setBookmarks(res.data);
+          updateBookmarks(res.data);
+        },
+        () => {}
+      )
+    );
+    setBookmarks(bookmarks);
+  };
   useEffect(() => {
-    if (router.query.tab === "saves")
-      dispacth(
-        actionGetAllBookmarks(
-          (res) => {
-            setBookmarks(res);
-          },
-          () => {}
-        )
-      );
-  }, [router.query]);
+    fetchBookmarks();
+  }, [collections, router.query]);
   return (
     <VStack alignItems={"flex-start"} flex={1} w={"full"}>
-      <Text>All Saves</Text>
-      <Text>{bookmarks?.data.length} question</Text>
+      <Text
+        style={{
+          fontSize: 20,
+          fontWeight: "bold",
+        }}
+      >
+        All Saves
+      </Text>
+      <Text>{_bookmarks?.length} question</Text>
       <Box w={"full"}>
-        {bookmarks?.data.map((bookmark, index) => (
+        {_bookmarks?.map((bookmark, index) => (
           <BookmarkItem
             colorMode={colorMode}
-            bookmarksLength={bookmarks.data.length}
+            bookmarksLength={_bookmarks.length}
             bookmark={bookmark}
             router={router}
             index={index}

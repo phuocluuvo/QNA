@@ -1,14 +1,18 @@
-import actionGetProfile from "@/API/redux/actions/user/ActionGetProfile";
+import actionGetProfile, {
+  actionGetUserDashBoardById,
+} from "@/API/redux/actions/user/ActionGetProfile";
 import { Colors } from "@/assets/constant/Colors";
 import { Pages } from "@/assets/constant/Pages";
 import { LanguageHelper } from "@/util/Language/Language.util";
 import helper from "@/util/helper";
 import { HistoryActivityListType } from "@/util/type/HistoryActivity";
-import { UserType } from "@/util/type/User.type";
+import { DashBoardUserType, UserType } from "@/util/type/User.type";
 import { TimeIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
+  Divider,
+  Grid,
   HStack,
   Heading,
   Stack,
@@ -19,6 +23,7 @@ import {
   Tabs,
   Text,
   VStack,
+  styled,
   useColorMode,
   useToast,
 } from "@chakra-ui/react";
@@ -29,6 +34,11 @@ import { BiCake } from "react-icons/bi";
 import { useDispatch } from "react-redux";
 import TabProfile from "./(TabProfile)";
 import { actionGetUserById } from "@/API/redux/actions/user/ActionGetUserById";
+import api from "@/API/api";
+import { QuestionListType } from "@/util/type/Question.type";
+import { AnswerListType } from "@/util/type/Answer.type";
+import QuestionItem from "@/components/QuestionItem";
+import AnswerItem from "@/components/AnswerItem";
 const DEFAULT_USER: UserType = {
   fullname: "",
   email: "",
@@ -47,6 +57,8 @@ function DashBoard() {
   const [history, setHistory] = React.useState<HistoryActivityListType | null>(
     null
   );
+
+  const [dashboard, setDashboard] = React.useState<DashBoardUserType>();
   const { colorMode } = useColorMode();
   const router = useRouter();
   const query = router.query;
@@ -87,13 +99,24 @@ function DashBoard() {
               username: res.username,
               avatar: res.avatar,
               activityPoint: res.activityPoint,
+              title: res.title,
+              about: res.about,
             })
           );
         },
         () => {}
       )
     );
-  }, []);
+    dispatch(
+      actionGetUserDashBoardById(
+        userId as string,
+        (res) => {
+          setDashboard(res);
+        },
+        () => {}
+      )
+    );
+  }, [router.query]);
   return (
     <Box
       style={{
@@ -160,6 +183,13 @@ function DashBoard() {
           <HStack justifyItems={"flex-start"}>
             <Heading>{state.fullname}</Heading>
           </HStack>
+          <Text
+            style={{
+              fontSize: "16px",
+            }}
+          >
+            {state.title}
+          </Text>
           <Heading size={"sm"}>
             {state.activityPoint}{" "}
             <span
@@ -170,6 +200,7 @@ function DashBoard() {
               contribuite points
             </span>
           </Heading>
+
           <Stack
             direction={{
               base: "column",
@@ -226,12 +257,16 @@ function DashBoard() {
         </TabList>
         <TabPanels>
           <TabPanel>
-            <TabProfile user={state} />
+            {dashboard ? (
+              <TabProfile user={state} dashboard={dashboard} />
+            ) : null}
           </TabPanel>
         </TabPanels>
       </Tabs>
     </Box>
   );
 }
+
+
 
 export default DashBoard;

@@ -1,3 +1,4 @@
+"use client";
 import { ActionGetAllNotification } from "@/API/redux/actions/user/ActionGetAllNotification";
 import { ActionReadAllNotification } from "@/API/redux/actions/user/ActionReadAllNotification";
 import { CommonParams } from "@/API/type/params/Common.params";
@@ -19,7 +20,7 @@ import {
   useColorMode,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 const limitations = [5, 10, 15, 20];
 const filterData = [
@@ -38,6 +39,8 @@ const filterData = [
 ];
 
 function NotificationPage() {
+  const [hydrated, setHydrated] = useState(false);
+
   const dispatch = useDispatch();
   const { getTranslate, getListLanguage, getCurrentLanguage } = LanguageHelper(
     Pages.HOME
@@ -178,7 +181,13 @@ function NotificationPage() {
   }
   React.useEffect(() => {
     getNotifcation();
-  }, [query]);
+  }, []);
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+  if (!hydrated) {
+    return null;
+  }
   return (
     <Box
       display={"flex"}
@@ -197,25 +206,28 @@ function NotificationPage() {
           style={{
             fontSize: "xs",
           }}
+          suppressHydrationWarning
           onChange={(e) => {
-            router.push({
-              pathname: router.pathname,
-              query: {
-                ...router.query,
-                select: e.target.value,
-                limit: 10,
-                page: 1,
+            router.push(
+              {
+                pathname: router.pathname,
+                query: {
+                  ...router.query,
+                  select: e.target.value,
+                  limit: 10,
+                  page: 1,
+                },
               },
-            },
-            undefined,
-            { shallow: true });
+              undefined,
+              { shallow: true }
+            );
           }}
         >
           {
             //@ts-ignore
             filterData.map((item) => (
               <option value={item.value ? item.value : ""}>
-                <Text as={"span"} flex={1}>
+                <Text as={"span"}>
                   {getTranslate("NOTIFICATIONS") + `(${item.label})`}
                 </Text>
               </option>

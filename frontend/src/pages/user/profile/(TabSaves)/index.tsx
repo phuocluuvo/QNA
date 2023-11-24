@@ -24,7 +24,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import TabBookMarkAll from "./(all)";
 import { AddIcon } from "@chakra-ui/icons";
 import { LanguageHelper } from "@/util/Language/Language.util";
@@ -40,6 +40,7 @@ import { CollectionType } from "@/util/type/Collection.type";
 import helper from "@/util/helper";
 import OtherTab from "./(other)";
 import _ from "lodash";
+import { LayoutContext } from "@/provider/LayoutProvider";
 
 function SavesQuestion({ user }: { user: UserType }) {
   const { colorMode } = useColorMode();
@@ -55,6 +56,7 @@ function SavesQuestion({ user }: { user: UserType }) {
   });
   const [selectedCollection, setSelectedCollection] =
     useState<CollectionType | null>(null);
+  const { addNewCollection } = useContext(LayoutContext);
   const { getTranslate } = LanguageHelper(Pages.HOME);
   const dispacth = useDispatch();
   useEffect(() => {
@@ -75,12 +77,14 @@ function SavesQuestion({ user }: { user: UserType }) {
     );
   }, []);
   function createCollectionHandle() {
+    if (state?.collectionName.trim() === "") return;
     dispacth(
       actionCreateCollection(
         state?.collectionName as string,
         (res) => {
           let newCollection = state?.collection ? [...state?.collection] : [];
           newCollection.push(res);
+          addNewCollection(res);
           // @ts-ignore
           setState((oldState) =>
             // @ts-ignore
@@ -110,9 +114,10 @@ function SavesQuestion({ user }: { user: UserType }) {
         <TabList
           display={{ sm: "none", md: "flex" }}
           flexDir={{ base: "row", md: "column" }}
-          borderBottom={{
-            base: "1px solid",
-            md: "none",
+          style={{
+            borderBottomColor: "transparent",
+            borderBottomStyle: "solid",
+            borderBottomWidth: "1px",
           }}
         >
           <TabCustom

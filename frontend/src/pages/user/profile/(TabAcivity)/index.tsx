@@ -2,6 +2,7 @@ import { ActionGetUserHistory } from "@/API/redux/actions/user/ActionGetActivity
 import { CommonParams } from "@/API/type/params/Common.params";
 import { Colors } from "@/assets/constant/Colors";
 import { Pages } from "@/assets/constant/Pages";
+import ActivityItem from "@/components/ActivityItem";
 import { LanguageHelper } from "@/util/Language/Language.util";
 import helper from "@/util/helper";
 import {
@@ -24,6 +25,7 @@ import {
   Spacer,
   useColorMode,
   Text,
+  Badge,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import React from "react";
@@ -71,27 +73,26 @@ function TabActivity({
         ? `${router.query.sortBy}:${router.query.orderBy || defaultOrderBy}`
         : `${defaultSortBy}:${defaultOrderBy}`,
     };
-    if (router.query.tab === "activity")
-      dispatch(
+    // if (router.query.tab === "activity")
+    dispatch(
+      // @ts-ignore
+      ActionGetUserHistory(
+        queryParams,
         // @ts-ignore
-        ActionGetUserHistory(
-          queryParams,
-          // @ts-ignore
-          (res) => {
-            setHistory(res);
-          },
-          // @ts-ignore
-          (err) => {
-            console.log(err);
-          }
-        )
-      );
+        (res) => {
+          setHistory(res);
+        },
+        // @ts-ignore
+        (err) => {
+          console.log(err);
+        }
+      )
+    );
   }, [query]);
   return (
     <>
       <TableContainer mt={5}>
         <Table
-          variant="striped"
           size={{
             base: "sm",
             md: "lg",
@@ -104,31 +105,14 @@ function TabActivity({
           <Thead>
             <Tr>
               <Th>{getTranslate("ACTIVITY")}</Th>
+              <Th>Type</Th>
               <Th>Date</Th>
               <Th isNumeric>Point Received</Th>
             </Tr>
           </Thead>
           <Tbody>
             {history?.data.map((item: HistoryActivityType) => (
-              <Tr>
-                <Td>
-                  {getCurrentLanguage().code === "vi"
-                    ? helper.getTranslationFromHistoryAcitvityVi(
-                        item.activityType
-                      )
-                    : helper.getTranslationFromHistoryAcitvityEn(
-                        item.activityType
-                      )}
-                </Td>
-                <Td>
-                  {helper.formatDate(
-                    item.createdAt,
-                    false,
-                    "HH:mm:ss - DD/MM/YYYY"
-                  )}
-                </Td>
-                <Td isNumeric>{item.pointChange}</Td>
-              </Tr>
+              <ActivityItem item={item} key={item.id} />
             ))}
           </Tbody>
           <Tfoot></Tfoot>
@@ -145,9 +129,9 @@ function TabActivity({
             ? history?.meta.totalPages > 1 &&
               numberOfPages.map((_, index) => {
                 if (
-                  index < 2 || // first 2 pages
-                  index > numberOfPages.length - 3 || // last 2 pages
-                  (pageNumber && Math.abs(pageNumber - index - 1) <= 2) // 2 pages around current page
+                  index < 1 || // first page
+                  index > numberOfPages.length - 2 || // last page
+                  (pageNumber && Math.abs(pageNumber - index - 1) <= 1) // 1 page around current page
                 ) {
                   return (
                     <Button
@@ -178,18 +162,11 @@ function TabActivity({
                     </Button>
                   );
                 } else if (
-                  (index === 2 && pageNumber > 4) || // after first 2 pages and current page is greater than 4
-                  (index === numberOfPages.length - 3 &&
-                    pageNumber < numberOfPages.length - 3) // before last 2 pages and current page is less than total pages - 3
+                  (index === 1 && pageNumber > 3) || // after first page and current page is greater than 3
+                  (index === numberOfPages.length - 2 &&
+                    pageNumber < numberOfPages.length - 2) // before last page and current page is less than total pages - 2
                 ) {
-                  return (
-                    <Button
-                      onClick={() => pageNumClick(index + 1, limit)}
-                      key={index}
-                    >
-                      ...
-                    </Button>
-                  );
+                  return <Text key={index}>...</Text>;
                 } else {
                   return null;
                 }

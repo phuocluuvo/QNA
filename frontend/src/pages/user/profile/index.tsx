@@ -1,32 +1,19 @@
 import actionGetProfile from "@/API/redux/actions/user/ActionGetProfile";
-import { Colors } from "@/assets/constant/Colors";
 import { Pages } from "@/assets/constant/Pages";
 import { LanguageHelper } from "@/util/Language/Language.util";
 import helper from "@/util/helper";
-import { HistoryActivityListType } from "@/util/type/HistoryActivity";
 import { UserType } from "@/util/type/User.type";
-import { TimeIcon } from "@chakra-ui/icons";
 import {
-  Avatar,
   Box,
-  HStack,
-  Heading,
-  Stack,
   Tab,
   TabList,
   TabPanel,
   TabPanels,
   Tabs,
-  Text,
-  VStack,
   styled,
-  useColorMode,
-  useToast,
 } from "@chakra-ui/react";
-import moment from "moment";
 import { useRouter } from "next/router";
 import React from "react";
-import { BiCake } from "react-icons/bi";
 import { useDispatch } from "react-redux";
 import TabActivity from "./(TabAcivity)";
 import TabProfile from "./(TabProfile)";
@@ -57,19 +44,24 @@ function DashBoard() {
     dispatch(
       actionGetProfile(
         (res: UserType) => {
-          console.log(res);
-          // @ts-ignore
           setState((oldState) =>
             helper.mappingState(oldState, {
               fullname: res.fullname,
               email: res.email,
               id: res.id,
+              title: res.title,
               createdAt: res.createdAt,
               dob: res.dob,
               updatedAt: res.updatedAt,
               username: res.username,
               avatar: res.avatar,
               activityPoint: res.activityPoint,
+              role: res.role,
+              facebookLink: res.facebookLink,
+              githubLink: res.githubLink,
+              twitterLink: res.twitterLink,
+              location: res.location,
+              about: res.about,
             })
           );
         },
@@ -93,32 +85,32 @@ function DashBoard() {
       >
         <TabList>
           <CustomTab
-            onClickCapture={() => {
-              router.push({
-                pathname: "/user/profile",
-                query: { ...router.query, tab: "activity" },
-              });
-            }}
+          // onClickCapture={() => {
+          //   router.push({
+          //     pathname: "/user/profile",
+          //     query: { ...router.query, tab: "activity" },
+          //   });
+          // }}
           >
             {getTranslate("ACTIVITY")}
           </CustomTab>
           <CustomTab
-            onClickCapture={() => {
-              router.push({
-                pathname: "/user/profile",
-                query: null,
-              });
-            }}
+          // onClickCapture={() => {
+          //   router.push({
+          //     pathname: "/user/profile",
+          //     query: null,
+          //   });
+          // }}
           >
             {getTranslate("PROFILE")}
           </CustomTab>
           <CustomTab
-            onClickCapture={() => {
-              router.push({
-                pathname: "/user/profile",
-                query: { ...router.query, tab: "saves" },
-              });
-            }}
+          // onClickCapture={() => {
+          //   router.push({
+          //     pathname: "/user/profile",
+          //     query: { ...router.query, tab: "saves" },
+          //   });
+          // }}
           >
             {getTranslate("SAVED")}
           </CustomTab>
