@@ -116,6 +116,23 @@ export class AuthController {
     }
   }
 
+  @Get("/github")
+  @UseGuards(AuthGuard("github"))
+  async githubAuth() {}
+
+  @Get("/github/callback")
+  @UseGuards(AuthGuard("github"))
+  async githubAuthRedirect(@Req() req, @Res() res) {
+    const info = await this.authService.signInWithGithub(req.user);
+    if (info.refreshToken) {
+      res.redirect(
+        `${process.env.URL_WEB}/auth/signin/?refreshToken=${info.refreshToken}`,
+      );
+    } else {
+      res.redirect(`${process.env.URL_WEB}/auth/signin/?error=1`);
+    }
+  }
+
   @Post("/forgot-password")
   async forgotPassword(@Query("username") username: string) {
     return this.authService.forgotPassword(username);

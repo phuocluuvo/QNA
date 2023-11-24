@@ -139,6 +139,39 @@ export class AuthService {
     return { ...existUser, ...tokens, refreshToken };
   }
 
+  async signInWithGithub(user: any) {
+    // Check if user exists
+    let existUser = await this.usersService.findOneByGithub(user.profileUrl);
+    if (!existUser) {
+      existUser = await this.createNewForGithub(user);
+    }
+
+    if (!existUser.avatar && user.photos?.length) {
+      await this.usersService.update(existUser.id, {
+        avatar: user.photos[0].value,
+      });
+    }
+
+    if (!existUser) throw new BadRequestException(message.NOT_EXITS_USER);
+
+    const isBlock = existUser.state === UserState.BLOCKED;
+
+    if (isBlock) throw new BadRequestException(message.USER_IS_BLOCK);
+
+    const tokens = await this.getTokens(
+      existUser.id,
+      existUser.username,
+      existUser.role,
+    );
+    const refreshToken = await this.updateRefreshToken(
+      existUser.id,
+      tokens.refreshToken,
+    );
+    delete existUser.password;
+
+    return { ...existUser, ...tokens, refreshToken };
+  }
+
   /**
    * Logout a user by updating the refresh token.
    *
@@ -287,6 +320,19 @@ export class AuthService {
     createUserDto.avatar = user.picture;
     createUserDto.password = await this.hashData(user.email);
     createUserDto.refreshToken = user.token;
+    return this.usersService.create(createUserDto);
+  }
+
+  async createNewForGithub(user: any): Promise<any> {
+    const randomDigits = Math.floor(10000 + Math.random() * 90000).toString();
+
+    const createUserDto = new CreateUserDto();
+    createUserDto.username = user.username + randomDigits;
+    createUserDto.fullname = user.displayName;
+    createUserDto.email = user.email || null;
+    createUserDto.password = await this.hashData(user.username);
+    createUserDto.refreshToken = null;
+    createUserDto.githubLink = user.profileUrl;
     return this.usersService.create(createUserDto);
   }
 
