@@ -256,6 +256,7 @@ const getAllCollections = () => {
 };
 
 const createCollection = (collectionName: string) => {
+  console.log("collectionName:", collectionName);
   return AuthApi(REQUEST_METHOD.POST, url.COLLECTION, { name: collectionName });
 };
 
@@ -299,15 +300,14 @@ const deleteBookmark = (bookmarkId: string) => {
 const getAnouncements = () => {
   return api.get(url.NOTIFICATION_ANOUNTMENT);
 };
-const getAllQuesitonByUser = (userId: string) => {
+const getAllQuesitonByUser = (userId: string, type: "vote" | "createdAt") => {
   return api.get(
-    url.QUESTION + "?filter.user.id=" + userId + "&limit=10&sortBy=vote:DESC"
+    url.QUESTION + `?filter.user.id=${userId}&limit=10&sortBy=${type}:DESC`
   );
 };
-const getAllAnswerByUser = (userId: string) => {
+const getAllAnswerByUser = (userId: string, type: "vote" | "createdAt") => {
   let _url =
-    url.ANSWER + "?filter.user.id=" + userId + "&limit=10&sortBy=vote:DESC";
-  console.log("_url:", _url);
+    url.ANSWER + `?filter.user.id=${userId}&limit=10&sortBy=${type}:DESC`;
   return api.get(_url);
 };
 
