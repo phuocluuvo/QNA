@@ -35,7 +35,7 @@ export class User {
   @Column({ nullable: true, default: null })
   dob: Date;
 
-  @Column({ nullable: false, unique: true })
+  @Column({ nullable: true, unique: true })
   email: string;
 
   @Column({ nullable: true })

@@ -122,6 +122,20 @@ export class UsersService {
     }
   }
 
+  async findOneByGithub(github: string): Promise<User | undefined> {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { githubLink: github },
+      });
+
+      if (user) {
+        return user;
+      }
+    } catch (err) {
+      throw new Error(`Error finding ${err} user ${err.message}`);
+    }
+  }
+
   /**
    * Find a user by refresh token.
    * @param refreshToken Refresh token to search for.
