@@ -1,4 +1,4 @@
-import { IsDateString, IsNotEmpty, IsString } from "class-validator";
+import { IsBoolean, IsDateString, IsNotEmpty, IsString } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 import { Expose } from "class-transformer";
 
@@ -19,4 +19,9 @@ export class CreateAnnouncementDto {
   @IsDateString()
   @Expose()
   expiration_date: Date;
+
+  @ApiProperty()
+  @IsBoolean()
+  @Expose()
+  is_published: boolean;
 }

@@ -11,6 +11,7 @@ import { CreateAnnouncementDto } from "./dto/create-announcement.dto";
 import { UpdateAnnouncementDto } from "./dto/update-announcement.dto";
 import { PaginateQuery, paginate } from "nestjs-paginate";
 import { announcementPaginateConfig } from "src/config/pagination/announcement-pagination";
+import { FindAnnouncementDto } from "./dto/find-announcement.dto";
 
 @Injectable()
 export class AnnouncementService {
@@ -65,9 +66,17 @@ export class AnnouncementService {
   /**
    * Find all announcement
    */
-  async getAll(query: PaginateQuery) {
+  async getAll(query: PaginateQuery, findAnnouncementDto: FindAnnouncementDto) {
     const queryBuidler =
       this.announcementRepository.createQueryBuilder("announcement");
+    if (findAnnouncementDto.is_published)
+      queryBuidler.andWhere("announcement.is_published = :is_published", {
+        is_published: findAnnouncementDto.is_published,
+      });
+    if (findAnnouncementDto.title)
+      queryBuidler.andWhere("announcement.title LIKE :title", {
+        title: `%${findAnnouncementDto.title}%`,
+      });
     return paginate<Announcement>(
       query,
       queryBuidler,
@@ -78,11 +87,22 @@ export class AnnouncementService {
   /**
    * Find all announcement for user
    */
-  async getAllForUser(query: PaginateQuery) {
+  async getAllForUser(
+    query: PaginateQuery,
+    findAnnouncementDto: FindAnnouncementDto,
+  ) {
     const queryBuilder = this.announcementRepository
       .createQueryBuilder("announcement")
       .where("announcement.expiration_date > :currentTime", {
         currentTime: new Date(),
+      });
+    if (findAnnouncementDto.is_published)
+      queryBuilder.andWhere("announcement.is_published = :is_published", {
+        is_published: findAnnouncementDto.is_published,
+      });
+    if (findAnnouncementDto.title)
+      queryBuilder.andWhere("announcement.title LIKE :title", {
+        title: `%${findAnnouncementDto.title}%`,
       });
     return paginate<Announcement>(
       query,

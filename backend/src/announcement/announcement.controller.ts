@@ -20,6 +20,7 @@ import { Roles } from "src/auth/decorator/roles.decorator";
 import { UpdateAnnouncementDto } from "./dto/update-announcement.dto";
 import { CreateAnnouncementDto } from "./dto/create-announcement.dto";
 import { PaginateQuery } from "nestjs-paginate";
+import { FindAnnouncementDto } from "./dto/find-announcement.dto";
 
 @Controller("announcement")
 @ApiTags("announcement")
@@ -59,18 +60,22 @@ export class AnnouncementController {
   @Get()
   @UseGuards(PublicGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  async getAllAnnouncement(@Query() query: PaginateQuery) {
-    return this.announcementService.getAll(query);
+  async getAllAnnouncement(
+    @Query() query: PaginateQuery,
+    @Query() findAnnouncementDto: FindAnnouncementDto,
+  ) {
+    return this.announcementService.getAll(query, findAnnouncementDto);
   }
 
   @ApiOperation({
     summary: "get all announcement for user",
   })
   @Get("/user")
-  @UseGuards(PublicGuard, RolesGuard)
-  @Roles(Role.ADMIN, Role.USER, Role.MONITOR)
-  async getAllAnnouncementForUser(@Query() query: PaginateQuery) {
-    return this.announcementService.getAllForUser(query);
+  async getAllAnnouncementForUser(
+    @Query() query: PaginateQuery,
+    @Query() findAnnouncementDto: FindAnnouncementDto,
+  ) {
+    return this.announcementService.getAllForUser(query, findAnnouncementDto);
   }
 
   @ApiOperation({

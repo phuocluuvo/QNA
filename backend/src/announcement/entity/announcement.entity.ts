@@ -25,4 +25,7 @@ export class Announcement {
 
   @Column({ type: "datetime" })
   expiration_date: Date;
+
+  @Column({ type: "tinyint", default: 0 })
+  is_published: boolean;
 }
