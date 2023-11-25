@@ -28,4 +28,7 @@ export const url = {
   GOOGLE_LOGIN: "/api/auth/refresh-v2",
   CHECK_USERNAME: "/api/auth/exists",
   COLLECTION: "/api/collection",
+  ANNOUNCEMENT: "/api/announcement/user",
+  ANMOUNCEMENT_DETAIL: "/api/announcement/{id}",
+  TOP_TAG_USER: "/api/tag/topTagUser/{userId}",
 };

@@ -31,7 +31,7 @@ const removeEmpty = (obj: { [x: string]: any }) => {
 };
 
 const getQuestion = (form: FormQuestion) => {
-  return api.get(url.QUESTION + "/" + form.id.toString());
+  return AuthApi("GET", url.QUESTION + "/" + form.id.toString());
 };
 
 const getQuestionList = (params: GetQuesionParams) => {
@@ -256,7 +256,6 @@ const getAllCollections = () => {
 };
 
 const createCollection = (collectionName: string) => {
-  console.log("collectionName:", collectionName);
   return AuthApi(REQUEST_METHOD.POST, url.COLLECTION, { name: collectionName });
 };
 
@@ -298,19 +297,29 @@ const deleteBookmark = (bookmarkId: string) => {
 };
 
 const getAnouncements = () => {
-  return api.get(url.NOTIFICATION_ANOUNTMENT);
+  return AuthApi(REQUEST_METHOD.GET, url.ANNOUNCEMENT);
 };
-const getAllQuesitonByUser = (userId: string, type: "vote" | "createdAt") => {
+const getAllQuesitonByUser = (userId: string, type: "votes" | "createdAt") => {
   return api.get(
     url.QUESTION + `?filter.user.id=${userId}&limit=10&sortBy=${type}:DESC`
   );
 };
-const getAllAnswerByUser = (userId: string, type: "vote" | "createdAt") => {
+const getAllAnswerByUser = (userId: string, type: "votes" | "createdAt") => {
   let _url =
     url.ANSWER + `?filter.user.id=${userId}&limit=10&sortBy=${type}:DESC`;
   return api.get(_url);
 };
-
+const getAllTagsByUser = (
+  userId: string,
+  type: "questionsNumber" | "createdAt"
+) => {
+  // let paramToURL =
+  //   url.TAG + `?filter.user.id=${userId}&limit=10&sortBy=${type}:DESC`;
+  return AuthApi(
+    REQUEST_METHOD.GET,
+    url.TOP_TAG_USER.replace("{userId}", userId)
+  );
+};
 export default {
   requestSignUp,
   getQuestion,
@@ -362,4 +371,5 @@ export default {
   getQuestionWithRelatedTags,
   getAllQuesitonByUser,
   getAllAnswerByUser,
+  getAllTagsByUser,
 };
