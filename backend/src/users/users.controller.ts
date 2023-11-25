@@ -8,6 +8,7 @@ import {
   Query,
   Request,
   UseGuards,
+  Res,
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { UsersService } from "./users.service";
@@ -48,6 +49,23 @@ export class UsersController {
   async getProfile(@Request() req) {
     const user = await this.usersService.getProfile(req.user["sub"]);
     return plainToClass(UserDto, user, { excludeExtraneousValues: true });
+  }
+
+  @ApiOperation({
+    summary: "Confirm email for user",
+  })
+  @Get("/confirm-email")
+  async confirmEmail(@Query("uuid") uuid: string, @Res() res): Promise<any> {
+    try {
+      const result = await this.usersService.confirmEmail(uuid);
+      if (result) {
+        res.redirect(`${process.env.URL_WEB}/en?addEmail=true`);
+      } else {
+        res.redirect(`${process.env.URL_WEB}/en?addEmail=false`);
+      }
+    } catch (err) {
+      res.redirect(`${process.env.URL_WEB}/en?addEmail=false`);
+    }
   }
 
   /**
@@ -178,5 +196,19 @@ export class UsersController {
     return plainToClass(UserDto, user, {
       excludeExtraneousValues: true,
     });
+  }
+
+  @ApiOperation({
+    summary: "Add email for user",
+  })
+  @ApiBearerAuth()
+  @UseGuards(AccessTokenGuard)
+  @Post("add-email")
+  async addEmail(
+    @Request() req: any,
+    @Body("email") email: string,
+  ): Promise<any> {
+    const userId = req.user.sub;
+    return this.usersService.AddEmail(userId, email);
   }
 }
