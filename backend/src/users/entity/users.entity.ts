@@ -17,6 +17,7 @@ import { Tag } from "../../tag/entity/tag.entity";
 import { Bookmark } from "../../bookmark/entity/bookmark.entity";
 import { History } from "../../history/entity/history.entity";
 import { Collection } from "../../collection/enity/collection.entity";
+import { Announcement } from "../../announcement/entity/announcement.entity";
 
 @Entity()
 export class User {
@@ -131,4 +132,7 @@ export class User {
 
   @OneToMany(() => History, (history) => history.user)
   histories: History[];
+
+  @OneToMany(() => Announcement, (a) => a.user)
+  announcements: Announcement[];
 }
