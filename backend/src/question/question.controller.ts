@@ -92,8 +92,19 @@ export class QuestionController {
   @Get(":id")
   @UseGuards(PublicGuard)
   async findOneById(@Param("id") id: string, @Req() req: Request) {
-    const userId = req.user["sub"];
-    return this.questionService.getQuestionAndIncreaseViewCount(id, userId);
+    const ability = this.caslAbilityFactory.createForUser(req.user);
+    const question = await this.questionService.findOneById(id);
+
+    if (
+      !ability.can(Action.Update, question) ||
+      question.state == QuestionState.BLOCKED
+    ) {
+      throw new ForbiddenException(message.NOT_FOUND.QUESTION);
+    }
+    return this.questionService.getQuestionAndIncreaseViewCount(
+      id,
+      req.user["sub"],
+    );
   }
 
   /**
