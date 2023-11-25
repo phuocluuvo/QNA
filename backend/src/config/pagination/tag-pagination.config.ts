@@ -5,7 +5,7 @@ export const tagPaginateConfig: PaginateConfig<Tag> = {
   sortableColumns: ["content", "createdAt", "updatedAt"],
   defaultSortBy: [["name", "ASC"]],
   searchableColumns: ["name", "content"],
-  relations: ["user"],
+  relations: ["user", "questions"],
   filterableColumns: {
     "user.id": [FilterOperator.EQ],
     state: [FilterOperator.EQ],
