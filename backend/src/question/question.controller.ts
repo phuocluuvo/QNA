@@ -94,10 +94,9 @@ export class QuestionController {
   async findOneById(@Param("id") id: string, @Req() req: Request) {
     const ability = this.caslAbilityFactory.createForUser(req.user);
     const question = await this.questionService.findOneById(id);
-
     if (
-      !ability.can(Action.Update, question) ||
-      question.state == QuestionState.BLOCKED
+      question.state == QuestionState.BLOCKED &&
+      !ability.can(Action.Update, question)
     ) {
       throw new ForbiddenException(message.NOT_FOUND.QUESTION);
     }
