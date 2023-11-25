@@ -17,7 +17,15 @@ import {
 import router from "next/router";
 import React, { useEffect, useState } from "react";
 
-function TagItem({ tag, onClick }: { tag: TagType; onClick?: () => void }) {
+function TagItem({
+  tag,
+  onClick,
+  type = "normal",
+}: {
+  tag: TagType;
+  onClick?: () => void;
+  type: "normal" | "simple";
+}) {
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
   const [mouseIn, setMouseIn] = useState(false);
   useEffect(() => {
@@ -41,7 +49,9 @@ function TagItem({ tag, onClick }: { tag: TagType; onClick?: () => void }) {
         <Box
           onMouseOver={() => handleMouseOver()}
           onMouseLeave={() => handleMouseOut()}
-          w={{ base: "100%", md: "48%", xl: "23%" }}
+          w={
+            type === "simple" ? "100%" : { base: "100%", md: "48%", xl: "23%" }
+          }
           key={tag.id}
           style={{
             border: "1px solid #ccc",
@@ -51,7 +61,7 @@ function TagItem({ tag, onClick }: { tag: TagType; onClick?: () => void }) {
           onClick={() => {
             typeof onClick === "function"
               ? onClick()
-              : router.push(`search/tag/${tag.name}`);
+              : router.push(router.basePath + `/search/tag/${tag.name}`);
           }}
           _hover={{
             boxShadow: "0 0 0 2px orange",
@@ -82,15 +92,18 @@ function TagItem({ tag, onClick }: { tag: TagType; onClick?: () => void }) {
               {tag.state}
             </Badge>
           </HStack>
-          <Text
-            style={{
-              fontSize: "14px",
-              marginBottom: "10px",
-            }}
-            noOfLines={3}
-          >
-            {tag.content}
-          </Text>
+          {type === "normal" && (
+            <Text
+              style={{
+                fontSize: "14px",
+                marginBottom: "10px",
+              }}
+              noOfLines={3}
+            >
+              {tag.content}
+            </Text>
+          )}
+
           <Text
             style={{
               fontSize: "12px",

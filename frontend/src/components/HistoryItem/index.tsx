@@ -13,7 +13,7 @@ import {
 import React from "react";
 import DiffText from "../DiffText";
 import { QuestionHistoryType } from "@/util/type/Question.type";
-import helper from "@/util/helper";
+import helper, { markdownToPlainText } from "@/util/helper";
 
 function HistoryItem({ history }: { history: QuestionHistoryType }) {
   const { isOpen, onToggle } = useDisclosure();
@@ -42,13 +42,13 @@ function HistoryItem({ history }: { history: QuestionHistoryType }) {
           <Collapse in={isOpen} animateOpacity>
             <Box p={4}>
               <DiffText
-                inputA={history.title}
-                inputB={history.question.title}
+                inputA={markdownToPlainText(history.title)}
+                inputB={markdownToPlainText(history.question.title)}
                 type="chars"
               />
               <DiffText
-                inputA={history.content}
-                inputB={history.question.content}
+                inputA={markdownToPlainText(history.content)}
+                inputB={markdownToPlainText(history.question.content)}
                 type="chars"
               />
             </Box>

@@ -67,6 +67,7 @@ function PageContainer({ children }: Props) {
         w={"full"}
         style={{
           height: "100px",
+          marginTop: "20px",
         }}
       />
     </Container>

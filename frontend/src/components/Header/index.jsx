@@ -73,16 +73,6 @@ function Header() {
             height={Dimensions.HEADER_HEIGHT}
           >
             <SearchBar getTranslate={getTranslate} />
-            <Button
-              variant="main_button"
-              display={routes.pathname === "/question/create" ? "none" : "flex"}
-              color={"white"}
-              onClick={() => {
-                routes.push("/question/create");
-              }}
-            >
-              {getTranslate("CREATE")}
-            </Button>
           </HStack>
           <ChangeLanguageButton
             title={getCurrentLanguage().code}

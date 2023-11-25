@@ -1,4 +1,5 @@
 import { Colors } from "@/assets/constant/Colors";
+import helper from "@/util/helper";
 import { UserType } from "@/util/type/User.type";
 import {
   Avatar,
@@ -61,11 +62,11 @@ function UserItem({ user }: { user: UserType }) {
           {user.location}
         </Text>
         <Text colorScheme="orange" fontSize={"sm"} fontWeight={"bold"}>
-          {user.activityPoint}
+          {helper.numberFormat(user.activityPoint)}
         </Text>
         {user?.role !== "user" ? (
           <Badge colorScheme={user.role === "admin" ? "red" : "blue"}>
-            {user?.role}
+            {user?.role.slice(0, 5).toUpperCase()}
           </Badge>
         ) : (
           <Spacer />

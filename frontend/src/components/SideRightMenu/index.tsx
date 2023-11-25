@@ -36,6 +36,7 @@ import {
   BiSave,
   BiUser,
 } from "react-icons/bi";
+import Annoucements from "../Annoucements";
 function SideRightMenu() {
   const route = useRouter();
   const { getTranslate } = LanguageHelper(Pages.HOME);

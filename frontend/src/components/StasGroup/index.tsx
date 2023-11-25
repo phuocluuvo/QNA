@@ -1,6 +1,6 @@
 import { Colors } from "@/assets/constant/Colors";
 import { DashBoardUserType } from "@/util/type/User.type";
-import { Divider, HStack, useColorMode } from "@chakra-ui/react";
+import { Divider, Grid, HStack, useColorMode } from "@chakra-ui/react";
 import React from "react";
 import StasDashBoard from "../StasDashboard";
 
@@ -9,20 +9,21 @@ function StasGroup({
   filter,
 }: {
   dashboard: DashBoardUserType;
-  filter: "quater" | "year" | "month";
+  filter: "quarter" | "year" | "month";
 }) {
   const { colorMode } = useColorMode();
   return (
-    <HStack
+    <Grid
+      templateColumns={{
+        base: "repeat(2, 1fr)",
+        md: "repeat(2, 1fr)",
+      }}
       style={{
         border: "1px solid" + Colors(colorMode === "dark").PRIMARY,
-        width: "fit-content",
+        width: "100%",
         padding: "10px",
         borderRadius: "10px",
-      }}
-      height={{
-        base: "120px",
-        md: "150px",
+        height: "100%",
       }}
     >
       <StasDashBoard
@@ -31,7 +32,6 @@ function StasGroup({
         bottomText="Total Activity Point"
       />
 
-      <Divider orientation="vertical" />
       {dashboard[filter] && (
         <StasDashBoard
           title="Question"
@@ -39,7 +39,6 @@ function StasGroup({
           bottomText="Total Questions"
         />
       )}
-      <Divider orientation="vertical" />
       {dashboard[filter] && (
         <StasDashBoard
           title="Answer"
@@ -47,7 +46,6 @@ function StasGroup({
           bottomText="Total Answers"
         />
       )}
-      <Divider orientation="vertical" />
       {dashboard[filter] && (
         <StasDashBoard
           title="Votes"
@@ -55,7 +53,7 @@ function StasGroup({
           bottomText="Total Vote times"
         />
       )}
-    </HStack>
+    </Grid>
   );
 }
 

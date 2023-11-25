@@ -2,6 +2,7 @@
 import { Colors } from "@/assets/constant/Colors";
 import {
   Avatar,
+  Badge,
   Box,
   Button,
   HStack,
@@ -17,7 +18,10 @@ import {
   useMediaQuery,
 } from "@chakra-ui/react";
 import React from "react";
-import helper from "@/util/helper";
+import helper, {
+  markdownToPlainText,
+  removeVietnameseTones,
+} from "@/util/helper";
 import { QuestionType } from "@/util/type/Question.type";
 import { useRouter } from "next/router";
 import Author from "../Author";
@@ -25,19 +29,28 @@ import TagQuestion from "../TagQuestion";
 import moment from "moment";
 import { LanguageHelper } from "@/util/Language/Language.util";
 import { Pages } from "@/assets/constant/Pages";
-import { CheckIcon } from "@chakra-ui/icons";
+import dynamic from "next/dynamic";
+const EditerMarkdown = dynamic(
+  () =>
+    import("@uiw/react-md-editor").then((mod) => {
+      return mod.default.Markdown;
+    }),
+  { ssr: false }
+);
 function QuestionItem({
   question,
   isDarkMode,
   onClick,
   isLast,
   isVerifyItem,
+  type = "normal",
 }: {
   question: QuestionType;
   isDarkMode?: boolean;
   onClick?: () => void;
   isLast?: boolean;
   isVerifyItem?: boolean;
+  type?: "minimals" | "normal";
 }) {
   const { getTranslate } = LanguageHelper(Pages.HOME);
   const router = useRouter();
@@ -59,21 +72,26 @@ function QuestionItem({
       direction={{ base: "column-reverse", md: "row" }}
       mx={{ base: 0, md: 1 }}
       rounded={"md"}
-      w={{ base: "80%", md: "fit-content" }}
+      w={"full"}
       _hover={{
         boxShadow: "0 0 0 1px " + Colors(isDarkMode).BORDER,
       }}
-      height={{ base: "auto", md: "auto" }}
-      minW={{ base: "80vw", md: "80%" }}
-      mb={2}
-      // flex={{ base: 1, lg: isLast ? "none" : 1 }}
+      minW={
+        type === "minimals"
+          ? {
+              base: "200px",
+              md: "200px",
+            }
+          : { base: "80vw", md: "80%" }
+      }
+      mb={type === "minimals" ? 0 : 2}
       flex={1}
       transition={"ease-in-out 0.2s"}
-      p={{ base: 2, md: 3 }}
+      p={2}
       bg={Colors(isDarkMode).PRIMARY_BG}
     >
       <Stack
-        display={isVerifyItem ? "none" : "flex"}
+        display={type === "minimals" ? "none" : "flex"}
         direction={{
           base: "row",
           md: "column",
@@ -121,7 +139,7 @@ function QuestionItem({
         </Text>
         <Text>{helper.numberFormat(question.views ? question.views : 0)}</Text>
       </Stack>
-      {!isVerifyItem && imageSource ? (
+      {type === "normal" && imageSource ? (
         <Image
           src={imageSource}
           alt="Picture of the author"
@@ -136,32 +154,39 @@ function QuestionItem({
           }}
         />
       ) : null}
-      <VStack
+      <Stack
         key={question.id}
+        spacing={1}
         flex={1}
         alignItems={"flex-start"}
-        justifyContent={"space-between"}
+        direction={type === "minimals" ? "row" : "column"}
       >
-        <Stack
-          direction={
-            isVerifyItem
-              ? {
-                  base: "column",
-                  md: "row-reverse",
-                }
-              : {
-                  base: "column",
-                  md: "row",
-                }
-          }
-          w={"full"}
-          justifyContent={"space-between"}
+        <Tag
+          display={type === "minimals" ? "block" : "none"}
+          m="auto"
+          mr={2}
+          p={"3"}
+          fontSize={"xl"}
+          colorScheme="green"
+          justifyItems={"center"}
+          alignItems={"center"}
+          textAlign={"center"}
         >
-          {isVerifyItem && (
-            <Text colorScheme="gray" fontSize={"xs"}>
-              {question.id}
-            </Text>
-          )}
+          {question.votes}
+        </Tag>
+        <Stack direction={"column"} w={"full"} justifyContent={"space-between"}>
+          <Tooltip
+            hasArrow
+            label={"This question is blocked due to violation of the rules"}
+          >
+            <Badge
+              colorScheme={question.state === "blocked" ? "red" : "green"}
+              display={question.state === "blocked" ? "block" : "none"}
+              w={"fit-content"}
+            >
+              {question.state}
+            </Badge>
+          </Tooltip>
           <Link
             onClick={() => {
               typeof onClick === "function"
@@ -169,78 +194,78 @@ function QuestionItem({
                 : // @ts-ignore
                   router.push(router.basePath + `/question/${question.id}`);
             }}
-            fontWeight={"bold"}
-            maxW={"full"}
+            fontWeight={"semibold"}
+            w={"100%"}
+            h={"30px"}
             noOfLines={1}
+            paddingTop={{
+              base: 0,
+              md: 2,
+            }}
+            fontSize={"lg"}
           >
-            {moment(question.createdAt).isAfter(
-              moment().subtract(3, "days")
-            ) ? (
-              <Tag mr="3">New</Tag>
-            ) : (
-              ""
-            )}
             <span
               style={{
-                display: !isVerifyItem ? "none" : "unset",
+                display:
+                  !isVerifyItem || type === "minimals" ? "none" : "unset",
               }}
             >
               {getTranslate("TITLE")}:
             </span>{" "}
             {question.title}
           </Link>
-        </Stack>
+        </Stack>{" "}
         <Text
           style={{
-            display: !isVerifyItem ? "none" : "unset",
+            display: type === "normal" ? "none" : "unset",
+            minWidth: "fit-content",
           }}
-          fontSize={"xs"}
         >
-          {getTranslate("CONTENT")}:
+          {helper.formatDate(question.createdAt, false, "ddd, DD/MM/YYYY")}
         </Text>
-        <Box
-          dangerouslySetInnerHTML={{
-            __html: question.content.replace(/<img.*?>/g, ""),
-          }}
-          fontSize={"sm"}
-          maxW={{ base: "xs", md: "md" }}
-          noOfLines={2}
-        />
+        {type === "minimals" ? null : (
+          <Text w={"full"} noOfLines={2} fontSize={"sm"} opacity={0.8}>
+            {markdownToPlainText(question.content)}
+          </Text>
+        )}
         <Spacer />
-        <HStack w={"full"} alignItems={"flex-end"}>
-          <HStack flexWrap={"wrap"}>
-            {question.tagNames?.map((tag) => (
-              <TagQuestion tag={tag} key={tag} />
-            ))}
+        {type === "minimals" ? null : (
+          <HStack w={"full"} alignItems={"flex-end"} pb={2}>
+            <HStack flexWrap={"wrap"}>
+              {question.tagNames?.map((tag) => (
+                <TagQuestion tag={tag} key={tag} />
+              ))}
+            </HStack>
+            <Spacer />
+
+            <Author
+              type="simple"
+              user={question.user}
+              nameStyle={{
+                fontWeight: "bold",
+                fontSize: "sm",
+                noOfLines: { base: 1, md: 2 },
+                _hover: {
+                  textDecoration: "underline",
+                },
+              }}
+              headingText={getTranslate("ASKED_AT").replace(
+                "{0}",
+                helper.formatDate(
+                  question.createdAt,
+                  false,
+                  "H:mm A - ddd, DD/MM/YYYY"
+                )
+              )}
+              bottomTextStyle={{
+                color: "gray.500",
+                fontSize: "xs",
+                noOfLines: { base: 1, md: 2 },
+              }}
+            />
           </HStack>
-          <Spacer />
-          <Author
-            type="simple"
-            user={question.user}
-            nameStyle={{
-              fontWeight: "bold",
-              fontSize: "sm",
-              noOfLines: { base: 1, md: 2 },
-              _hover: {
-                textDecoration: "underline",
-              },
-            }}
-            headingText={getTranslate("ASKED_AT").replace(
-              "{0}",
-              helper.formatDate(
-                question.createdAt,
-                false,
-                "H:mm A - ddd, DD/MM/YYYY"
-              )
-            )}
-            bottomTextStyle={{
-              color: "gray.500",
-              fontSize: "xs",
-              noOfLines: { base: 1, md: 2 },
-            }}
-          />
-        </HStack>
-      </VStack>
+        )}
+      </Stack>
     </Stack>
   );
 }

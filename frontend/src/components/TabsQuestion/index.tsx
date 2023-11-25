@@ -13,6 +13,7 @@ import {
   VStack,
   Button,
   HStack,
+  Divider,
 } from "@chakra-ui/react";
 import { Colors } from "@/assets/constant/Colors";
 import { useDispatch } from "react-redux";
@@ -52,8 +53,7 @@ function TabsQuestion({
         {
           page: 1,
           limit: 8,
-          "filter.type": "$eq:" + QUESTION_SORT_BY.NO_ANSWER,
-          sortBy: "createdAt:ASC",
+          sortBy: "createdAt:DESC",
         },
         (res) => {
           // @ts-ignore
@@ -75,6 +75,7 @@ function TabsQuestion({
           page: 1,
           limit: 8,
           "filter.type": "$eq:" + QUESTION_SORT_BY.NO_ANSWER,
+          sortBy: "createdAt:DESC",
         },
         (res) => {
           // @ts-ignore
@@ -95,7 +96,10 @@ function TabsQuestion({
   return (
     <Box
       rounded={"md"}
-      w={'full'}
+      w={{
+        base: "full",
+        md: "300px",
+      }}
       bg={Colors(colorMode === "dark").PRIMARY_BG}
       {...containerStyles}
     >
@@ -112,7 +116,10 @@ function TabsQuestion({
         />
         <TabPanels>
           <TabPanel>
-            <VStack>
+            <VStack
+              alignItems={"flex-start"}
+              divider={<Divider color={Colors(colorMode === "dark").BORDER} />}
+            >
               {state.questionsNew && state.questionsNew.length > 0
                 ? state.questionsNew.map((question) => (
                     <HStack w={"full"}>
@@ -153,6 +160,7 @@ function TabsQuestion({
                           cursor: "pointer",
                           opacity: 1,
                         }}
+                        noOfLines={2}
                       >
                         {question.title.trim()}
                       </Text>
@@ -162,7 +170,10 @@ function TabsQuestion({
             </VStack>
           </TabPanel>
           <TabPanel>
-            <VStack alignItems={"start"}>
+            <VStack
+              alignItems={"flex-start"}
+              divider={<Divider color={Colors(colorMode === "dark").BORDER} />}
+            >
               {state.questionsUnanswer && state.questionsUnanswer.length > 0
                 ? state.questionsUnanswer.map((question) => (
                     <HStack>
@@ -203,6 +214,7 @@ function TabsQuestion({
                           cursor: "pointer",
                           opacity: 1,
                         }}
+                        noOfLines={2}
                       >
                         {question.title.trim()}
                       </Text>

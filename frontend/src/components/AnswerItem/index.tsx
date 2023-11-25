@@ -3,20 +3,24 @@ import {
   Box,
   Button,
   Collapse,
-  Divider,
   Flex,
   HStack,
   Heading,
   Input,
   Link,
   Spacer,
+  Tag,
   Text,
   Tooltip,
   VStack,
+  useColorMode,
 } from "@chakra-ui/react";
 import React from "react";
 import VoteButton from "../VoteButton";
-import helper from "@/util/helper";
+import helper, {
+  markdownToPlainText,
+  removeVietnameseTones,
+} from "@/util/helper";
 import Author from "../Author";
 import { CheckIcon } from "@chakra-ui/icons";
 import actionApproveAnswer from "@/API/redux/actions/answer/actionApproveAnswer";
@@ -33,19 +37,28 @@ import actionCreateCommentAnswer from "@/API/redux/actions/answer/actionCreateCo
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { CommentType } from "@/util/type/Comment.type";
-
+import dynamic from "next/dynamic";
+const EditerMarkdown = dynamic(
+  () =>
+    import("@uiw/react-md-editor").then((mod) => {
+      return mod.default.Markdown;
+    }),
+  { ssr: false }
+);
 function AnswerItem({
   answer,
   getTranslate,
   isAuthor,
   dispatch,
   fecthAnswer,
+  type = "normal",
 }: {
   answer: AnswerType;
   getTranslate: (key: string) => string;
   isAuthor: boolean;
   dispatch: (action: any) => void;
   fecthAnswer: () => void;
+  type?: "minimals" | "normal";
 }) {
   const session = useSession();
   const router = useRouter();
@@ -71,7 +84,7 @@ function AnswerItem({
     comment: "",
     answer: answer,
   });
-
+  const { colorMode } = useColorMode();
   React.useEffect(() => {
     // @ts-ignore
     setState((oldState) =>
@@ -156,11 +169,25 @@ function AnswerItem({
   };
   return (
     <>
-      <Divider />
-      <Box key={answer.id} my={5}>
+      <Box
+        id={answer.id}
+        key={answer.id}
+        my={type === "normal" ? 5 : 0}
+        w={"full"}
+      >
         <HStack alignItems={"stretch"} height={"full"}>
+          <Tag
+            h={"fit-content"}
+            variant="solid"
+            alignSelf={"center"}
+            colorScheme="green"
+            display={type === "normal" ? "none" : "flex"}
+          >
+            {answer.votes}
+          </Tag>
           <Flex
             direction={{ base: "column", md: "row" }}
+            display={type === "minimals" ? "none" : "flex"}
             pos={{ base: "sticky" }}
             top={28}
           >
@@ -216,34 +243,61 @@ function AnswerItem({
                   />
                 </Tooltip>
               )}
-              
             </VStack>
           </Flex>
           <VStack
             alignItems={"flex-start"}
             justifyContent={"space-between"}
             flex={1}
+            w={"full"}
           >
-            {/* display raw text */}
-            <Box
-              dangerouslySetInnerHTML={{
-                __html: answer.content.trim(),
+            {type === "minimals" ? (
+              <Text
+                style={{
+                  fontSize: "16px",
+                  backgroundColor: "transparent",
+                }}
+                noOfLines={2}
+              >
+                {markdownToPlainText(answer.content)}
+              </Text>
+            ) : (
+              <Box data-color-mode={colorMode} w={"100%"}>
+                <EditerMarkdown
+                  source={answer.content}
+                  style={{
+                    fontSize: "16px",
+                    backgroundColor: "transparent",
+                  }}
+                />
+              </Box>
+            )}
+
+            <Link
+              style={{
+                display: type === "normal" ? "none" : "block",
               }}
-              fontSize={"sm"}
-              w={"full"}
-              h={"full"}
-              flex={1}
-            />
-            <VStack
+              href={`/question/${answer.question.id}/${removeVietnameseTones(
+                answer.question.title
+              )}#${answer.id}`}
+              color={"blue.500"}
+              // @ts-ignore
+              scroll={false}
+            >
+              {answer.question.title}
+            </Link>
+            <HStack
               w={"full"}
               justifyContent={"space-between"}
               mb={"1"}
               mr={2}
               flex={1}
+              display={type === "minimals" ? "none" : "flex"}
               alignItems={"flex-start"}
             >
+              <Spacer />
               <Author
-              type="simple"
+                type="simple"
                 sizeAvatar={"xs"}
                 user={answer.user}
                 nameStyle={{
@@ -261,10 +315,11 @@ function AnswerItem({
                   )
                 )}
               />
-            </VStack>
+            </HStack>
             {/* comment */}
             <VStack
               w={"full"}
+              display={type === "minimals" ? "none" : "flex"}
               justifyContent={"space-between"}
               alignItems={"center"}
               spacing={0}
@@ -335,7 +390,7 @@ function AnswerItem({
               />
             </Collapse>
             {/* comment button */}
-            <HStack>
+            <HStack display={type === "minimals" ? "none" : "flex"}>
               <Button
                 type="button"
                 isDisabled={
@@ -382,6 +437,9 @@ function AnswerItem({
               </Button>
             </HStack>
           </VStack>
+          <Text display={type === "normal" ? "none" : "block"} fontSize={"md"}>
+            {helper.formatDate(answer.createdAt, false, "ddd, DD/MM/YYYY")}
+          </Text>
         </HStack>
       </Box>
       <CustomAlertDialog
