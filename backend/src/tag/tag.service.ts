@@ -185,4 +185,16 @@ export class TagService {
 
     return queryBuilder.getRawMany();
   }
+
+  async topTagUserByUser(userId: string) {
+    const queryBuilder = this.tagRepository
+      .createQueryBuilder("tag")
+      .addSelect(["COUNT(tag.id) as tag_questionsNumber"])
+      .leftJoin("tag.questions", "question")
+      .leftJoin("question.user", "user")
+      .where("user.id = :userId", { userId: userId })
+      .groupBy("tag.id")
+      .limit(10);
+    return queryBuilder.getMany();
+  }
 }

@@ -2,9 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { User } from "../../users/entity/users.entity";
 
 @Entity()
 export class Announcement {
@@ -28,4 +31,8 @@ export class Announcement {
 
   @Column({ type: "tinyint", default: 0 })
   is_published: boolean;
+
+  @ManyToOne(() => User, (user) => user.announcements, { nullable: true })
+  @JoinColumn({ name: "user_id" })
+  user: User;
 }

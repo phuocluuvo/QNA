@@ -49,6 +49,15 @@ export class TagController {
     return this.tagService.find(query);
   }
 
+  @ApiOperation({
+    summary: "verify tag",
+  })
+  @ApiBearerAuth()
+  @Get("topTagUser/:userId")
+  async topTagUserByUser(@Param("userId") userId: string) {
+    return this.tagService.topTagUserByUser(userId);
+  }
+
   /**
    * Get a specific tag by its name.
    *
@@ -60,7 +69,7 @@ export class TagController {
   })
   @Get(":name")
   @UseGuards()
-  async findOneById(@Param("id") name: string) {
+  async findOneById(@Param("name") name: string) {
     return this.tagService.findOneByName(name);
   }
 
