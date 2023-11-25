@@ -92,6 +92,9 @@ export class User {
   @Column({ nullable: true, type: "text" })
   location: string;
 
+  @Column({ nullable: true })
+  more: string;
+
   // This is the virtual column.
 
   @VirtualColumn({

@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsDateString,
   IsNotEmpty,
   IsOptional,
@@ -27,4 +28,9 @@ export class UpdateAnnouncementDto {
   @Expose()
   @IsOptional()
   expiration_date: Date;
+
+  @ApiProperty()
+  @IsBoolean()
+  @Expose()
+  is_published: boolean;
 }
