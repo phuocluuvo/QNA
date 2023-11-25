@@ -42,14 +42,6 @@ export class TagService {
    */
   async find(query: PaginateQuery) {
     const queryBuilder = this.tagRepository.createQueryBuilder("tag");
-    queryBuilder.select([
-      "tag.id",
-      "tag.name",
-      "tag.content",
-      "tag.questionsNumber",
-      "tag.state",
-    ]);
-    queryBuilder.leftJoin("tag.questions", "question");
 
     return await paginate<Tag>(query, queryBuilder, tagPaginateConfig);
   }
