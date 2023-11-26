@@ -1,9 +1,10 @@
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import {
   Box,
   Button,
   Collapse,
   Container,
+  Divider,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -22,19 +23,17 @@ import {
   Text,
   Textarea,
   Tooltip,
-  VStack,
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+// const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import dynamic from "next/dynamic";
 import { Field, Form, Formik, FormikHelpers } from "formik";
 import helper from "@/util/helper";
 import useStateWithCallback from "@/hooks/useStateWithCallback";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import actionCreateQuestion from "@/API/redux/actions/question/ActionCreateQuestion";
 import useAxiosAuth from "@/hooks/useAxiosAuth";
-import { url } from "@/API/api/url";
 import { useRouter } from "next/router";
 import { TagType } from "@/util/type/Tag.type";
 import actionSearchTags from "@/API/redux/actions/tags/ActionSearchTag";
@@ -46,7 +45,9 @@ import { FormCreateQuestion } from "@/API/type/Form.type";
 import actionCreateTag from "@/API/redux/actions/tags/ActionCreateTag";
 import actionGetQuestion from "@/API/redux/actions/question/ActionGetQuestion";
 import actionUpdateQuestion from "@/API/redux/actions/question/ActionUpdateQuesiton";
-import { signIn, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import "@uiw/react-md-editor/markdown-editor.css";
+import "@uiw/react-markdown-preview/markdown.css";
 type State = {
   title: string;
   bodyQuestion: string;
@@ -55,7 +56,19 @@ type State = {
   resultsTagIds?: Set<TagType>;
   tagName?: string;
   tagContent?: string;
+  type?: "question" | "answer";
 };
+const MDEditor = dynamic(
+  () => import("@uiw/react-md-editor").then((mod) => mod.default),
+  { ssr: false }
+);
+const EditerMarkdown = dynamic(
+  () =>
+    import("@uiw/react-md-editor").then((mod) => {
+      return mod.default.Markdown;
+    }),
+  { ssr: false }
+);
 function EditQuestion() {
   const formRef = useRef(null);
   const [state, setState] = useStateWithCallback<State>({
@@ -481,56 +494,40 @@ function EditQuestion() {
                         people to answer it correctly.
                       </Text>
                     </FormLabel>
-                    <ReactQuill
-                      id="body"
-                      theme="snow"
-                      value={state.bodyQuestion}
-                      onChange={handleChangeBodyQuestion}
-                      modules={{
-                        toolbar: [
-                          [{ header: [1, 2, false] }],
-                          [
-                            "bold",
-                            "italic",
-                            "underline",
-                            "strike",
-                            "blockquote",
-                          ],
-                          [
-                            { list: "ordered" },
-                            { list: "bullet" },
-                            { indent: "-1" },
-                            { indent: "+1" },
-                          ],
-                          ["link", "image", "code-block"],
-                          ["clean"],
-                        ],
-                      }}
-                      formats={[
-                        "bold",
-                        "italic",
-                        "underline",
-                        "strike",
-                        "blockquote",
-                        "link",
-                        "image",
-                        "video",
-                        "code-block",
-                        "list",
-                        "bullet",
-                        "indent",
-                        "header",
-                        "align",
-                        "color",
-                        "background",
-                        "font",
-                        "size",
-                        "clean",
-                      ]}
-                      bounds={".app"}
-                      placeholder={"Create Question"}
-                      tabIndex={1}
-                    />
+                    <Box data-color-mode={colorMode}>
+                      <MDEditor
+                        style={{
+                          height: "auto",
+                          minHeight: "300px",
+                          maxHeight: "500px",
+                        }}
+                        preview={"edit"}
+                        value={state.bodyQuestion}
+                        onChange={(value) => {
+                          // @ts-ignore
+                          setState((oldState) =>
+                            helper.mappingState(oldState, {
+                              bodyQuestion: value,
+                            })
+                          );
+                        }}
+                      />
+
+                      <Divider
+                        my={{
+                          base: "10px",
+                          md: "20px",
+                        }}
+                      />
+                      <Box data-color-mode={colorMode}>
+                        <EditerMarkdown
+                          source={state.bodyQuestion}
+                          style={{
+                            backgroundColor: "transparent",
+                          }}
+                        />
+                      </Box>
+                    </Box>
                     <FormErrorMessage>{form.errors.body}</FormErrorMessage>
                   </FormControl>
                 )}

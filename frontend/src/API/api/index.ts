@@ -8,6 +8,7 @@ import {
   FormGetAnswer,
   FormQuestion,
   FormSignUp,
+  FormUnblockedComment,
   FormUpdateProfile,
   FormVote,
   FormVoteAnswer,
@@ -18,6 +19,8 @@ import { REQUEST_METHOD } from "../type/Request.type";
 import { GetQuesionParams } from "../type/params/Question.params";
 import { GetCommentAnswerParams } from "../type/params/Comment.params";
 import { CommonParams } from "../type/params/Common.params";
+import moment from "moment";
+import { CommentType } from "@/util/type/Comment.type";
 
 const requestSignUp = (form: FormSignUp) => {
   return api.post(url.SIGN_UP, form);
@@ -320,6 +323,45 @@ const getAllTagsByUser = (
     url.TOP_TAG_USER.replace("{userId}", userId)
   );
 };
+const getAcitvityDashboardByUser = (userId: string, date = "all") => {
+  return AuthApi(
+    REQUEST_METHOD.GET,
+    url.ACTIVITY_DASHBOARD_USER.replace("{id}", userId) + "?date=" + date
+  );
+};
+
+const createCancelBlockedComment = async (form: FormUnblockedComment) => {
+  form.type = "undelete";
+  console.log("form createCancelBlockedComment", form);
+  // get all comments and count number of comment that have type is "blocked"
+  let commentBlockedNumber = await AuthApi(
+    REQUEST_METHOD.GET,
+    url.COMMENT + "?question_id=" + form.question_id
+  ).then((res) => {
+    let commentBlockedNumber = 0;
+    res?.data.da
+      ? res.data.data.forEach((comment: CommentType) => {
+          if (comment.type === "undelete") {
+            commentBlockedNumber++;
+          }
+        })
+      : 0;
+    return commentBlockedNumber;
+  });
+  // if number of comment that have type is "blocked" is greater than 3, then block question
+  if (commentBlockedNumber > 3) {
+    blockQuestion(form.question_id);
+  }
+  AuthApi(
+    REQUEST_METHOD.POST,
+    url.UNBLOCK_QUESTION.replace("{id}", form.question_id),
+    {
+      question_id: form.question_id,
+    }
+  );
+
+  return AuthApi(REQUEST_METHOD.POST, url.COMMENT, form);
+};
 export default {
   requestSignUp,
   getQuestion,
@@ -372,4 +414,6 @@ export default {
   getAllQuesitonByUser,
   getAllAnswerByUser,
   getAllTagsByUser,
+  getAcitvityDashboardByUser,
+  createCancelBlockedComment,
 };

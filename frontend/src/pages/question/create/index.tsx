@@ -4,6 +4,7 @@ import {
   Button,
   Collapse,
   Container,
+  Divider,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -22,19 +23,16 @@ import {
   Text,
   Textarea,
   Tooltip,
-  VStack,
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+// const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import dynamic from "next/dynamic";
 import { Field, Form, Formik, FormikHelpers } from "formik";
 import helper from "@/util/helper";
 import useStateWithCallback from "@/hooks/useStateWithCallback";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import actionCreateQuestion from "@/API/redux/actions/question/ActionCreateQuestion";
-import useAxiosAuth from "@/hooks/useAxiosAuth";
-import { url } from "@/API/api/url";
 import { useRouter } from "next/router";
 import { TagType } from "@/util/type/Tag.type";
 import actionSearchTags from "@/API/redux/actions/tags/ActionSearchTag";
@@ -44,9 +42,20 @@ import { LanguageHelper } from "@/util/Language/Language.util";
 import { Pages } from "@/assets/constant/Pages";
 import { FormCreateQuestion } from "@/API/type/Form.type";
 import actionCreateTag from "@/API/redux/actions/tags/ActionCreateTag";
-import actionGetQuestion from "@/API/redux/actions/question/ActionGetQuestion";
 import actionUpdateQuestion from "@/API/redux/actions/question/ActionUpdateQuesiton";
-import { signIn, useSession } from "next-auth/react";
+import "@uiw/react-md-editor/markdown-editor.css";
+import "@uiw/react-markdown-preview/markdown.css";
+const MDEditor = dynamic(
+  () => import("@uiw/react-md-editor").then((mod) => mod.default),
+  { ssr: false }
+);
+const EditerMarkdown = dynamic(
+  () =>
+    import("@uiw/react-md-editor").then((mod) => {
+      return mod.default.Markdown;
+    }),
+  { ssr: false }
+);
 type State = {
   title: string;
   bodyQuestion: string;
@@ -416,7 +425,43 @@ function CreateQuestion() {
                         people to answer it correctly.
                       </Text>
                     </FormLabel>
-                    <ReactQuill
+                    <Box data-color-mode={colorMode}>
+                      <MDEditor
+                        style={{
+                          height: "auto",
+                          minHeight: "300px",
+                          maxHeight: "500px",
+                        }}
+                        preview={"edit"}
+                        about="This is a markdown editor that uses a preview panel to show the result of your markdown!"
+                        value={state.bodyQuestion}
+                        onChange={(value) => {
+                          // @ts-ignore
+                          setState((oldState) =>
+                            helper.mappingState(oldState, {
+                              bodyQuestion: value,
+                            })
+                          );
+                        }}
+                      />
+
+                      <Divider
+                        my={{
+                          base: "10px",
+                          md: "20px",
+                        }}
+                      />
+                      <Box data-color-mode={colorMode}>
+                        <EditerMarkdown
+                          source={state.bodyQuestion}
+                          style={{
+                            backgroundColor:
+                              colorMode === "light" ? "#fff" : "#1a202c",
+                          }}
+                        />
+                      </Box>
+                    </Box>
+                    {/* <ReactQuill
                       id="body"
                       theme="snow"
                       value={state.bodyQuestion}
@@ -472,7 +517,7 @@ function CreateQuestion() {
                       bounds={".app"}
                       placeholder={"Create Question"}
                       tabIndex={1}
-                    />
+                    /> */}
                     <FormErrorMessage>{form.errors.body}</FormErrorMessage>
                   </FormControl>
                 )}

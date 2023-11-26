@@ -81,3 +81,9 @@ export type FormUpdateProfile = {
   websiteLink?: string;
   dob?: string;
 };
+
+export type FormUnblockedComment = {
+  question_id: string;
+  content: string;
+  type?: "undelete";
+};
