@@ -57,14 +57,6 @@ export class ActivityController {
     return this.activityService.findByUserId(query, id);
   }
 
-  /**
-   * get activity history userId
-   * @param id
-   * @param date
-   */
-  @ApiOperation({
-    summary: "get activity history userId",
-  })
   @Get("activityPointChange/:id")
   async getActivityPointChange(
     @Param("id") id: string,
