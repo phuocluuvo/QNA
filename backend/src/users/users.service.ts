@@ -290,9 +290,7 @@ export class UsersService {
         .leftJoin("user.questions", "question")
         .leftJoin("user.answers", "answer")
         .leftJoin("user.votes", "vote")
-        .leftJoin("user.tags", "tag")
-        .where("user.id = :id", { id })
-        .groupBy("user.id");
+        .leftJoin("user.tags", "tag");
       switch (timeType) {
         case QuestionTimeTypeEnum.MONTH:
           queryBuilder
@@ -344,6 +342,7 @@ export class UsersService {
         default:
           break;
       }
+      queryBuilder.where("user.id = :id", { id }).groupBy("user.id");
       const result = await queryBuilder.getRawOne();
       return result;
     } catch (err) {
