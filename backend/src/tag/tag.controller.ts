@@ -29,6 +29,7 @@ import { Roles } from "../auth/decorator/roles.decorator";
 import { Role } from "../enums/role.enum";
 import { TagState } from "../enums/tag-state.enum";
 import { UpdateTagDto } from "./dto/update-tag.dto";
+import { PublicGuard } from "../auth/guards/public.guard";
 
 @ApiTags("tag")
 @Controller("tag")
@@ -44,9 +45,9 @@ export class TagController {
   @ApiOkPaginatedResponse(Question, tagPaginateConfig)
   @ApiPaginationQuery(tagPaginateConfig)
   @Get()
-  @UseGuards()
-  find(@Paginate() query: PaginateQuery) {
-    return this.tagService.find(query);
+  @UseGuards(PublicGuard)
+  find(@Paginate() query: PaginateQuery, @Req() req: Request) {
+    return this.tagService.find(query, req["user"]);
   }
 
   @ApiOperation({
