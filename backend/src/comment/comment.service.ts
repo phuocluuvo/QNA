@@ -100,7 +100,7 @@ export class CommentService {
       commentTrans["question"] = commentDto.question_id;
     }
     if (commentDto.type) {
-      commentTrans["question"] = commentDto.type;
+      commentTrans["type"] = commentDto.type;
     }
 
     return this.commentRepository.save(commentTrans);
