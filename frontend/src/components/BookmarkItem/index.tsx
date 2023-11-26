@@ -13,6 +13,7 @@ import {
   ExternalLinkIcon,
   RepeatIcon,
   EditIcon,
+  LockIcon,
 } from "@chakra-ui/icons";
 import {
   VStack,
@@ -133,6 +134,9 @@ function BookmarkItem({
         maxW={"100%"}
         minW={{ base: "100%", md: "50vw" }}
         flex={1}
+        bgColor={
+          bookmark.question.state === "blocked" ? "rgba(255,0,0,0.3)" : ""
+        }
         style={{
           display: "flex",
           width: "100%",
@@ -156,6 +160,15 @@ function BookmarkItem({
         >
           <TopItemContainer>
             <HStack w={"100%"} justifyContent={"flex-start"}>
+              <Tag
+                display={
+                  bookmark.question.state === "blocked" ? "flex" : "none"
+                }
+                colorScheme="red"
+              >
+                <LockIcon />
+                <Text as="span">Blocked</Text>
+              </Tag>
               <SmallText>{bookmark.question.votes} votes</SmallText>
               <SmallText
                 style={{
@@ -218,6 +231,7 @@ function BookmarkItem({
               whiteSpace: "nowrap",
               paddingBlock: "10px",
             }}
+            colorScheme={bookmark.question.state === "blocked" ? "red" : "blue"}
             variant={"link"}
             fontSize={{
               base: "xs",

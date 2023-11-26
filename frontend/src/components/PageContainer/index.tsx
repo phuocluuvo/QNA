@@ -22,23 +22,23 @@ function PageContainer({ children }: Props) {
   React.useEffect(() => {
     let checkUser =
       sessionStorage.getItem("next-auth.session-token")?.toString() ?? null;
-    // const intervalId = setInterval(() => {
-    //   checkUser &&
-    //     dispatch(
-    //       // @ts-ignore
-    //       ActionGetBadgeNotification(
-    //         (res: any) => {
-    //           setBadgeNumber(res);
-    //         },
-    //         (err: any) => {}
-    //       )
-    //     );
-    // }, 3000);
+    const intervalId = setInterval(() => {
+      checkUser &&
+        dispatch(
+          // @ts-ignore
+          ActionGetBadgeNotification(
+            (res: any) => {
+              setBadgeNumber(res);
+            },
+            (err: any) => {}
+          )
+        );
+    }, 3000);
 
-    // // Clear the interval when the component unmounts
-    // return () => {
-    //   clearInterval(intervalId);
-    // };
+    // Clear the interval when the component unmounts
+    return () => {
+      clearInterval(intervalId);
+    };
   }, []);
   return (
     <Container

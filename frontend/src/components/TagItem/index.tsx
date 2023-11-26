@@ -24,7 +24,7 @@ function TagItem({
 }: {
   tag: TagType;
   onClick?: () => void;
-  type: "normal" | "simple";
+  type?: "normal" | "simple";
 }) {
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
   const [mouseIn, setMouseIn] = useState(false);
