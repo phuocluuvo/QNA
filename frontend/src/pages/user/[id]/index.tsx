@@ -1,6 +1,4 @@
-import actionGetProfile, {
-  actionGetUserDashBoardById,
-} from "@/API/redux/actions/user/ActionGetProfile";
+import { actionGetUserDashBoardById } from "@/API/redux/actions/user/ActionGetProfile";
 import { Colors } from "@/assets/constant/Colors";
 import { Pages } from "@/assets/constant/Pages";
 import { LanguageHelper } from "@/util/Language/Language.util";
@@ -11,8 +9,6 @@ import { TimeIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
-  Divider,
-  Grid,
   HStack,
   Heading,
   Stack,
@@ -23,7 +19,6 @@ import {
   Tabs,
   Text,
   VStack,
-  styled,
   useColorMode,
   useToast,
 } from "@chakra-ui/react";
@@ -34,11 +29,6 @@ import { BiCake } from "react-icons/bi";
 import { useDispatch } from "react-redux";
 import TabProfile from "./(TabProfile)";
 import { actionGetUserById } from "@/API/redux/actions/user/ActionGetUserById";
-import api from "@/API/api";
-import { QuestionListType } from "@/util/type/Question.type";
-import { AnswerListType } from "@/util/type/Answer.type";
-import QuestionItem from "@/components/QuestionItem";
-import AnswerItem from "@/components/AnswerItem";
 const DEFAULT_USER: UserType = {
   fullname: "",
   email: "",
@@ -163,6 +153,7 @@ function DashBoard() {
             zIndex={2}
             bottom={2}
             left={2}
+            textOverflow={"ellipsis"}
           >
             @{state.username}
           </Text>
@@ -266,7 +257,5 @@ function DashBoard() {
     </Box>
   );
 }
-
-
 
 export default DashBoard;
