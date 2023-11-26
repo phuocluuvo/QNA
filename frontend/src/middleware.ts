@@ -7,5 +7,7 @@ export const config = {
     "/en/user/notification",
     "/user/profile",
     "/en/user/profile",
+    "/question/create",
+    "/en/question/create",
   ],
 };
