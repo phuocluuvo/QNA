@@ -27,6 +27,7 @@
     "@uiw/react-md-editor": "^3.25.6",
     "apisauce": "^3.0.1",
     "axios": "^1.5.0",
+    "chart.js": "^4.4.0",
     "cookie": "^0.5.0",
     "diff": "^5.1.0",
     "eslint": "8.47.0",
@@ -44,6 +45,7 @@
     "nextjs-progressbar": "^0.0.16",
     "ni18n": "^1.1.0",
     "react": "^17.0.0 || ^18.0.0",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^17.0.0 || ^18.0.0",
     "react-i18next": "^13.2.0",
     "react-icons": "^4.11.0",
@@ -63,7 +65,9 @@
   },
   "devDependencies": {
     "@types/accept-language-parser": "^1.5.3",
-    "@types/cookie": "^0.5.2"
+    "@types/cookie": "^0.5.2",
+    "next-share": "^0.27.0",
+    "remove-markdown": "^0.5.0"
   },
   "resolutions": {
     "styled-components": "^5"
