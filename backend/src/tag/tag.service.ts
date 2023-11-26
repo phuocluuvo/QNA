@@ -42,7 +42,7 @@ export class TagService {
    */
   async find(query: PaginateQuery) {
     const queryBuilder = this.tagRepository.createQueryBuilder("tag");
-
+    queryBuilder.where({ state: TagState.VERIFIED });
     return await paginate<Tag>(query, queryBuilder, tagPaginateConfig);
   }
 
@@ -150,7 +150,7 @@ export class TagService {
 
     const result = await this.tagRepository.save(tag);
     const activity = await this.activityService.create(
-      ReputationActivityTypeEnum.VERIFY_QUESTION,
+      ReputationActivityTypeEnum.VERIFY_TAG,
       ObjectActivityTypeEnum.TAG,
       tagId,
       userId,
@@ -158,7 +158,7 @@ export class TagService {
     );
     await this.notificationService.create(
       notificationText.TAG.VERIFY,
-      notificationTextDesc.QUESTION.DELETE,
+      notificationTextDesc.TAG.VERIFY,
       tag.user.id,
       activity.id,
     );

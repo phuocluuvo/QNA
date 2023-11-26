@@ -13,7 +13,6 @@ import {
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { AccessTokenGuard } from "../auth/guards/accessToken.guard";
-import { UpdateCommentDto } from "../comment/dto/update-comment.dto";
 import { message } from "../constants/message.constants";
 import { TagService } from "./tag.service";
 import { CreateTagDto } from "./dto/create-tag.dto";
@@ -29,6 +28,7 @@ import { RolesGuard } from "../auth/guards/roles.guard";
 import { Roles } from "../auth/decorator/roles.decorator";
 import { Role } from "../enums/role.enum";
 import { TagState } from "../enums/tag-state.enum";
+import { UpdateTagDto } from "./dto/update-tag.dto";
 
 @ApiTags("tag")
 @Controller("tag")
@@ -99,23 +99,23 @@ export class TagController {
    * Update an existing tag.
    *
    * @param id - The ID of the answer to update.
-   * @param commentDto - The updated data for the tag.
+   * @param tagDto
    * @returns The updated tag.
    */
   @ApiOperation({
-    summary: "update answer",
+    summary: "update tag",
   })
   @ApiBearerAuth()
   @Patch(":id")
   @UseGuards(AccessTokenGuard)
-  async update(@Param("id") id: string, @Body() commentDto: UpdateCommentDto) {
+  async update(@Param("id") id: string, @Body() tagDto: UpdateTagDto) {
     const comment = await this.tagService.findOne({ id: id });
 
     if (!comment) {
-      throw new NotFoundException(message.NOT_FOUND.COMMENT);
+      throw new NotFoundException(message.NOT_FOUND.TAG);
     }
 
-    return this.tagService.update(id, commentDto);
+    return this.tagService.update(id, tagDto);
   }
 
   /**

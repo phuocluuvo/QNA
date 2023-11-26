@@ -499,4 +499,28 @@ export class QuestionService {
   async getQuestionHistory(query: PaginateQuery, questionId: string) {
     return this.historyService.getQuestionHistory(query, questionId);
   }
+
+  @Transactional()
+  async replaceTag(newTagId: string, oldTagId: string) {
+    const tagToReplace = await this.tagService.findOne({ id: newTagId });
+
+    if (!tagToReplace) {
+      throw new NotFoundException(`Tag with ID ${newTagId} not found.`);
+    }
+
+    const oldTag = await this.tagService.findOne({ id: oldTagId });
+    if (!oldTag) {
+      throw new NotFoundException(`New tag with ID ${oldTagId} not found.`);
+    }
+
+    try {
+      await this.questionRepository.query(
+        `UPDATE question_tag SET tag_id = '${newTagId}' WHERE tag_id = '${oldTagId}'`,
+      );
+      await this.tagService.remove(oldTag);
+    } catch (error) {
+      throw new BadRequestException(`Error replace tag`);
+    }
+    return tagToReplace;
+  }
 }

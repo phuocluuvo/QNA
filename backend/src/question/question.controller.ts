@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Query,
   Req,
   UseGuards,
@@ -301,5 +302,15 @@ export class QuestionController {
     } else {
       throw new ForbiddenException(message.NOT_AUTHOR.QUESTION);
     }
+  }
+
+  @Put("replaceTag")
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.MONITOR)
+  async replaceTag(
+    @Body("tag_to_replace") newTag: string,
+    @Body("old_tag") oldTag: string,
+  ) {
+    return this.questionService.replaceTag(newTag, oldTag);
   }
 }

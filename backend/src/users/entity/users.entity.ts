@@ -18,6 +18,7 @@ import { Bookmark } from "../../bookmark/entity/bookmark.entity";
 import { History } from "../../history/entity/history.entity";
 import { Collection } from "../../collection/enity/collection.entity";
 import { Announcement } from "../../announcement/entity/announcement.entity";
+import { Sysconfig } from "../../sysconfig/entity/sysconfig.entity";
 
 @Entity()
 export class User {
@@ -135,4 +136,7 @@ export class User {
 
   @OneToMany(() => Announcement, (a) => a.user)
   announcements: Announcement[];
+
+  @OneToMany(() => Sysconfig, (a) => a.latestEditUser)
+  sysconfigs: Sysconfig[];
 }
