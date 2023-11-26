@@ -15,6 +15,7 @@ import { Question } from "../question/entity/question.entity";
 import { Answer } from "../answer/entity/answer.entity";
 import { Comment } from "../comment/entity/comment.entity";
 import { message } from "../constants/message.constants";
+import { SysconfigService } from "../sysconfig/sysconfig.service";
 
 @Injectable()
 export class ActivityService {
@@ -22,6 +23,7 @@ export class ActivityService {
     @Inject("ACTIVITY_REPOSITORY")
     private readonly activityRepository: Repository<Activity>,
     private readonly usersService: UsersService,
+    private readonly sysconfigService: SysconfigService,
   ) {}
 
   /**
@@ -51,11 +53,13 @@ export class ActivityService {
     userId: string,
     authorId: string,
   ) {
+    const repu = await this.transConfigToReputationConstant(activityType);
+
     const newActivity = new Activity();
     newActivity.activityType = activityType;
     newActivity.objectType = objectType;
     newActivity.objectId = objectId;
-    newActivity.pointChange = reputationActivityPoint[activityType];
+    newActivity.pointChange = repu;
     newActivity.user = { id: userId } as unknown as User;
 
     switch (objectType) {
@@ -79,10 +83,7 @@ export class ActivityService {
     const activity = await this.activityRepository.save(newActivity);
 
     // Update activity points
-    await this.usersService.updateActivityPoint(
-      authorId,
-      reputationActivityPoint[activityType],
-    );
+    await this.usersService.updateActivityPoint(authorId, repu);
     return activity;
   }
 
@@ -163,5 +164,50 @@ export class ActivityService {
     }
 
     return result;
+  }
+
+  private async transConfigToReputationConstant(
+    activityType: ReputationActivityTypeEnum,
+  ): Promise<number> {
+    const sysconfigUsing = await this.sysconfigService.getUsingSysconfig();
+    if (sysconfigUsing) {
+      const reputation = {
+        [ReputationActivityTypeEnum.CREATE_QUESTION]:
+          sysconfigUsing.createQuestion,
+        [ReputationActivityTypeEnum.UPDATE_QUESTION]:
+          sysconfigUsing.updateQuestion,
+        [ReputationActivityTypeEnum.CREATE_ANSWER]: sysconfigUsing.createAnswer,
+        [ReputationActivityTypeEnum.UPDATE_ANSWER]: sysconfigUsing.updateAnswer,
+        [ReputationActivityTypeEnum.CREATE_COMMENT]:
+          sysconfigUsing.createComment,
+        [ReputationActivityTypeEnum.UPDATE_COMMENT]:
+          sysconfigUsing.updateComment,
+        [ReputationActivityTypeEnum.UPVOTE]: sysconfigUsing.upVote,
+        [ReputationActivityTypeEnum.CANCLE_UPVOTE]: sysconfigUsing.cancleUpVote,
+        [ReputationActivityTypeEnum.CHANGE_DOWNVOTE_TO_UPVOTE]:
+          sysconfigUsing.changeDownVoteToUpVote,
+        [ReputationActivityTypeEnum.ACCEPT_ANSWER]: sysconfigUsing.acceptAnswer,
+        [ReputationActivityTypeEnum.DELETE_QUESTION]:
+          sysconfigUsing.deleteQuestion,
+        [ReputationActivityTypeEnum.DELETE_ANSWER]: sysconfigUsing.deleteAnswer,
+        [ReputationActivityTypeEnum.DELETE_COMMENT]:
+          sysconfigUsing.deleteComment,
+        [ReputationActivityTypeEnum.DOWNVOTE]: sysconfigUsing.downVote,
+        [ReputationActivityTypeEnum.CANCLE_DOWNVOTE]:
+          sysconfigUsing.cancleDownVote,
+        [ReputationActivityTypeEnum.CHANGE_UPVOTE_TO_DOWNVOTE]:
+          sysconfigUsing.changeUpVoteToDownVote,
+        [ReputationActivityTypeEnum.UN_ACCEPT_ANSWER]:
+          sysconfigUsing.unAcceptAnswer,
+        [ReputationActivityTypeEnum.BLOCK_QUESTION]:
+          sysconfigUsing.blockQuestion,
+        [ReputationActivityTypeEnum.VERIFY_QUESTION]:
+          sysconfigUsing.verifyQuestion,
+        [ReputationActivityTypeEnum.VERIFY_TAG]: sysconfigUsing.verifyTag,
+      };
+      return reputation[activityType];
+    } else {
+      return reputationActivityPoint[activityType];
+    }
   }
 }
