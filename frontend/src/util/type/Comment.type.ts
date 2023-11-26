@@ -10,6 +10,7 @@ type Comment = {
   user: UserType;
   answer?: AnswerType;
   question?: QuestionType;
+  type: "normal" | "report" | "pending" | "undelete";
 };
 
 export type CommentType = Comment;

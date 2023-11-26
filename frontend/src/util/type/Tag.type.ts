@@ -5,7 +5,9 @@ interface Tag {
   name: string;
   questionsNumber: number;
   content?: string;
-  state?: "pending" | "verified" | "blocked";
+  state: "pending" | "verified" | "blocked";
+  createdAt: string;
+  updatedAt: string;
 }
 export type TagListType = {
   data: Array<Tag>;
