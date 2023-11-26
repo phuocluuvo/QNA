@@ -20,6 +20,7 @@ import { PassportModule } from "@nestjs/passport";
 import { GoogleStrategy } from "src/auth/google.strategy";
 import { AnnouncementModule } from "src/announcement/announcement.module";
 import { GithubStrategy } from "src/auth/github.strategy";
+import { SysconfigModule } from "../sysconfig/sysconfig.module";
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { GithubStrategy } from "src/auth/github.strategy";
     PassportModule.register({ defaultStrategy: "github" }),
     RedisCacheModule,
     AnnouncementModule,
+    SysconfigModule,
   ],
   controllers: [AppController],
   providers: [AppService, GoogleStrategy, GithubStrategy],
