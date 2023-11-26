@@ -14,6 +14,7 @@ import { reputationActivityPoint } from "../constants/reputation.constants";
 import { Question } from "../question/entity/question.entity";
 import { Answer } from "../answer/entity/answer.entity";
 import { Comment } from "../comment/entity/comment.entity";
+import { message } from "../constants/message.constants";
 
 @Injectable()
 export class ActivityService {
@@ -133,6 +134,9 @@ export class ActivityService {
     const user = await this.usersService.find({
       id: userId,
     });
+    if (!user) {
+      throw new BadRequestException(message.NOT_FOUND.USER);
+    }
 
     const queryBuiler =
       await this.activityRepository.createQueryBuilder("activity");
