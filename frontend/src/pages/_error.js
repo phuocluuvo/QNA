@@ -13,6 +13,8 @@ function CustomError({ statusCode }) {
       setMessage("Page not found");
     } else if (statusCode === 500) {
       setMessage("Loading..." + "\n" + "Please wait a moment");
+    } else if (statusCode === 401) {
+      setMessage("Unauthorized: Please log in");
     }
     const interval = setInterval(() => {
       setCountdown((prev) => prev - 1);
