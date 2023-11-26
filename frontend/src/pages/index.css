@@ -8,7 +8,13 @@
 }
 
 body {
-  overflow: scroll !important;
+  overflow-y: scroll !important;
+}
+
+.editer-markdown {
+  height: 100%;
+  width: 100%;
+  overflow-y: scroll !important;
 }
 
 .answer-editor-blocker {

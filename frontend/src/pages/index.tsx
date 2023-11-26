@@ -8,8 +8,10 @@ import {
   HStack,
   Heading,
   Spacer,
+  Stack,
   Text,
   VStack,
+  styled,
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
@@ -20,7 +22,6 @@ import actionGetQuestionList from "@/API/redux/actions/question/ActionGetQuestio
 import { QuestionListType } from "@/util/type/Question.type";
 import { useRouter } from "next/router";
 import { Colors } from "@/assets/constant/Colors";
-import SelectOptions from "@/components/SelectOptions";
 import { LanguageHelper } from "@/util/Language/Language.util";
 import { Pages } from "@/assets/constant/Pages";
 import FilterColumn from "@/components/FilterColumn";
@@ -34,6 +35,7 @@ import {
 } from "@/assets/constant/Filter.data";
 import TagList from "@/components/TagList";
 import { useSession } from "next-auth/react";
+import Annoucements from "@/components/Annoucements";
 
 const limitations = [5, 10, 15, 20];
 
@@ -57,11 +59,10 @@ export default function Home() {
   const [valueSort, setValueSort] = useState("title");
   const [isDecending, setIsDecending] = useState("DESC");
   const { isOpen, onToggle } = useDisclosure();
-
   useEffect(() => {
     const defaultLimit = 10;
     const defaultPage = 1;
-    const defaultSortBy = "title";
+    const defaultSortBy = "created_at";
     const defaultOrderBy = "DESC";
 
     const queryParams: GetQuesionParams = {
@@ -75,7 +76,7 @@ export default function Home() {
         : `${defaultSortBy}:${defaultOrderBy}`,
     };
 
-    setValueSort((router.query.sortBy as string) ?? "title");
+    setValueSort((router.query.sortBy as string) ?? "created_at");
     setIsDecending((router.query.orderBy as string) ?? "DESC");
 
     dispatch(
@@ -91,6 +92,7 @@ export default function Home() {
       )
     );
   }, [router.query]);
+
   useEffect(() => {
     setHydrated(true);
   }, []);
@@ -142,8 +144,10 @@ export default function Home() {
         <link rel="icon" href="/images/favicon.ico" sizes="any" />
       </Head>
       <VStack alignItems={"end"} flex={{ base: 1, md: 0.8 }}>
-        <HStack
+        <Stack
+          direction={{ base: "column", md: "row" }}
           w={"full"}
+          flexWrap={"wrap"}
           justifyContent={"space-between"}
           alignItems={"flex-start"}
         >
@@ -155,28 +159,81 @@ export default function Home() {
           </VStack>
           <VStack flex={1} alignItems={"flex-end"}>
             <HStack>
-              <SelectOptions
-                getTranslate={getTranslate}
-                containerStyle={{
-                  fontSize: "xs",
-                  variant: "filled",
-                  w: "fit-content",
-                }}
-                onSelect={(e) => {
-                  router.push({
-                    pathname: router.pathname,
-                    query: {
-                      ...router.query,
-                      select: e.target.value,
-                      limit: 10,
-                      page: 1,
-                    },
-                  },
-                  undefined,
-                  { shallow: true });
-                }}
-              />
               <Button
+              variant={"main_button"}
+                size={"sm"}
+                onClick={() => {
+                  router.push({
+                    pathname: "/question/create",
+                  });
+                }}
+              >
+                {getTranslate("ASK_QUESTION")}
+              </Button>
+              <HStack spacing={0}>
+                <FilterButton
+                  style={{
+                    borderColor:
+                      filter === "no_answer"
+                        ? Colors(colorMode === "dark").PRIMARY
+                        : "transparent",
+                    padding: "5px 10px",
+                    borderEndEndRadius: 0,
+                    borderStartEndRadius: 0,
+                  }}
+                  size={"sm"}
+                  isActive={filter === "no_answer" || !filter}
+                  onClick={() => {
+                    router.replace(
+                      {
+                        pathname: router.pathname,
+                        query: {
+                          ...router.query,
+                          select: "no_answer",
+                          limit: 10,
+                          page: 1,
+                        },
+                      },
+                      undefined,
+                      { shallow: true }
+                    );
+                  }}
+                >
+                  {getTranslate("UNANSWERED")}
+                </FilterButton>
+                <FilterButton
+                  size={"sm"}
+                  style={{
+                    borderColor:
+                      filter === "no_approved"
+                        ? Colors(colorMode === "dark").PRIMARY
+                        : "transparent",
+                    padding: "5px 10px",
+                    borderEndStartRadius: 0,
+                    borderStartStartRadius: 0,
+                  }}
+                  isActive={filter === "no_approved"}
+                  onClick={() => {
+                    router.replace(
+                      {
+                        pathname: router.pathname,
+                        query: {
+                          ...router.query,
+                          select: "no_approved",
+                          limit: 10,
+                          page: 1,
+                        },
+                      },
+                      undefined,
+                      { shallow: true }
+                    );
+                  }}
+                >
+                  {getTranslate("UNAPPROVED")}
+                </FilterButton>
+              </HStack>
+              <Button
+                size={"sm"}
                 aria-label="Search database"
                 leftIcon={<BiFilterAlt />}
                 onClick={onToggle}
@@ -185,7 +242,7 @@ export default function Home() {
               </Button>
             </HStack>
           </VStack>
-        </HStack>
+        </Stack>
         <Collapse in={isOpen} animateOpacity>
           <VStack w={"full"} alignItems={"flex-end"}>
             <HStack
@@ -214,7 +271,11 @@ export default function Home() {
               <FilterColumn
                 title={getTranslate("SORT_BY")}
                 value={valueSort}
-                defaultValue={(router.query.sortBy as string) ?? "title"}
+                defaultValue={
+                  (router.query.sortBy as string)
+                    ? (router.query.sortBy as string)
+                    : "title"
+                }
                 setValue={setValueSort}
                 dataList={
                   getCurrentLanguage().code === "en"
@@ -375,16 +436,7 @@ export default function Home() {
           </Flex>
         </Flex>
       </VStack>
-      <VStack
-        flex={{ base: 1, md: 0.2 }}
-        w={"full"}
-        style={{
-          position: "sticky",
-          top: "11%",
-        }}
-        p={0}
-        m={0}
-      >
+      <VStack flex={{ base: 1, md: 0.2 }} w={"full"} p={0} m={0}>
         <TabsQuestion
           router={router}
           getTranslate={getTranslate}
@@ -392,6 +444,7 @@ export default function Home() {
             flex: 1,
           }}
         />
+        <Annoucements />
         <TagList
           router={router}
           getTranslate={getTranslate}
@@ -405,7 +458,11 @@ export default function Home() {
     </Fragment>
   );
 }
-
+const FilterButton = styled(Button, {
+  baseStyle: {
+    padding: "5px 10px",
+  },
+});
 // @ts-ignore
 export async function getServerSideProps({ params, query, ...props }) {
   return {
