@@ -103,7 +103,7 @@ export class TagController {
    * @returns The updated tag.
    */
   @ApiOperation({
-    summary: "update answer",
+    summary: "update tag",
   })
   @ApiBearerAuth()
   @Patch(":id")

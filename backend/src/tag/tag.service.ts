@@ -42,7 +42,7 @@ export class TagService {
    */
   async find(query: PaginateQuery) {
     const queryBuilder = this.tagRepository.createQueryBuilder("tag");
-
+    queryBuilder.where({ state: TagState.VERIFIED });
     return await paginate<Tag>(query, queryBuilder, tagPaginateConfig);
   }
 
