@@ -313,7 +313,7 @@ function UsersListPage() {
           gap={5}
         >
           {state.users?.data.map((user, index) => (
-            <UserItem user={user} />
+            <UserItem key={user.id} user={user} />
           ))}
         </Flex>
         <Flex
