@@ -151,7 +151,7 @@ export class QuestionService {
       ...questionTrans,
     });
     delete question.tagNames;
-
+    question.updatedAt = new Date();
     return this.questionRepository.save(question);
   }
 

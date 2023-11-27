@@ -170,7 +170,6 @@ export class ActivityService {
     activityType: ReputationActivityTypeEnum,
   ): Promise<number> {
     const sysconfigUsing = await this.sysconfigService.getUsingSysconfig();
-    console.log(sysconfigUsing);
     if (sysconfigUsing) {
       const reputation = {
         [ReputationActivityTypeEnum.CREATE_QUESTION]:

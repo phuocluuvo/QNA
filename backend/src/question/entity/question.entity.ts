@@ -8,7 +8,6 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
   VirtualColumn,
 } from "typeorm";
 import { User } from "../../users/entity/users.entity";
@@ -42,7 +41,7 @@ export class Question {
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: "updated_at" })
+  @CreateDateColumn({ name: "updated_at" })
   updatedAt: Date;
 
   @Column({ type: "enum", enum: QuestionState, default: QuestionState.PENDING })
