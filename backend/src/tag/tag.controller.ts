@@ -13,7 +13,6 @@ import {
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { AccessTokenGuard } from "../auth/guards/accessToken.guard";
-import { UpdateCommentDto } from "../comment/dto/update-comment.dto";
 import { message } from "../constants/message.constants";
 import { TagService } from "./tag.service";
 import { CreateTagDto } from "./dto/create-tag.dto";
@@ -29,6 +28,8 @@ import { RolesGuard } from "../auth/guards/roles.guard";
 import { Roles } from "../auth/decorator/roles.decorator";
 import { Role } from "../enums/role.enum";
 import { TagState } from "../enums/tag-state.enum";
+import { UpdateTagDto } from "./dto/update-tag.dto";
+import { PublicGuard } from "../auth/guards/public.guard";
 
 @ApiTags("tag")
 @Controller("tag")
@@ -44,9 +45,18 @@ export class TagController {
   @ApiOkPaginatedResponse(Question, tagPaginateConfig)
   @ApiPaginationQuery(tagPaginateConfig)
   @Get()
-  @UseGuards()
-  find(@Paginate() query: PaginateQuery) {
-    return this.tagService.find(query);
+  @UseGuards(PublicGuard)
+  find(@Paginate() query: PaginateQuery, @Req() req: Request) {
+    return this.tagService.find(query, req["user"]);
+  }
+
+  @ApiOperation({
+    summary: "verify tag",
+  })
+  @ApiBearerAuth()
+  @Get("topTagUser/:userId")
+  async topTagUserByUser(@Param("userId") userId: string) {
+    return this.tagService.topTagUserByUser(userId);
   }
 
   /**
@@ -60,7 +70,7 @@ export class TagController {
   })
   @Get(":name")
   @UseGuards()
-  async findOneById(@Param("id") name: string) {
+  async findOneById(@Param("name") name: string) {
     return this.tagService.findOneByName(name);
   }
 
@@ -90,23 +100,23 @@ export class TagController {
    * Update an existing tag.
    *
    * @param id - The ID of the answer to update.
-   * @param commentDto - The updated data for the tag.
+   * @param tagDto
    * @returns The updated tag.
    */
   @ApiOperation({
-    summary: "update answer",
+    summary: "update tag",
   })
   @ApiBearerAuth()
   @Patch(":id")
   @UseGuards(AccessTokenGuard)
-  async update(@Param("id") id: string, @Body() commentDto: UpdateCommentDto) {
+  async update(@Param("id") id: string, @Body() tagDto: UpdateTagDto) {
     const comment = await this.tagService.findOne({ id: id });
 
     if (!comment) {
-      throw new NotFoundException(message.NOT_FOUND.COMMENT);
+      throw new NotFoundException(message.NOT_FOUND.TAG);
     }
 
-    return this.tagService.update(id, commentDto);
+    return this.tagService.update(id, tagDto);
   }
 
   /**

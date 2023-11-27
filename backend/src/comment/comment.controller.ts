@@ -94,7 +94,7 @@ export class CommentController {
    * @returns The created comment.
    */
   @ApiOperation({
-    summary: "create answer",
+    summary: "create comment",
   })
   @ApiBearerAuth()
   @Post()
@@ -109,8 +109,11 @@ export class CommentController {
         "Either answer_id or question_id should be provided, not both or none.",
       );
     }
-    await this.answerService.findOneById(answerDto.answer_id);
-    await this.questionService.findOneById(answerDto.question_id);
+    if (answerDto.answer_id && !answerDto.question_id)
+      await this.answerService.findOneById(answerDto.answer_id);
+
+    if (!answerDto.answer_id && answerDto.question_id)
+      await this.questionService.findOneById(answerDto.question_id);
 
     return this.commentService.createWithActivity(answerDto, userId);
   }

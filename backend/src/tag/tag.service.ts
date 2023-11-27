@@ -24,6 +24,7 @@ import {
 } from "../constants/notification.constants";
 import { NotificationService } from "../notification/notification.service";
 import { Transactional } from "typeorm-transactional";
+import { Role } from "../enums/role.enum";
 
 @Injectable()
 export class TagService {
@@ -39,18 +40,14 @@ export class TagService {
    *
    * @returns Paginated list of tag.
    * @param query
+   * @param user
    */
-  async find(query: PaginateQuery) {
+  async find(query: PaginateQuery, user: any) {
     const queryBuilder = this.tagRepository.createQueryBuilder("tag");
-    queryBuilder.select([
-      "tag.id",
-      "tag.name",
-      "tag.content",
-      "tag.questionsNumber",
-      "tag.state",
-    ]);
-    queryBuilder.leftJoin("tag.questions", "question");
 
+    if (!(user.role == Role.ADMIN || user.role == Role.MONITOR)) {
+      queryBuilder.where({ state: TagState.VERIFIED });
+    }
     return await paginate<Tag>(query, queryBuilder, tagPaginateConfig);
   }
 
@@ -158,7 +155,7 @@ export class TagService {
 
     const result = await this.tagRepository.save(tag);
     const activity = await this.activityService.create(
-      ReputationActivityTypeEnum.VERIFY_QUESTION,
+      ReputationActivityTypeEnum.VERIFY_TAG,
       ObjectActivityTypeEnum.TAG,
       tagId,
       userId,
@@ -166,7 +163,7 @@ export class TagService {
     );
     await this.notificationService.create(
       notificationText.TAG.VERIFY,
-      notificationTextDesc.QUESTION.DELETE,
+      notificationTextDesc.TAG.VERIFY,
       tag.user.id,
       activity.id,
     );
@@ -192,5 +189,17 @@ export class TagService {
       .limit(5);
 
     return queryBuilder.getRawMany();
+  }
+
+  async topTagUserByUser(userId: string) {
+    const queryBuilder = this.tagRepository
+      .createQueryBuilder("tag")
+      .addSelect(["COUNT(tag.id) as tag_questionsNumber"])
+      .leftJoin("tag.questions", "question")
+      .leftJoin("question.user", "user")
+      .where("user.id = :userId", { userId: userId })
+      .groupBy("tag.id")
+      .limit(10);
+    return queryBuilder.getMany();
   }
 }

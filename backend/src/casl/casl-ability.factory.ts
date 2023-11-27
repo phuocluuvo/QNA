@@ -55,7 +55,7 @@ export class CaslAbilityFactory {
       Ability as AbilityClass<AppAbility>,
     );
 
-    if (userReq.role == Role.ADMIN) {
+    if (userReq.role == Role.ADMIN || userReq.role == Role.MONITOR) {
       can(Action.Manage, "all");
     } else {
       can(Action.Read, "all");

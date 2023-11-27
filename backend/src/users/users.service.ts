@@ -16,12 +16,15 @@ import { plainToClass } from "class-transformer";
 import { UpdateUserAdminDto } from "./dto/update-user-admin.dto";
 import { CreateUserAdminDto } from "./dto/create-user-admin.dto";
 import { QuestionTimeTypeEnum } from "src/enums/question-type.enum";
+import { v4 as uuidv4 } from "uuid";
+import { EmailService } from "src/email/email.service";
 
 @Injectable()
 export class UsersService {
   constructor(
     @Inject("USERS_REPOSITORY")
     private readonly userRepository: Repository<User>,
+    private readonly emailService: EmailService,
   ) {}
 
   async getAllUser(query: PaginateQuery, state: string, role: string) {
@@ -122,6 +125,20 @@ export class UsersService {
     }
   }
 
+  async findOneByGithub(github: string): Promise<User | undefined> {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { githubLink: github },
+      });
+
+      if (user) {
+        return user;
+      }
+    } catch (err) {
+      throw new Error(`Error finding ${err} user ${err.message}`);
+    }
+  }
+
   /**
    * Find a user by refresh token.
    * @param refreshToken Refresh token to search for.
@@ -155,6 +172,18 @@ export class UsersService {
       const user = await this.userRepository.findOne({
         where: { uuid },
       });
+
+      if (user) {
+        return user;
+      }
+    } catch (err) {
+      throw new Error(`Error finding ${err} user ${err.message}`);
+    }
+  }
+
+  async findOneById(id: string): Promise<User | undefined> {
+    try {
+      const user = await this.userRepository.findOneById(id);
 
       if (user) {
         return user;
@@ -261,9 +290,7 @@ export class UsersService {
         .leftJoin("user.questions", "question")
         .leftJoin("user.answers", "answer")
         .leftJoin("user.votes", "vote")
-        .leftJoin("user.tags", "tag")
-        .where("user.id = :id", { id })
-        .groupBy("user.id");
+        .leftJoin("user.tags", "tag");
       switch (timeType) {
         case QuestionTimeTypeEnum.MONTH:
           queryBuilder
@@ -315,6 +342,7 @@ export class UsersService {
         default:
           break;
       }
+      queryBuilder.where("user.id = :id", { id }).groupBy("user.id");
       const result = await queryBuilder.getRawOne();
       return result;
     } catch (err) {
@@ -495,5 +523,72 @@ export class UsersService {
       .where("user.id = :userId", { userId });
 
     return queryBuilder.getRawOne();
+  }
+
+  async updateEmail(id: string, email: string) {
+    try {
+      const user = await this.userRepository.findOneById(id);
+      if (!user) {
+        throw new NotFoundException(message.NOT_FOUND.USER);
+      }
+      user.email = email;
+      return this.userRepository.save(user);
+    } catch (err) {
+      throw new Error(`Error update ${err} user ${err.message}`);
+    }
+  }
+
+  async AddEmail(id: string, email: string): Promise<any> {
+    if (!email) {
+      throw new BadRequestException(message.EMAIL_IS_REQUIRED);
+    }
+    if (await this.findOneByEmail(email)) {
+      throw new BadRequestException(message.EXISTED.EMAIL);
+    }
+    const user = await this.findOneById(id);
+    user.more = email;
+    if (!user) throw new BadRequestException(message.NOT_EXITS_USER);
+    if (user.uuid && user.uuid_created_at) {
+      const expirationTime = new Date(
+        user.uuid_created_at.getTime() + 5 * 60 * 1000,
+      );
+      const currentTime = new Date();
+      if (expirationTime > currentTime) {
+        throw new BadRequestException(
+          message.PLEASE_ALLOW_AT_LEAST_5_MINUTES_BEFORE_MAKING_ANOTHER_REQUEST,
+        );
+      } else {
+        return this.updateUuidForAddEmail(user);
+      }
+    } else {
+      return this.updateUuidForAddEmail(user);
+    }
+  }
+
+  async updateUuidForAddEmail(user: any): Promise<any> {
+    user.uuid = uuidv4();
+    user.uuid_created_at = new Date();
+    await this.update(user.id, user);
+    return this.emailService.sendEmailAddEmail(
+      user.more,
+      `${process.env.URL_API}/api/user/confirm-email?uuid=${user.uuid}`,
+    );
+  }
+
+  async confirmEmail(uuid: string): Promise<any> {
+    const user = await this.findOneByUuid(uuid);
+    const currentTime = new Date();
+    const expirationTime = new Date(
+      user.uuid_created_at.getTime() + 5 * 60 * 1000,
+    );
+    if (expirationTime < currentTime) {
+      throw new BadRequestException(message.THE_LINK_HAS_EXPIRED);
+    }
+    if (!user) throw new BadRequestException(message.NOT_EXITS_USER);
+    user.email = user.more;
+    user.more = null;
+    user.uuid = null;
+    user.uuid_created_at = null;
+    return this.update(user.id, user);
   }
 }

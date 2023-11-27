@@ -17,6 +17,8 @@ import { Tag } from "../../tag/entity/tag.entity";
 import { Bookmark } from "../../bookmark/entity/bookmark.entity";
 import { History } from "../../history/entity/history.entity";
 import { Collection } from "../../collection/enity/collection.entity";
+import { Announcement } from "../../announcement/entity/announcement.entity";
+import { Sysconfig } from "../../sysconfig/entity/sysconfig.entity";
 
 @Entity()
 export class User {
@@ -35,7 +37,7 @@ export class User {
   @Column({ nullable: true, default: null })
   dob: Date;
 
-  @Column({ nullable: false, unique: true })
+  @Column({ nullable: true, unique: true })
   email: string;
 
   @Column({ nullable: true })
@@ -86,11 +88,14 @@ export class User {
   @Column({ name: "uuid_created_at", type: "datetime", nullable: true })
   uuid_created_at: Date;
 
-  @Column({ name: "about", nullable: true, type: "text" })
+  @Column({ nullable: true, type: "text" })
   about: string;
 
-  @Column({ nullable: false, type: "text" })
+  @Column({ nullable: true, type: "text" })
   location: string;
+
+  @Column({ nullable: true })
+  more: string;
 
   // This is the virtual column.
 
@@ -128,4 +133,10 @@ export class User {
 
   @OneToMany(() => History, (history) => history.user)
   histories: History[];
+
+  @OneToMany(() => Announcement, (a) => a.user)
+  announcements: Announcement[];
+
+  @OneToMany(() => Sysconfig, (a) => a.latestEditUser)
+  sysconfigs: Sysconfig[];
 }

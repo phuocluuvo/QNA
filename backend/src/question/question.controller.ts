@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -8,6 +9,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Query,
   Req,
   UseGuards,
@@ -92,8 +94,18 @@ export class QuestionController {
   @Get(":id")
   @UseGuards(PublicGuard)
   async findOneById(@Param("id") id: string, @Req() req: Request) {
-    const userId = req.user["sub"];
-    return this.questionService.getQuestionAndIncreaseViewCount(id, userId);
+    const ability = this.caslAbilityFactory.createForUser(req.user);
+    const question = await this.questionService.findOneById(id);
+    if (
+      question.state == QuestionState.BLOCKED &&
+      !ability.can(Action.Update, question)
+    ) {
+      throw new ForbiddenException(message.NOT_FOUND.QUESTION);
+    }
+    return this.questionService.getQuestionAndIncreaseViewCount(
+      id,
+      req.user["sub"],
+    );
   }
 
   /**
@@ -262,5 +274,58 @@ export class QuestionController {
       userId,
       QuestionState.BLOCKED,
     );
+  }
+
+  /**
+   * undelete for a question.
+   *
+   * @param req - The request object.
+   * @param questionId
+   * @returns The result of the vote.
+   */
+  @ApiOperation({
+    summary: "verify question",
+  })
+  @ApiBearerAuth()
+  @Get(":questionId/unblock")
+  @UseGuards(AccessTokenGuard)
+  async undelete(@Req() req: Request, @Param("questionId") questionId: string) {
+    const userId = req.user["sub"];
+    const ability = this.caslAbilityFactory.createForUser(req.user);
+    const question = await this.questionService.findOneById(questionId);
+
+    if (!(await this.questionService.checkReport(question.id))) {
+      throw new BadRequestException(message.CANNOT_UN_BLOCK_OVER_MANY_TIMES);
+    }
+
+    if (ability.can(Action.Delete, question)) {
+      return this.questionService.censoring(
+        questionId,
+        userId,
+        QuestionState.PENDING,
+      );
+    } else {
+      throw new ForbiddenException(message.NOT_AUTHOR.QUESTION);
+    }
+  }
+
+  @ApiOperation({
+    summary: "get count unblock question",
+  })
+  @ApiBearerAuth()
+  @Get(":questionId/getCountUnblock")
+  @UseGuards(AccessTokenGuard)
+  async getCounUnBlock(@Param("questionId") questionId: string) {
+    return await this.questionService.getCountReport(questionId);
+  }
+
+  @Put("replaceTag")
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.MONITOR)
+  async replaceTag(
+    @Body("tag_to_replace") newTag: string,
+    @Body("old_tag") oldTag: string,
+  ) {
+    return this.questionService.replaceTag(newTag, oldTag);
   }
 }

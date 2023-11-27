@@ -18,6 +18,9 @@ import { DashboardModule } from "src/dashboard/dashboard.module";
 import { HistoryModule } from "../history/history.module";
 import { PassportModule } from "@nestjs/passport";
 import { GoogleStrategy } from "src/auth/google.strategy";
+import { AnnouncementModule } from "src/announcement/announcement.module";
+import { GithubStrategy } from "src/auth/github.strategy";
+import { SysconfigModule } from "../sysconfig/sysconfig.module";
 
 @Module({
   imports: [
@@ -36,9 +39,12 @@ import { GoogleStrategy } from "src/auth/google.strategy";
     DashboardModule,
     HistoryModule,
     PassportModule.register({ defaultStrategy: "google" }),
+    PassportModule.register({ defaultStrategy: "github" }),
     RedisCacheModule,
+    AnnouncementModule,
+    SysconfigModule,
   ],
   controllers: [AppController],
-  providers: [AppService, GoogleStrategy],
+  providers: [AppService, GoogleStrategy, GithubStrategy],
 })
 export class AppModule {}
