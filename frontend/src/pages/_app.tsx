@@ -48,6 +48,7 @@ function App({ Component, pageProps: { session, ...pageProps } }) {
                   <Header {...pageProps} />
                   <GoToTopButton {...pageProps} />
                   <NextNProgress
+                    key={Math.random()}
                     color={Colors(false).PRIMARY}
                     startPosition={0.3}
                     stopDelayMs={200}

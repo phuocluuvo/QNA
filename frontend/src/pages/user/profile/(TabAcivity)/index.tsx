@@ -35,10 +35,8 @@ const limitations = [5, 10, 15, 20];
 
 function TabActivity({
   getTranslate,
-  userId,
 }: {
-  getTranslate: (label: string) => string;
-  userId: string | string[];
+  getTranslate: (key: string) => string;
 }) {
   const [history, setHistory] = React.useState<HistoryActivityListType | null>(
     null
@@ -89,7 +87,7 @@ function TabActivity({
     };
 
     api.getActivityHistory(queryParams).then((res) => {
-      console.log("__getActivityHistoryUser", userId, res);
+      console.log("__getActivityHistoryUser", res);
       // @ts-ignore
       setHistory(res?.data);
     });
