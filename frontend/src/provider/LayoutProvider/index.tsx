@@ -123,6 +123,7 @@ export const useTemplateContextValue = (navigation: {
       removeBookmark,
       addNewCollection,
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [_showLeftMenu, _badgeNumber, _bookmarks, _currentQuestion]
   );
 };
