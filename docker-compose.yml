@@ -30,6 +30,7 @@ services:
       - ./backend:/usr/src/app
       - /usr/src/app/node_modules
     working_dir: /usr/src/app
+    command: pm2-runtime start dist/main.js
     depends_on:
       - redis
       - mysql
