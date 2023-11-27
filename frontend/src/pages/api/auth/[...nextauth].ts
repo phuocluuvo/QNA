@@ -1,22 +1,45 @@
 import NextAuth, { AuthOptions } from "next-auth";
 import CredentialProvider from "next-auth/providers/credentials";
+import GitHubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
 import api from "@/API/api";
+import axios from "@/API/api/axios";
 
 export const authOptions: AuthOptions = {
   providers: [
+    GitHubProvider({
+      clientId: process.env.GITHUB_ID as string,
+      clientSecret: process.env.GITHUB_SECRET as string,
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_ID as string,
+      clientSecret: process.env.GOOGLE_SECRET as string,
+    }),
     CredentialProvider({
       name: "Credentials",
       credentials: {
         username: { label: "Username", type: "text", placeholder: "jsmith" },
         password: { label: "Password", type: "password" },
+        token: { label: "Token", type: "text" },
       },
-      // @ts-ignoref
       async authorize(credentials, req) {
+        if (credentials?.token) {
+          console.log("credentials__:", credentials);
+          const user = await axios.post("/api/auth/refresh-v2", {
+            refreshToken: credentials?.token,
+          });
+
+          console.log("user__:", user);
+          if (!user) return null;
+          return user.data;
+        }
+
         const form = {
           username: credentials?.username as string,
           password: credentials?.password as string,
         };
         const user = await api.requestSignIn(form);
+        if (!user) return null;
         return user.data;
       },
     }),
@@ -56,6 +79,7 @@ export const authOptions: AuthOptions = {
   secret: process.env.NEXTAUTH_SECRET as string,
   pages: {
     signIn: "/auth/signin",
+    error: "/auth/error",
   },
 };
 

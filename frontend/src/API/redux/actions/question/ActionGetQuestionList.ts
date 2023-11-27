@@ -1,6 +1,3 @@
-import { FormQuestion } from "@/API/type/Form.type";
-
-import questionDataList from "@/util/mock/QuestionDataList.mock";
 import {
   failureGetQuestionList,
   requestGetQuestionList,
@@ -9,11 +6,15 @@ import {
 import { responseHandler } from "../ResponseHandler";
 import { finishedRequest, requesting } from "../../reducers/GlobalSlice";
 import api from "@/API/api";
-import { QuestionListType } from "@/util/type/Question.type";
+import {
+  QuestionHistoryListType,
+  QuestionListType,
+} from "@/util/type/Question.type";
+import { GetQuesionParams } from "@/API/type/params/Question.params";
 export default function actionGetQuestionList(
-  query: { page: number; limit: number },
-  callbackSuccess: (res: QuestionListType) => {},
-  callbackError: () => {}
+  query: GetQuesionParams,
+  callbackSuccess: (res: QuestionListType) => {} | void,
+  callbackError: () => void
 ) {
   return (dispatch: any) => {
     dispatch(requesting());
@@ -32,34 +33,48 @@ export default function actionGetQuestionList(
         )
       );
     });
-    // dispatch(finishedRequest());
-
-    // if (questionDataList) {
-    //   // sort by createdAt
-    //   let sortedQuestion = [...questionDataList.items].sort(
-    //     (a: any, b: any) =>
-    //       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    //   );
-    //   let newQuestionDataList = {
-    //     ...questionDataList,
-    //     items: sortedQuestion,
-    //   };
-    //   let fakeData = {
-    //     data: {
-    //       data: { data: newQuestionDataList },
-    //     },
-    //     status: 200,
-    //   };
-    //   dispatch(
-    //     responseHandler(
-    //       fakeData,
-    //       callbackSuccess,
-    //       callbackError,
-    //       true,
-    //       successGetQuestionList,
-    //       failureGetQuestionList
-    //     )
-    //   );
-    // }
   };
 }
+
+export function actionGetQuestionWithRelatedTags(
+  query: GetQuesionParams,
+  callbackSuccess: (res: QuestionListType) => {} | void,
+  callbackError: () => void
+) {
+  return (dispatch: any) => {
+    dispatch(requesting());
+    dispatch(requestGetQuestionList());
+    api.getQuestionWithRelatedTags(query).then((res: any) => {
+      console.log("getQuestionList:", res);
+      dispatch(finishedRequest());
+      dispatch(
+        responseHandler(
+          res,
+          callbackSuccess,
+          callbackError,
+          true,
+          successGetQuestionList,
+          failureGetQuestionList
+        )
+      );
+    });
+  };
+}
+
+export const actionGetQuestionHistory = (
+  id: string,
+  callbackSuccess: (res: QuestionHistoryListType) => {} | void,
+  callbackError: () => void
+) => {
+  return (dispatch: any) => {
+    dispatch(requesting());
+    dispatch(requestGetQuestionList());
+    api.getQuestionHistory(id).then((res: any) => {
+      console.log("get Question List History:", res);
+      dispatch(finishedRequest());
+      dispatch(
+        responseHandler(res, callbackSuccess, callbackError, false, null, null)
+      );
+    });
+  };
+};
