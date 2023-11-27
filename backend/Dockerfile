@@ -20,4 +20,4 @@ RUN npm run build
 
 # Start the server using the production build
 #CMD [ "node", "dist/main" ]
-#CMD ["pm2-runtime", "start", "dist/main.js"]
+CMD ["pm2-runtime", "start", "dist/main.js"]
