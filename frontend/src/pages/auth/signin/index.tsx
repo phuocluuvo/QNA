@@ -123,24 +123,9 @@ export default function SignIn() {
       actions.setSubmitting(false);
     }, 1000);
   }
-  function LoginGithubHandle(type: "github" | "google") {
-    if (type === "google") {
-      const baseURL = "http://localhost:3001";
-      window.location.href = `${baseURL}/api/auth/${type}`;
-    } else
-      signIn(type).then((response) => {
-        if (response && response.ok) {
-          if (router.query.callbackUrl) {
-            router.push(router.query.callbackUrl as string, undefined, {
-              shallow: true,
-            });
-          } else {
-            router.push("/", undefined, { shallow: true });
-          }
-        } else {
-          toast({ title: getTranslate("LOGIN_ERROR"), status: "error" });
-        }
-      });
+  function LoginSocialHandle(type: "github" | "google") {
+    const baseURL = "http://localhost:3001";
+    window.location.href = `${baseURL}/api/auth/${type}`;
   }
 
   function ResetPassword({
@@ -258,7 +243,7 @@ export default function SignIn() {
               size: "lg",
               colorScheme: "gray",
             }}
-            onLogin={() => LoginGithubHandle("github")}
+            onLogin={() => LoginSocialHandle("github")}
           />
           {/* Google */}
           <LoginButton
@@ -270,7 +255,7 @@ export default function SignIn() {
             type="google"
             getTranslate={getTranslate}
             onLogin={() => {
-              LoginGithubHandle("google");
+              LoginSocialHandle("google");
             }}
           />
           <Box mt={5} mb={5} w={"100%"} h={"1px"} bg={"gray.300"}></Box>

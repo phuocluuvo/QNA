@@ -16,6 +16,7 @@ import {
   BiDotsVerticalRounded,
   BiPencil,
   BiSolidBookmarkPlus,
+  BiSolidPencil,
   BiSolidShare,
   BiTime,
   BiTimer,
@@ -67,6 +68,7 @@ import TitleHeader from "@/components/Title";
 import api from "@/API/api";
 import { GetServerSideProps } from "next";
 import { Tooltip } from "chart.js";
+import CommentModal from "@/components/CommentModal";
 const EditerMarkdown = dynamic(
   () =>
     import("@uiw/react-md-editor").then((mod) => {
@@ -83,6 +85,7 @@ function Question() {
   const [hydrated, setHydrated] = useState(false);
   const session = useSession();
   const dispatch = useDispatch();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   // @ts-ignore
   const questionsRequesting = useSelector(
     (state: { questionReducer: { type: ActionTypes } }) =>
@@ -633,64 +636,19 @@ function Question() {
                         }}
                       />
                     </Box>
-                    <VStack
-                      w={"full"}
-                      justifyContent={"space-between"}
-                      alignItems={"center"}
-                      spacing={0}
-                      divider={<Divider />}
+
+                    <Button
+                      onClick={onOpen}
+                      display={
+                        session.data?.user.id === state.question.user.id
+                          ? "flex"
+                          : "none"
+                      }
+                      leftIcon={<BiSolidPencil />}
                     >
-                      {state.question.comments?.length > 0 &&
-                        state.question.comments.map((comment) => (
-                          <HStack
-                            key={comment.id}
-                            w={"full"}
-                            opacity={0.8}
-                            _hover={{
-                              opacity: 1,
-                            }}
-                            py={2}
-                            flexWrap={"wrap"}
-                          >
-                            <Text
-                              fontSize={"xs"}
-                              color={
-                                comment.type !== "undelete"
-                                  ? "red"
-                                  : "darkorange"
-                              }
-                            >
-                              {comment.content}
-                            </Text>
-                            <Text fontSize={"xs"}>
-                              {helper.formatDate(
-                                comment.createdAt,
-                                false,
-                                "H:mm A - ddd, DD/MM/YYYY"
-                              )}{" "}
-                            </Text>
-                            <Button
-                              variant={"link"}
-                              colorScheme="facebook"
-                              onClick={() =>
-                                router.push(
-                                  `/user/${
-                                    comment.user.id ?? session.data?.user.id
-                                  }`
-                                )
-                              }
-                              _hover={{
-                                textDecoration: "underline",
-                              }}
-                            >
-                              <Text fontSize={"xs"}>
-                                {comment.user.fullname ??
-                                  session.data?.user.fullname}
-                              </Text>
-                            </Button>
-                          </HStack>
-                        ))}
-                    </VStack>
+                      Show your question comment report history
+                    </Button>
+
                     <Spacer />
                     {userData ? (
                       state.question.user.id === userData?.id ? (
@@ -818,6 +776,11 @@ function Question() {
                 </VStack>
               </Box>
             </Flex>
+            <CommentModal
+              comments={state.question.comments}
+              isOpen={isOpen}
+              onClose={onClose}
+            />
           </Container>
         </>
       ) : (

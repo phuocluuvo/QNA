@@ -33,4 +33,5 @@ export const url = {
   TOP_TAG_USER: "/api/tag/topTagUser/{userId}",
   ACTIVITY_DASHBOARD_USER: "/api/activity/activityPointChange/{id}",
   UNBLOCK_QUESTION: "/api/question/{id}/unblock",
+  COUNT_FAG: "/api/question/{id}/getCountUnblock",
 };

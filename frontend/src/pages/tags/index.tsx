@@ -1,8 +1,8 @@
 import actionGetTagList from "@/API/redux/actions/tags/ActionGetTagList";
 import { Colors } from "@/assets/constant/Colors";
 import { Pages } from "@/assets/constant/Pages";
-import SelectOptions from "@/components/SelectOptions";
 import TagItem from "@/components/TagItem";
+import TitleHeader from "@/components/Title";
 import useStateWithCallback from "@/hooks/useStateWithCallback";
 import { LanguageHelper } from "@/util/Language/Language.util";
 import helper from "@/util/helper";
@@ -12,7 +12,6 @@ import {
   Button,
   Flex,
   HStack,
-  Heading,
   Input,
   Spacer,
   Text,
@@ -27,7 +26,7 @@ type State = {
   tags: TagListType | null;
   search: string;
 };
-const limitations = [36];
+const limitations = [12, 48];
 function TagsPage() {
   const [state, setState] = useStateWithCallback<State>({
     tags: null,
@@ -120,16 +119,14 @@ function TagsPage() {
   return (
     <>
       <Head>
-        <title>Question Dân IT - Tags</title>
+        <title>Tags - Question Dân IT</title>
         <meta
           name="description"
           content="The website answers the question about IT"
         />
       </Head>
       <VStack alignItems={"start"}>
-        <Heading size={"lg"} fontWeight={"medium"}>
-          {getTranslate("TAGS")}
-        </Heading>
+        <TitleHeader title={getTranslate("TAGS")} />
         <Text
           maxW={{ base: "100%", md: "50%" }}
           style={{

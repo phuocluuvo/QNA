@@ -330,37 +330,22 @@ const getAcitvityDashboardByUser = (userId: string, date = "all") => {
   );
 };
 
-const createCancelBlockedComment = async (form: FormUnblockedComment) => {
+const createCancelBlockedComment = (form: FormUnblockedComment) => {
   form.type = "undelete";
   console.log("form createCancelBlockedComment", form);
-  // get all comments and count number of comment that have type is "blocked"
-  let commentBlockedNumber = await AuthApi(
-    REQUEST_METHOD.GET,
-    url.COMMENT + "?question_id=" + form.question_id
-  ).then((res) => {
-    let commentBlockedNumber = 0;
-    res?.data.da
-      ? res.data.data.forEach((comment: CommentType) => {
-          if (comment.type === "undelete") {
-            commentBlockedNumber++;
-          }
-        })
-      : 0;
-    return commentBlockedNumber;
-  });
-  // if number of comment that have type is "blocked" is greater than 3, then block question
-  if (commentBlockedNumber > 3) {
-    blockQuestion(form.question_id);
-  }
-  AuthApi(
-    REQUEST_METHOD.POST,
-    url.UNBLOCK_QUESTION.replace("{id}", form.question_id),
-    {
-      question_id: form.question_id,
-    }
-  );
-
+  // create the comment
   return AuthApi(REQUEST_METHOD.POST, url.COMMENT, form);
+};
+
+const unBlockQuestion = (questionId: string) => {
+  return AuthApi(
+    REQUEST_METHOD.GET,
+    url.UNBLOCK_QUESTION.replace("{id}", questionId)
+  );
+};
+
+const getFlagNumber = (id: string) => {
+  return AuthApi(REQUEST_METHOD.GET, url.COUNT_FAG.replace("{id}", id));
 };
 export default {
   requestSignUp,
@@ -416,4 +401,6 @@ export default {
   getAllTagsByUser,
   getAcitvityDashboardByUser,
   createCancelBlockedComment,
+  getFlagNumber,
+  unBlockQuestion,
 };

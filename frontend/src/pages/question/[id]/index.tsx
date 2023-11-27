@@ -19,7 +19,7 @@ export default function RedirectPage() {
         .then((res: { data: QuestionType }) => {
           // @ts-ignore
           setTitle(res.data.title);
-          router.push(
+          router.replace(
             `/question/${id}/${removeVietnameseTones(res.data.title)}`
           );
         })

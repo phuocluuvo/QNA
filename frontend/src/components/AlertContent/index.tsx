@@ -48,6 +48,15 @@ function AlertContent({ question }: { question: QuestionType }) {
   const [flagNumber, setFlagNumber] = useState(3);
   const toast = useToast();
   const session = useSession();
+  useEffect(() => {
+    if (session.data) {
+      api.getFlagNumber(question.id).then((res) => {
+        if (res?.data) {
+          setFlagNumber(3 - res.data);
+        }
+      });
+    }
+  }, []);
   const submitComment = () => {
     api
       .createCancelBlockedComment({
@@ -56,8 +65,16 @@ function AlertContent({ question }: { question: QuestionType }) {
       })
       .then((res) => {
         console.log(res);
-        if (res?.data) {
-          setFlagNumber(flagNumber - 1);
+        if (res) {
+          api.getFlagNumber(question.id).then((res) => {
+            if (res?.data) {
+              console.log("getFlagNumber", res.data);
+              setFlagNumber(3 - res.data);
+            }
+          });
+          api.unBlockQuestion(question.id).then((res) => {
+            console.log(res);
+          });
           toast({
             title: "Send Comment success",
             description:
