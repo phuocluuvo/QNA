@@ -124,7 +124,7 @@ export default function SignIn() {
     }, 1000);
   }
   function LoginSocialHandle(type: "github" | "google") {
-    const baseURL = "http://localhost:3001";
+    const baseURL = "http://trongphan5301.click";
     window.location.href = `${baseURL}/api/auth/${type}`;
   }
 

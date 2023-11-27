@@ -3,7 +3,7 @@ import { url } from "./url";
 import { getSession, signIn } from "next-auth/react";
 import _ from "lodash";
 import { STATUS } from "../constant/StatusCode.enum";
-const BASE_URL = "http://localhost:3001";
+const BASE_URL = "http://trongphan5301.click";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 export const apiFormData = axios.create({
