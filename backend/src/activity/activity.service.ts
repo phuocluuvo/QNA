@@ -100,6 +100,7 @@ export class ActivityService {
     const activity = await this.activityRepository.count({
       where: {
         user: { id: userId },
+        activityType: ReputationActivityTypeEnum.CREATE_QUESTION,
         createdAt: MoreThanOrEqual(todayStart),
       },
     });
