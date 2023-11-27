@@ -24,7 +24,6 @@ import { PaginateQuery } from "nestjs-paginate/lib/decorator";
 import { ApiOkPaginatedResponse, ApiPaginationQuery } from "nestjs-paginate";
 import { notificationPagination } from "../config/pagination/notification-pagination";
 import { Notification } from "./entity/notification.entity";
-import { PublicGuard } from "../auth/guards/public.guard";
 
 @Controller("notification")
 @ApiTags("notification")
@@ -51,10 +50,10 @@ export class NotificationController {
   }
 
   @ApiOperation({
-    summary: "get announcement",
+    summary: "get announcement count",
   })
   @Get("badgeNumber")
-  @UseGuards(PublicGuard)
+  @UseGuards(AccessTokenGuard)
   async getBadgeNumber(@Req() req: Request) {
     if (req["user"]) {
       return this.notificationService.getBadgeNumber(req["user"]["sub"]);
