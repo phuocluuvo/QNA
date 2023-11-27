@@ -170,6 +170,7 @@ export class ActivityService {
     activityType: ReputationActivityTypeEnum,
   ): Promise<number> {
     const sysconfigUsing = await this.sysconfigService.getUsingSysconfig();
+    console.log(sysconfigUsing);
     if (sysconfigUsing) {
       const reputation = {
         [ReputationActivityTypeEnum.CREATE_QUESTION]:
@@ -204,10 +205,29 @@ export class ActivityService {
         [ReputationActivityTypeEnum.VERIFY_QUESTION]:
           sysconfigUsing.verifyQuestion,
         [ReputationActivityTypeEnum.VERIFY_TAG]: sysconfigUsing.verifyTag,
+        [ReputationActivityTypeEnum.UN_BLOCK_QUESTION]:
+          sysconfigUsing.unBlockQuestion,
       };
       return reputation[activityType];
     } else {
       return reputationActivityPoint[activityType];
     }
+  }
+
+  async checkUndeleteQuestion(questionId: string): Promise<boolean> {
+    const requiredActivity = 10;
+    const activity = await this.countUnblockQuestion(questionId);
+    return activity < requiredActivity;
+  }
+
+  async countUnblockQuestion(questionId: string): Promise<number> {
+    const activityType = ReputationActivityTypeEnum.UN_BLOCK_QUESTION;
+
+    return await this.activityRepository.count({
+      where: {
+        question: { id: questionId },
+        activityType: activityType,
+      },
+    });
   }
 }

@@ -20,6 +20,7 @@ export enum ReputationActivityTypeEnum {
 
   BLOCK_QUESTION = "block_question",
   VERIFY_QUESTION = "verify_question",
+  UN_BLOCK_QUESTION = "un_block_question",
 
   VERIFY_TAG = "verify_tag",
 }

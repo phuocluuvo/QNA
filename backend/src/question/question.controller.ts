@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -293,6 +294,10 @@ export class QuestionController {
     const ability = this.caslAbilityFactory.createForUser(req.user);
     const question = await this.questionService.findOneById(questionId);
 
+    if (!(await this.questionService.checkReport(question.id))) {
+      throw new BadRequestException(message.CANNOT_UN_BLOCK_OVER_MANY_TIMES);
+    }
+
     if (ability.can(Action.Delete, question)) {
       return this.questionService.censoring(
         questionId,
@@ -302,6 +307,16 @@ export class QuestionController {
     } else {
       throw new ForbiddenException(message.NOT_AUTHOR.QUESTION);
     }
+  }
+
+  @ApiOperation({
+    summary: "get count unblock question",
+  })
+  @ApiBearerAuth()
+  @Get(":questionId/getCountUnblock")
+  @UseGuards(AccessTokenGuard)
+  async getCounUnBlock(@Param("questionId") questionId: string) {
+    return await this.questionService.getCountReport(questionId);
   }
 
   @Put("replaceTag")

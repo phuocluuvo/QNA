@@ -115,6 +115,12 @@ export class CreateSysconfigDto {
   @Expose()
   @IsNotEmpty()
   @IsNumber()
+  unBlockQuestion: number;
+
+  @ApiProperty()
+  @Expose()
+  @IsNotEmpty()
+  @IsNumber()
   verifyQuestion: number;
 
   @ApiProperty()
