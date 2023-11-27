@@ -21,6 +21,7 @@ export const reputationActivityPoint = {
   [ReputationActivityTypeEnum.UN_ACCEPT_ANSWER]: -20,
 
   [ReputationActivityTypeEnum.BLOCK_QUESTION]: -10,
+  [ReputationActivityTypeEnum.UN_BLOCK_QUESTION]: 10,
   [ReputationActivityTypeEnum.VERIFY_QUESTION]: 0,
 
   [ReputationActivityTypeEnum.VERIFY_TAG]: 0,

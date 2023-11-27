@@ -151,7 +151,7 @@ export class QuestionService {
       ...questionTrans,
     });
     delete question.tagNames;
-
+    question.updatedAt = new Date();
     return this.questionRepository.save(question);
   }
 
@@ -373,32 +373,42 @@ export class QuestionService {
 
   @Transactional()
   async censoring(questionId: string, userId: string, state: QuestionState) {
+    let mess, repu, noti, notiDesc;
+    if (state == QuestionState.VERIFIED) {
+      mess = message.QUESTION.VERIFIED;
+      repu = ReputationActivityTypeEnum.VERIFY_QUESTION;
+      noti = notificationText.QUESTION.VERIFY;
+      notiDesc = notificationTextDesc.QUESTION.VERIFY;
+    } else if (state == QuestionState.BLOCKED) {
+      mess = message.QUESTION.BLOCKED;
+      repu = ReputationActivityTypeEnum.BLOCK_QUESTION;
+      noti = notificationText.QUESTION.BLOCK;
+      notiDesc = notificationTextDesc.QUESTION.BLOCK;
+    } else if (state == QuestionState.PENDING) {
+      mess = message.QUESTION.PENDING;
+      repu = ReputationActivityTypeEnum.UN_BLOCK_QUESTION;
+      noti = notificationText.QUESTION.VERIFY;
+      notiDesc = notificationTextDesc.QUESTION.UN_BLOCK;
+    }
+
     const question = await this.findOneById(questionId);
     if (question.state == state) {
-      throw new BadRequestException(
-        state == QuestionState.VERIFIED
-          ? message.QUESTION.VERIFIED
-          : message.QUESTION.BLOCKED,
-      );
+      throw new BadRequestException(mess);
     }
 
     question.state = state;
     const result = await this.questionRepository.save(question);
 
     const activity = await this.activityService.create(
-      state == QuestionState.VERIFIED
-        ? ReputationActivityTypeEnum.VERIFY_QUESTION
-        : ReputationActivityTypeEnum.BLOCK_QUESTION,
+      repu,
       ObjectActivityTypeEnum.QUESTION,
       questionId,
       userId,
       question.user.id,
     );
     await this.notificationService.create(
-      state == QuestionState.VERIFIED
-        ? notificationText.QUESTION.VERIFY
-        : notificationText.QUESTION.BLOCK,
-      notificationTextDesc.QUESTION.DELETE,
+      noti,
+      notiDesc,
       question.user.id,
       activity.id,
     );
@@ -522,5 +532,13 @@ export class QuestionService {
       throw new BadRequestException(`Error replace tag`);
     }
     return tagToReplace;
+  }
+
+  async checkReport(questionId: string) {
+    return await this.activityService.checkUndeleteQuestion(questionId);
+  }
+
+  async getCountReport(questionId: string) {
+    return await this.activityService.countUnblockQuestion(questionId);
   }
 }

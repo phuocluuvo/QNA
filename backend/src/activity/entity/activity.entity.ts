@@ -20,7 +20,7 @@ export class Activity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column({ name: "point_change" })
+  @Column({ name: "point_change", default: 0 })
   pointChange: number;
 
   @Column({ name: "activity_type" })

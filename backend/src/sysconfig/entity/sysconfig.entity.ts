@@ -68,6 +68,9 @@ export class Sysconfig {
   @Column({ name: "block_question" })
   blockQuestion: number;
 
+  @Column({ name: "un_block_question" })
+  unBlockQuestion: number;
+
   @Column({ name: "verify_question" })
   verifyQuestion: number;
 
