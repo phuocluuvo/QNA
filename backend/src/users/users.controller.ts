@@ -7,8 +7,8 @@ import {
   Post,
   Query,
   Request,
-  UseGuards,
   Res,
+  UseGuards,
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { UsersService } from "./users.service";
@@ -41,7 +41,7 @@ export class UsersController {
    * @returns Promise<UserDto> The profile of the authenticated user.
    */
   @ApiOperation({
-    summary: "get profile user",
+    summary: "get info user",
   })
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)

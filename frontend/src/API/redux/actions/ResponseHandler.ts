@@ -7,7 +7,7 @@ export function responseHandler(
   callbackError: (...props: any) => void,
   isSaveReducer: boolean,
   successReducer: any,
-  failReducer: any,
+  failReducer: any
 ): any {
   //   Languages = LanguagesUtils.getCurrentLanguage();
   return (dispatch: Dispatch<AnyAction>): any => {
@@ -79,6 +79,7 @@ export function failCb(
   statusCode?: number,
   resultCode?: number
 ) {
+  
   if (!messageApi) {
     messageApi = "";
   }
@@ -97,5 +98,11 @@ const getMessageFromStatusCode = (statusCode: number) => {
   switch (statusCode) {
     case 404:
       return "Not found";
+    case 401:
+      return "Unauthorized";
+    case 403:
+      return "Forbidden";
+    case 500:
+      return "Internal Server Error";
   }
 };

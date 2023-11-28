@@ -3,7 +3,9 @@ import { url } from "./url";
 import { getSession, signIn } from "next-auth/react";
 import _ from "lodash";
 import { STATUS } from "../constant/StatusCode.enum";
-const BASE_URL = "http://localhost:3001";
+const BASE_URL = "http://trongphan5301.click";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 export const apiFormData = axios.create({
   baseURL: BASE_URL,
   headers: {
@@ -51,6 +53,8 @@ async function refreshToken(
     data.statusCode === STATUS.BAD_REQUEST ||
     data.statusCode === STATUS.ACCESS_DENIED
   ) {
+    sessionStorage.removeItem("next-auth.session-token");
+
     signIn();
   } else {
     console.log("refreshToken:", data);
@@ -58,14 +62,14 @@ async function refreshToken(
   return data;
 }
 export async function AuthApi(
-  method: "GET" | "POST" | "DELETE" | "UPDATE",
+  method: "GET" | "POST" | "DELETE" | "UPDATE" | "PATCH",
   url: string,
   data: any = null
 ) {
   const sessionData =
-    sessionStorage.getItem("next-auth.session-token")?.toString() ?? "{}";
+    sessionStorage.getItem("next-auth.session-token")?.toString() ?? null;
   let sessionUser = null;
-  if (!_.isEmpty(JSON.parse(sessionData))) {
+  if (sessionData != "undefined" && sessionData) {
     sessionUser = JSON.parse(sessionData);
   } else {
     let _s = await getSession();
@@ -99,6 +103,8 @@ export async function AuthApi(
       (error.response.status == STATUS.UNAUTHORIZED ||
         error.response.status == STATUS.BAD_REQUEST)
     ) {
+      // @ts-ignore
+      toast.error(getErrorMessageFromCodeString(error.response.data?.message));
       console.log("error.response.status", error.response.status);
       console.log("error.response.data", error.response);
       if (sessionUser) {
@@ -125,4 +131,12 @@ export async function AuthApi(
       return res;
     }
   }
+}
+
+function getErrorMessageFromCodeString(code: string) {
+  if (code === "NOT_VOTE_MY_SELF")
+    return "You cannot vote for your question/answer";
+  if (code === "Unauthorized")
+    return "You need to be logged in to perform this action";
+  return code;
 }

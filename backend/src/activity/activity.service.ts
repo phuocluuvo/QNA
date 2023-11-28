@@ -92,25 +92,33 @@ export class ActivityService {
    * @param userId - The ID of the user who created the activity
    */
   async checkCreateQuestion(userId: string): Promise<boolean> {
+    const sysconfigUsing = await this.sysconfigService.getUsingSysconfig();
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
-    const requiredActivity = 3;
-    const activityType = ReputationActivityTypeEnum.CREATE_ANSWER;
 
+    let requiredActivity = 3;
+    let questionPointCheck =
+      reputationActivityPoint[ReputationActivityTypeEnum.CREATE_QUESTION];
+
+    if (sysconfigUsing) {
+      requiredActivity = sysconfigUsing.createQuestionDaily;
+      questionPointCheck = sysconfigUsing.questionCreatePointCheck;
+    }
+    console.log(requiredActivity, questionPointCheck);
     const activity = await this.activityRepository.count({
       where: {
         user: { id: userId },
+        activityType: ReputationActivityTypeEnum.CREATE_QUESTION,
         createdAt: MoreThanOrEqual(todayStart),
       },
     });
 
     if (activity >= requiredActivity) {
       const user = await this.usersService.findById(userId);
-      const pointCheck = (activity + 1) * reputationActivityPoint[activityType];
+      const pointCheck = (activity + 1) * questionPointCheck;
 
       return user.activityPoint > pointCheck;
     }
-
     return true;
   }
 

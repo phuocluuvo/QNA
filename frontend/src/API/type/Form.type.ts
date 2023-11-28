@@ -7,6 +7,7 @@ export type FormQuestion = {
 export type FormCreateQuestion = {
   title: string;
   content: string;
+  tag_ids: Array<string>;
 };
 export type FromUserLogin = {
   username: string;
@@ -43,4 +44,46 @@ export type FormApproveAnswer = {
 export type FormVoteAnswer = {
   answer_id: string;
   vote_type: VOTE;
+};
+
+export type FormCommentAnswer = {
+  answer_id?: string;
+  question_id?: string;
+  content: string;
+};
+
+export type FormCreateTag = {
+  name: string;
+  content: string;
+};
+export type FormGetProfile = {
+  page: number;
+  limit: number;
+  sortBy:
+    | "fullname"
+    | "username"
+    | "email"
+    | "role"
+    | "activityPoint"
+    | "createdAt"
+    | "updatedAt ";
+  search: string;
+  searchBy: "fullname" | "username" | "email";
+};
+
+export type FormUpdateProfile = {
+  fullname?: string;
+  email?: string;
+  avatar?: string;
+  title?: string;
+  facebookLink?: string;
+  twitterLink?: string;
+  websiteLink?: string;
+  dob?: string;
+};
+
+export type FormUnblockedComment = {
+  question_id: string;
+  content: string;
+  type?: "undelete";
 };

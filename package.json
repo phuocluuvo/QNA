@@ -1,5 +1,6 @@
 {
   "scripts": {
-    "dev": "cd frontend && yarn run dev"
+    "dev": "cd frontend && yarn run dev",
+    "admin":"./DoAnADMIN"
   }
 }

@@ -18,8 +18,10 @@ import dynamic from "next/dynamic";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import LinkButton from "../LinkButton";
-import { Colors } from "@/assets/constant/Colors";
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+const MDEditor = dynamic(
+  () => import("@uiw/react-md-editor").then((mod) => mod.default),
+  { ssr: false }
+);
 type State = {
   id: string;
   content: string;
@@ -120,53 +122,26 @@ function AnswerEditor({
                     <Text>{getTranslate("LOGIN_TO_ANSWER")}</Text>
                   </Box>
                 )}
-                <ReactQuill
-                  id="content"
-                  theme="snow"
-                  value={state.content}
-                  onChange={handleChangeAnswer}
-                  modules={{
-                    toolbar: [
-                      [{ header: [1, 2, false] }],
-                      ["bold", "italic", "underline", "strike", "blockquote"],
-                      [
-                        { list: "ordered" },
-                        { list: "bullet" },
-                        { indent: "-1" },
-                        { indent: "+1" },
-                      ],
-                      ["link", "image", "code-block"],
-                      ["clean"],
-                    ],
-                  }}
-                  formats={[
-                    "bold",
-                    "italic",
-                    "underline",
-                    "strike",
-                    "blockquote",
-                    "link",
-                    "image",
-                    "video",
-                    "code-block",
-                    "list",
-                    "bullet",
-                    "indent",
-                    "header",
-                    "align",
-                    "color",
-                    "background",
-                    "font",
-                    "size",
-                    "clean",
-                  ]}
-                  bounds={".app"}
-                  i18nIsDynamicList={false}
-                  readOnly={!sessions.data?.user?.id}
-                  placeholder={getTranslate("ANSWER_PLACEHOLDER")}
-                  tabIndex={1}
-                />
-
+                <Box data-color-mode={colorMode}>
+                  <MDEditor
+                    style={{
+                      height: "auto",
+                      minHeight: "300px",
+                      maxHeight: "500px",
+                      background: colorMode === "light" ? "#fff" : "#1a202c",
+                    }}
+                    preview={"edit"}
+                    value={state.content}
+                    onChange={(value) => {
+                      // @ts-ignore
+                      setState((oldState) =>
+                        helper.mappingState(oldState, {
+                          content: value,
+                        })
+                      );
+                    }}
+                  />
+                </Box>
                 <FormErrorMessage>{form.errors.content}</FormErrorMessage>
               </FormControl>
             )}
