@@ -6,6 +6,7 @@ import {
   HStack,
   Heading,
   IconButton,
+  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -14,13 +15,14 @@ import {
   ModalHeader,
   ModalOverlay,
   Spacer,
+  Stack,
   Text,
   Tooltip,
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
 import { NotificationType } from "@/util/type/Notification.type";
-import helper from "@/util/helper";
+import helper, { markdownToPlainText } from "@/util/helper";
 import { BiPin } from "react-icons/bi";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -137,9 +139,11 @@ function NotificationItem({
         itemRender = (
           <Box
             style={{
-              height: 100,
+              height: "fit-content",
+              maxHeight: 300,
               width: "100%",
               position: "relative",
+              overflow: "hidden",
             }}
           >
             <Heading size={"sm"}>{itemObject?.question.title}</Heading>
@@ -203,9 +207,11 @@ function NotificationItem({
         itemRender = (
           <Box
             style={{
-              height: 120,
+              height: "fit-content",
+              maxHeight: 300,
               width: "100%",
               position: "relative",
+              overflow: "hidden",
             }}
           >
             <Text>
@@ -223,7 +229,7 @@ function NotificationItem({
               >
                 {question?.title}
               </Button>{" "}
-              got a comment from
+              got a comment from{" "}
               <Button
                 variant={"link"}
                 colorScheme="blue"
@@ -245,7 +251,6 @@ function NotificationItem({
                 border: "1px solid",
                 borderRadius: "10px",
                 padding: "10px",
-                paddingBottom: "0px",
                 position: "relative",
                 display: "flex",
               }}
@@ -259,7 +264,7 @@ function NotificationItem({
                 <EditerMarkdown
                   source={itemObject?.content}
                   style={{
-                    fontSize: "16px",
+                    fontSize: "12px",
                     backgroundColor: "transparent",
                     color: colorMode === "dark" ? "white" : "black",
                   }}
@@ -267,6 +272,98 @@ function NotificationItem({
               ) : (
                 <></>
               )}
+            </Box>
+          </Box>
+        );
+        break;
+      }
+      case OBJECT_ACTIVITY_TYPE.VOTE_QUESTION: {
+        let itemObject = item.activity.question;
+        itemRender = (
+          <Box
+            style={{
+              height: "fit-content",
+              maxHeight: 300,
+              width: "100%",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            <Text>Your quesiton:</Text>
+            <Button
+              variant={"link"}
+              colorScheme="blue"
+              style={{
+                fontWeight: "bold",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                router.push(`/question/${itemObject?.id}`);
+              }}
+            >
+              <Text maxW={"full"} textOverflow={"ellipsis"} noOfLines={1}>
+                {itemObject?.title}
+              </Text>
+            </Button>
+            <Text>
+              Got a vote from{" "}
+              <Button
+                variant={"link"}
+                colorScheme="blue"
+                style={{
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                }}
+                onClick={() => {
+                  router.push(`/user/${item.activity.user?.id}`);
+                }}
+              >
+                {item.activity.user?.fullname}
+              </Button>
+            </Text>
+            <EditerMarkdown
+              source={itemObject?.content}
+              style={{
+                fontSize: "16px",
+                backgroundColor: "transparent",
+                color: colorMode === "dark" ? "white" : "black",
+              }}
+            />
+            <Box
+              style={{
+                position: "absolute",
+                bottom: "-10px",
+                height: 50,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                left: "50%",
+                width: "100%",
+                transform: "translateX(-50%)",
+                background: `linear-gradient(
+                  to bottom,
+                  rgba(255, 255, 255, 0),
+                 ${
+                   colorMode === "dark"
+                     ? "rgba(0, 0, 0, 1)"
+                     : "rgba(255, 255, 255, 1)"
+                 }
+                )`,
+              }}
+            >
+              <Text
+                style={{
+                  color: "blue",
+                  cursor: "pointer",
+                }}
+                onClick={() => {
+                  router.push(`/question/${itemObject?.id}`, undefined, {
+                    shallow: false,
+                  });
+                }}
+              >
+                show more
+              </Text>
             </Box>
           </Box>
         );
@@ -352,7 +449,11 @@ function NotificationItem({
         }}
         opacity={!item.isRead ? 1 : 0.5}
       >
-        <HStack w={"full"} onClick={onOpen}>
+        <Stack
+          direction={type === "normal" ? "row" : "column"}
+          w={"full"}
+          onClick={onOpen}
+        >
           <Text fontSize={"sm"} display={"flex"}>
             {/* @ts-ignore */}
             <Image
@@ -388,19 +489,35 @@ function NotificationItem({
                 />
               </Tooltip>
             )}
+            <Spacer />
+            <IconButton
+              aria-label=""
+              onClick={() => {
+                readNotification();
+              }}
+              size={"xs"}
+              icon={<RiMailLine />}
+            />
           </HStack>
-        </HStack>
+        </Stack>
         <Text fontSize={"sm"}>
           {/* @ts-ignore */}
           {item.activity?.objectType === OBJECT_ACTIVITY_TYPE.COMMENT && (
-            <EditerMarkdown
-              source={item.activity.comment?.content}
+            <Text
+              w={"fit-content"}
+              textOverflow={"ellipsis"}
               style={{
                 fontSize: "16px",
                 backgroundColor: "transparent",
                 color: colorMode === "dark" ? "white" : "black",
               }}
-            />
+            >
+              {markdownToPlainText(item.activity.comment?.content ?? "").slice(
+                0,
+                100
+              )}
+              ...
+            </Text>
           )}
           {item.activity?.objectType === OBJECT_ACTIVITY_TYPE.ANSWER && (
             <EditerMarkdown
@@ -420,37 +537,16 @@ function NotificationItem({
               }}
             >
               {item.activity.question?.user?.username}
-
-              {/* @ts-ignore */}
-              {item.activity.question?.answersNumber > 0 && (
-                <Text
-                  as="span"
-                  style={{
-                    fontWeight: "bold",
-                  }}
-                >
-                  {" "}
-                  and {item.activity.question?.answersNumber} other(s)
-                </Text>
-              )}
             </Text>
           )}
         </Text>
-        <IconButton
-          aria-label=""
-          onClick={() => {
-            readNotification();
-          }}
-          size={"xs"}
-          icon={<RiMailLine />}
-        />
       </Button>
       <Modal
         isOpen={isOpen}
         onClose={() => {
           onClose();
         }}
-        size={"xl"}
+        size={"2xl"}
       >
         <ModalOverlay />
         <ModalContent>

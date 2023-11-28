@@ -15,7 +15,7 @@ import {
   VStack,
   useColorMode,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useState } from "react";
 import VoteButton from "../VoteButton";
 import helper, {
   markdownToPlainText,
@@ -74,6 +74,8 @@ function AnswerItem({
     isShowComment: boolean;
     comment: string;
     answer: AnswerType;
+    isVoted: boolean;
+    voteType: VOTE;
   }>({
     // @ts-ignore
     count: answer.votes ?? 0,
@@ -83,6 +85,8 @@ function AnswerItem({
     isShowComment: false,
     comment: "",
     answer: answer,
+    isVoted: false,
+    voteType: VOTE.UPVOTE,
   });
   const { colorMode } = useColorMode();
   React.useEffect(() => {
@@ -91,6 +95,8 @@ function AnswerItem({
       helper.mappingState(oldState, {
         isApproved: answer.isApproved,
         answer: answer,
+        voteType: (answer.vote.length > 0 && answer.vote[0].voteType) || null,
+        isVoted: answer.vote.length > 0,
       })
     );
     // setCommentArray(answer.comments);
@@ -104,14 +110,27 @@ function AnswerItem({
       actionVoteAnswer(
         form,
         (res: AnswerType) => {
-          setState(
-            // @ts-ignore
-            (oldState) =>
-              helper.mappingState(oldState, {
-                count: res.votes,
-              }),
-            () => fecthAnswer()
-          );
+          if (state.voteType === type) {
+            setState(
+              // @ts-ignore
+              (oldState) => {
+                return helper.mappingState(oldState, {
+                  count: res.votes,
+                  isVoted: false,
+                });
+              }
+            );
+          } else
+            setState(
+              // @ts-ignore
+              (oldState) => {
+                return helper.mappingState(oldState, {
+                  count: res.votes,
+                  isVoted: true,
+                  voteType: type,
+                });
+              }
+            );
         },
         () => {}
       )
@@ -199,6 +218,11 @@ function AnswerItem({
             >
               {/* up vote */}
               <VoteButton
+                isDisabled={
+                  !session.data?.user?.id ||
+                  session.data?.user?.id === answer.user.id
+                }
+                isVoted={state.isVoted && state.voteType === VOTE.UPVOTE}
                 isDarkMode={state.isDarkMode}
                 type="up"
                 size={20}
@@ -209,6 +233,11 @@ function AnswerItem({
                 isDarkMode={state.isDarkMode}
                 type="down"
                 size={20}
+                isVoted={state.isVoted && state.voteType === VOTE.DOWNVOTE}
+                isDisabled={
+                  !session.data?.user?.id ||
+                  session.data?.user?.id === answer.user.id
+                }
                 onClick={() =>
                   // @ts-ignore
                   voteHandler(VOTE.DOWNVOTE)

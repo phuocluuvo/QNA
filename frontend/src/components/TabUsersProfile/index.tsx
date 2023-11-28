@@ -77,10 +77,7 @@ type sortByData = {
   tags: "questionsNumber" | "createdAt";
   dateActivity: string;
 };
-const _activityData = Array.from({ length: 5 }, (_, i) => ({
-  date: moment().subtract(i, "days").format("YYYY-MM-DD"),
-  count: Math.floor(Math.random() * 100), // replace with your count generation logic
-}));
+
 function TabProfile({
   user,
   dashboard,
@@ -120,15 +117,15 @@ function TabProfile({
       api.getAllAnswerByUser(user.id as string, sortBy.answers).then((_res) => {
         setAnswers(_res?.data);
       });
-    }, 100);
+    }, 500);
   }, [sortBy.answers]);
   useEffect(() => {
     setTimeout(() => {
-      api.getAcitvityDashboardByUser(user.id as string).then((_res) => {
+      api.getAcitvityDashboardByUser(user.id as string, "all").then((_res) => {
         console.log(_res);
         setActivityData(_res?.data);
       });
-    }, 100);
+    }, 500);
   }, [sortBy.questions]);
   useEffect(() => {
     setTimeout(() => {
@@ -137,14 +134,14 @@ function TabProfile({
         .then((_res) => {
           setQuestion(_res?.data);
         });
-    }, 100);
+    }, 500);
   }, [sortBy.dateActivity]);
   useEffect(() => {
     setTimeout(() => {
       api.getAllTagsByUser(user.id as string, sortBy.tags).then((_res) => {
         setTags(_res?.data);
       });
-    }, 100);
+    }, 500);
   }, [sortBy.tags]);
 
   useEffect(() => {
@@ -168,7 +165,7 @@ function TabProfile({
               <Grid
                 templateColumns={{
                   base: "repeat(1, 1fr)",
-                  md: "repeat(3, 1fr)",
+                  md: "repeat(2, 1fr)",
                 }}
                 templateRows={{
                   base: "repeat(1, 1fr)",
@@ -198,11 +195,15 @@ function TabProfile({
                         about="This is the activity points of this user"
                         datasetIdKey="id"
                         data={{
-                          labels: activityData.map((item) =>helper.formatDate(item.activity_date)),
+                          labels: activityData.map((item) =>
+                            helper.formatDate(item.activity_date)
+                          ),
                           datasets: [
                             {
                               label: "Activity Points",
-                              data: activityData.map((item) => item.total_points),
+                              data: activityData.map(
+                                (item) => item.total_points
+                              ),
                               fill: false,
                               backgroundColor: Colors(colorMode === "dark")
                                 .PRIMARY,
@@ -267,10 +268,10 @@ function TabProfile({
                   justifyContent: "center",
                   alignItems: "center",
                   height: "100%",
-                  minHeight: "fit-content",
+                  minHeight: "200px",
                 }}
               >
-                {user.about === "" ? (
+                {!user.about ? (
                   <Text
                     style={{
                       fontStyle: "italic",
