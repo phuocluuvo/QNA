@@ -52,6 +52,7 @@ export class SysconfigService {
     sysconfigDto: CreateSysconfigDto,
     userId: string,
   ): Promise<Sysconfig> {
+    await this.cacheManager.del("sysconfig-using");
     const sysconfigDtoTrans = plainToClass(CreateSysconfigDto, sysconfigDto, {
       excludeExtraneousValues: true,
     });
