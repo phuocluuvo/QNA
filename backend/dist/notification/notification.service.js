@@ -30,13 +30,9 @@ let NotificationService = class NotificationService {
         queryBuidler.where({ user: { id: userId } });
         if (filter) {
             const isRead = filter === "true";
-            queryBuidler.andWhere({ isAnnouncement: false });
             queryBuidler.andWhere("notification.isRead = :isRead", {
                 isRead: isRead,
             });
-        }
-        else {
-            queryBuidler.orWhere({ isAnnouncement: false });
         }
         return (0, nestjs_paginate_1.paginate)(query, queryBuidler, notification_pagination_1.notificationPagination);
     }
