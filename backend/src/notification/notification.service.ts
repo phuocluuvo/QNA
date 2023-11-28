@@ -32,7 +32,6 @@ export class NotificationService {
         isRead: isRead,
       });
     }
-    console.log(queryBuidler.getQuery());
     return paginate<Notification>(query, queryBuidler, notificationPagination);
   }
 
