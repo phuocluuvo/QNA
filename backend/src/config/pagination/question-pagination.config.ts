@@ -11,7 +11,7 @@ export const questionPaginateConfig: PaginateConfig<Question> = {
     "updatedAt",
   ],
   defaultSortBy: [["title", "ASC"]],
-  searchableColumns: ["title", "content"],
+  searchableColumns: ["id", "title", "content"],
   relations: ["user", "comments", "comments.user"],
   filterableColumns: {
     "user.id": [FilterOperator.EQ],

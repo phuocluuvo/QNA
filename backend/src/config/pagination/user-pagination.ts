@@ -11,7 +11,7 @@ export const userPaginateConfig: PaginateConfig<User> = {
     "createdAt",
     "updatedAt",
   ],
-  searchableColumns: ["fullname", "username", "email"],
+  searchableColumns: ["id", "fullname", "username", "email"],
   defaultSortBy: [["createdAt", "DESC"]],
   filterableColumns: {
     role: [FilterOperator.EQ],
