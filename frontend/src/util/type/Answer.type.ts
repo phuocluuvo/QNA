@@ -13,6 +13,7 @@ interface Answer {
   question: QuestionType;
   isApproved: boolean;
   comments: Array<CommentType>;
+  vote: Array<any>;
 }
 
 interface AnswerList {
