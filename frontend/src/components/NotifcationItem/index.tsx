@@ -62,11 +62,11 @@ function NotificationItem({
 
   const getContentBasedOnType = () => {
     let itemRender = <></>;
-    let type = item.activity.objectType;
-    switch (type) {
+    let _type = item.activity.objectType;
+    switch (_type) {
       case OBJECT_ACTIVITY_TYPE.QUESTION: {
         let itemObject = item.activity.question;
-        let type = itemObject?.state;
+        let _type = itemObject?.state;
         itemRender = (
           <Box
             style={{
@@ -95,10 +95,10 @@ function NotificationItem({
                 as="span"
                 style={{
                   fontWeight: "bold",
-                  color: type === "verified" ? "green" : "red",
+                  color: _type === "verified" ? "green" : "red",
                 }}
               >
-                {type?.toLocaleLowerCase()}
+                {_type?.toLocaleLowerCase()}
               </Text>{" "}
               from{" "}
               <Button
@@ -369,6 +369,102 @@ function NotificationItem({
         );
         break;
       }
+      case OBJECT_ACTIVITY_TYPE.VOTE_ANSWER: {
+        let itemObject = item.activity.answer;
+        itemRender = (
+          <Box
+            style={{
+              height: "fit-content",
+              maxHeight: 300,
+              width: "100%",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            <Text>Question:</Text>
+            <Button
+              variant={"link"}
+              colorScheme="blue"
+              style={{
+                fontWeight: "bold",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                router.push(`/question/${itemObject?.question.id}`);
+              }}
+            >
+              <Text maxW={"full"} textOverflow={"ellipsis"} noOfLines={1}>
+                {itemObject?.question.title.slice(0, 100) + "..."}
+              </Text>
+            </Button>
+            <Text>
+              Got a vote from{" "}
+              <Button
+                variant={"link"}
+                colorScheme="blue"
+                style={{
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                }}
+                onClick={() => {
+                  router.push(`/user/${item.activity.user?.id}`);
+                }}
+              >
+                {item.activity.user?.fullname}
+              </Button>
+            </Text>
+            <EditerMarkdown
+              source={itemObject?.content}
+              style={{
+                fontSize: "14px",
+                backgroundColor: "transparent",
+                color: colorMode === "dark" ? "white" : "black",
+              }}
+            />
+            <Box
+              style={{
+                position: "absolute",
+                bottom: "-10px",
+                height: 60,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                left: "50%",
+                width: "100%",
+                transform: "translateX(-50%)",
+                background: `linear-gradient(
+                  to bottom,
+                  rgba(255, 255, 255, 0),
+                 ${
+                   colorMode === "dark"
+                     ? "rgba(0, 0, 0, 1)"
+                     : "rgba(255, 255, 255, 1)"
+                 }
+                )`,
+              }}
+            >
+              <Text
+                style={{
+                  color: "blue",
+                  cursor: "pointer",
+                }}
+                onClick={() => {
+                  router.push(
+                    `/question/${itemObject?.question.id}#${itemObject?.id}`,
+                    undefined,
+                    {
+                      shallow: false,
+                    }
+                  );
+                }}
+              >
+                show more
+              </Text>
+            </Box>
+          </Box>
+        );
+        break;
+      }
       default:
         itemRender = <></>;
     }
@@ -510,6 +606,7 @@ function NotificationItem({
                 fontSize: "16px",
                 backgroundColor: "transparent",
                 color: colorMode === "dark" ? "white" : "black",
+                display: type === "small" ? "none" : "unset",
               }}
             >
               {markdownToPlainText(item.activity.comment?.content ?? "").slice(

@@ -193,12 +193,6 @@ function Question() {
               isBookmarked: data.bookmarks && data.bookmarks.length > 0,
             })
           );
-          if (router.query.name) {
-            let url =
-              router.basePath +
-              `/question/${id}/${removeVietnameseTones(data.title)}`;
-            router.replace(url);
-          }
           setQuestion(data);
           let arrayTags = data.tags?.map((tag) => tag.name);
           arrayTags && fecthQuestionsWithTag(arrayTags);
@@ -225,6 +219,15 @@ function Question() {
               answerList: res,
             });
           });
+          setTimeout(() => {
+            let _url;
+            _url = new URL(window.location.href);
+            const bookmark = _url.hash.substring(1);
+            const element = document.getElementById(bookmark);
+            if (element) {
+              element.scrollIntoView({ behavior: "smooth" });
+            }
+          }, 1000);
         },
         () => {
           console.log("err");
@@ -686,17 +689,19 @@ function Question() {
                 <VStack divider={<Divider />}>
                   {state.answerList &&
                     state.answerList?.data?.map((answer) => (
-                      <AnswerItem
-                        key={answer.id}
-                        answer={answer}
-                        getTranslate={getTranslate}
-                        isAuthor={
-                          session?.data?.user?.id.toString() ===
-                          state.question.user.id.toString()
-                        }
-                        fecthAnswer={fecthAnswer}
-                        dispatch={dispatch}
-                      />
+                      <div id={answer.id}>
+                        <AnswerItem
+                          key={answer.id}
+                          answer={answer}
+                          getTranslate={getTranslate}
+                          isAuthor={
+                            session?.data?.user?.id.toString() ===
+                            state.question.user.id.toString()
+                          }
+                          fecthAnswer={fecthAnswer}
+                          dispatch={dispatch}
+                        />
+                      </div>
                     ))}
                 </VStack>
               </Box>
