@@ -56,6 +56,7 @@ export class SysconfigController {
     @Body() sysconfigDto: UpdateSysconfigDto,
     userId: string,
   ) {
+    await this.sysconfigService.findOne(id);
     return await this.sysconfigService.update(id, sysconfigDto, userId);
   }
 

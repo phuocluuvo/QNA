@@ -134,4 +134,16 @@ export class CreateSysconfigDto {
   @IsNotEmpty()
   @IsBoolean()
   isUse: boolean;
+
+  @ApiProperty()
+  @Expose()
+  @IsNotEmpty()
+  @IsNumber()
+  createQuestionDaily: number;
+
+  @ApiProperty()
+  @Expose()
+  @IsNotEmpty()
+  @IsNumber()
+  questionCreatePointCheck: number;
 }

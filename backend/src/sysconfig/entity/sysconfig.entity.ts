@@ -77,6 +77,12 @@ export class Sysconfig {
   @Column({ name: "verify_tag" })
   verifyTag: number;
 
+  @Column({ name: "creat_question_daily" })
+  createQuestionDaily: number;
+
+  @Column({ name: "question_create_point_check" })
+  questionCreatePointCheck: number;
+
   @Column({ name: "is_use" })
   isUse: boolean;
 

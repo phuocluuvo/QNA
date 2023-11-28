@@ -24,7 +24,6 @@ import {
 } from "../constants/notification.constants";
 import { NotificationService } from "../notification/notification.service";
 import { Transactional } from "typeorm-transactional";
-import { Role } from "../enums/role.enum";
 
 @Injectable()
 export class TagService {
@@ -44,10 +43,9 @@ export class TagService {
    */
   async find(query: PaginateQuery, user: any) {
     const queryBuilder = this.tagRepository.createQueryBuilder("tag");
-
-    if (!(user.role == Role.ADMIN || user.role == Role.MONITOR)) {
-      queryBuilder.where({ state: TagState.VERIFIED });
-    }
+    // if (!(user.role == Role.ADMIN || user.role == Role.MONITOR)) {
+    //   queryBuilder.where({ state: TagState.VERIFIED });
+    // }
     return await paginate<Tag>(query, queryBuilder, tagPaginateConfig);
   }
 
