@@ -38,6 +38,10 @@ function App({ Component, pageProps: { session, ...pageProps } }) {
                       name="description"
                       content="The website answers the question about IT"
                     />
+                    <meta
+                      http-equiv="Content-Security-Policy"
+                      content="upgrade-insecure-requests"
+                    />
                     <link rel="icon" href="/images/favicon.ico" sizes="any" />
                     <link
                       rel="stylesheet"
