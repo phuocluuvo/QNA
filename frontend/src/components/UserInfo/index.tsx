@@ -58,7 +58,7 @@ function UserInfoProfile({ user }: { user: UserType }) {
     >
       <Box pos="relative" w={"fit-content"}>
         <Avatar
-          src={user.avatar}
+          src={user.avatar ?? ""}
           boxSize={{
             base: "100px",
             md: "150px",

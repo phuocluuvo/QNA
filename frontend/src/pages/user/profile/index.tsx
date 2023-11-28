@@ -15,10 +15,10 @@ import {
 import { useRouter } from "next/router";
 import React from "react";
 import { useDispatch } from "react-redux";
-import TabActivity from "./(TabAcivity)";
-import TabProfile from "./(TabProfile)";
-import SavesQuestion from "./(TabSaves)";
-import UserInfoProfile from "./(UserInfo)";
+import TabActivity from "@/components/TabActivity";
+import SavesQuestion from "@/components/TabSaves";
+import TabProfile from "@/components/TabProfile";
+import UserInfoProfile from "@/components/UserInfo";
 const DEFAULT_USER: UserType = {
   fullname: "",
   email: "",

@@ -27,8 +27,8 @@ import { useRouter } from "next/router";
 import React from "react";
 import { BiCake } from "react-icons/bi";
 import { useDispatch } from "react-redux";
-import TabProfile from "./(TabProfile)";
 import { actionGetUserById } from "@/API/redux/actions/user/ActionGetUserById";
+import TabProfile from "@/components/TabUsersProfile";
 const DEFAULT_USER: UserType = {
   fullname: "",
   email: "",

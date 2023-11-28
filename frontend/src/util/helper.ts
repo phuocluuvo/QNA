@@ -5,7 +5,7 @@ import {
   NotificationDesEumn,
   NotificationEumn,
 } from "./type/Notification.enum";
-const removeMd = require("remove-markdown");
+import removeMd from "remove-markdown";
 
 export const markdownToPlainText = (markdown: string) => {
   return removeMd(markdown, {

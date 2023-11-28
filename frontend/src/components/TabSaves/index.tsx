@@ -25,11 +25,11 @@ import {
 } from "@chakra-ui/react";
 
 import React, { useContext, useEffect, useState } from "react";
-import TabBookMarkAll from "./(all)";
+import TabBookMarkAll from "./all";
 import { AddIcon } from "@chakra-ui/icons";
 import { LanguageHelper } from "@/util/Language/Language.util";
 import { Pages } from "@/assets/constant/Pages";
-import ForLaterTab from "./(for-later)";
+import ForLaterTab from "./for-later";
 import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
 import {
@@ -38,7 +38,7 @@ import {
 } from "@/API/redux/actions/question/ActionBookmark";
 import { CollectionType } from "@/util/type/Collection.type";
 import helper from "@/util/helper";
-import OtherTab from "./(other)";
+import OtherTab from "./other";
 import _ from "lodash";
 import { LayoutContext } from "@/provider/LayoutProvider";
 

@@ -19,7 +19,6 @@ import React from "react";
 import { LanguageHelper } from "@/util/Language/Language.util";
 import { Pages } from "@/assets/constant/Pages";
 import { useDispatch } from "react-redux";
-import { myUserLogin } from "@/util/mock/UserData.mock";
 import { useRouter } from "next/router";
 import actionSignUp from "@/API/redux/actions/user/ActionSignUp";
 import { FormSignUp } from "@/API/type/Form.type";
