@@ -300,7 +300,6 @@ function Question() {
       answerLoadType === ActionTypes.REQUEST_CREATE_ANSWER ||
       answerLoadType === ActionTypes.REQUEST_GET_ANSWER_LIST
     ) {
-      console.log("request create answer");
       // fecthAnswer();
       setState(
         // @ts-ignore
@@ -636,11 +635,11 @@ function Question() {
                         }}
                       />
                     </Box>
-
                     <Button
                       onClick={onOpen}
                       display={
-                        session.data?.user.id === state.question.user.id
+                        session.data?.user.id === state.question.user.id &&
+                        state.question.state === "blocked"
                           ? "flex"
                           : "none"
                       }
@@ -654,6 +653,7 @@ function Question() {
                       state.question.user.id === userData?.id ? (
                         <HStack
                           py={2}
+                          mb={10}
                           divider={<Divider orientation="vertical" />}
                         >
                           <Button

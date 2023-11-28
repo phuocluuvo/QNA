@@ -41,6 +41,7 @@ import { TagListType, TagType } from "@/util/type/Tag.type";
 import actionSearchTags from "@/API/redux/actions/tags/ActionSearchTag";
 import actionGetTag from "@/API/redux/actions/tags/ActionGetTag";
 import { ActionTypes } from "@/API/constant/ActionTypes.enum";
+import _ from "lodash";
 const limitations = [5, 10, 15, 20];
 
 export default function TagPage() {
@@ -76,7 +77,7 @@ export default function TagPage() {
       limit: limit || defaultLimit,
       page: pageNumber || defaultPage,
       ...(router.query.id && {
-        "filter.tags": `${router.query.id}`,
+        "filter.tags": `${encodeURIComponent(router.query.id as string)}`,
       }),
       sortBy: router.query.sortBy
         ? `${router.query.sortBy}:${router.query.orderBy || defaultOrderBy}`

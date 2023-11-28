@@ -9,6 +9,7 @@
 
 body {
   overflow-y: scroll !important;
+  overflow-x: hidden !important;
 }
 
 .editer-markdown {

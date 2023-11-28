@@ -97,15 +97,16 @@ function DashBoard() {
         () => {}
       )
     );
-    dispatch(
-      actionGetUserDashBoardById(
-        userId as string,
-        (res) => {
-          setDashboard(res);
-        },
-        () => {}
-      )
-    );
+    userId &&
+      dispatch(
+        actionGetUserDashBoardById(
+          userId as string,
+          (res) => {
+            setDashboard(res);
+          },
+          () => {}
+        )
+      );
   }, [router.query]);
   return (
     <Box
@@ -188,7 +189,7 @@ function DashBoard() {
                 color: Colors(colorMode === "dark").PRIMARY,
               }}
             >
-              contribuite points
+              reputation points
             </span>
           </Heading>
 
