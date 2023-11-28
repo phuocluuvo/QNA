@@ -12,7 +12,7 @@ exports.userPaginateConfig = {
         "createdAt",
         "updatedAt",
     ],
-    searchableColumns: ["fullname", "username", "email"],
+    searchableColumns: ["id", "fullname", "username", "email"],
     defaultSortBy: [["createdAt", "DESC"]],
     filterableColumns: {
         role: [nestjs_paginate_1.FilterOperator.EQ],

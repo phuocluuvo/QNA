@@ -12,7 +12,7 @@ exports.questionPaginateConfig = {
         "updatedAt",
     ],
     defaultSortBy: [["title", "ASC"]],
-    searchableColumns: ["title", "content"],
+    searchableColumns: ["id", "title", "content"],
     relations: ["user", "comments", "comments.user"],
     filterableColumns: {
         "user.id": [nestjs_paginate_1.FilterOperator.EQ],
