@@ -214,7 +214,7 @@ function NotificationBell() {
           <PopoverFooter>
             <Box
               onClick={() => {
-                router.push("/user/notification");
+                router.push("/user/notification?select=");
               }}
               cursor={"pointer"}
               w={"full"}

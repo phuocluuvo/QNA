@@ -27,23 +27,80 @@ import {
   Text,
   Box,
   Input,
+  Stack,
+  Grid,
+  VStack,
+  styled,
 } from "@chakra-ui/react";
+import moment from "moment";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
+import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  PointElement,
+  LineElement,
+} from "chart.js";
+import { DashBoardUserType } from "@/util/type/User.type";
 import { useDispatch } from "react-redux";
+import { actionGetUserDashBoardById } from "@/API/redux/actions/user/ActionGetProfile";
+import StasGroup from "../StasGroup";
 const limitations = [5, 10, 15, 20];
-
+const filterData = [
+  {
+    label: "This Month",
+    value: "month",
+  },
+  {
+    label: "This Quarter",
+    value: "quarter",
+  },
+  {
+    label: "This Year",
+    value: "year",
+  },
+  {
+    label: "All",
+    value: "all",
+  },
+];
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Tooltip
+);
 function TabActivity({
   getTranslate,
 }: {
   getTranslate: (key: string) => string;
 }) {
+  const [dashboard, setDashboard] = React.useState<DashBoardUserType>();
+  const [selectedFilter, setSelectedFilter] = useState(filterData[0]);
+  const [activityData, setActivityData] = React.useState<
+    Array<{
+      activity_date: string;
+      total_points: number;
+    }>
+  >([
+    {
+      activity_date: moment().format("YYYY-MM-DD"),
+      total_points: 0,
+    },
+  ]);
   const [history, setHistory] = React.useState<HistoryActivityListType | null>(
     null
   );
+  const currentDate = new Date();
+  currentDate.setDate(currentDate.getDate() + 1);
   const [filterDates, setFilterDates] = useState({
     dateTo:
-      helper.formatDate(new Date().toDateString(), false, "YYYY-MM-DD") || "",
+      helper.formatDate(currentDate.toDateString(), false, "YYYY-MM-DD") || "",
     dateFrom:
       helper.formatDate(new Date().toDateString(), false, "YYYY-MM-DD") || "",
   });
@@ -51,6 +108,7 @@ function TabActivity({
   const router = useRouter();
   const query = router.query;
   const pageNumber = Number(query.page);
+  const session = useSession();
   const limit = Number(query.limit)
     ? Number(query.limit)
     : (history?.meta.itemsPerPage as number);
@@ -62,6 +120,7 @@ function TabActivity({
       query: { ...router.query, limit: limit, page: pageNumber },
     });
   };
+  const dispatch = useDispatch();
   const { getCurrentLanguage } = LanguageHelper(Pages.HOME);
   React.useEffect(() => {
     const defaultLimit = 10;
@@ -91,9 +150,122 @@ function TabActivity({
       // @ts-ignore
       setHistory(res?.data);
     });
+    if (session.data?.user.id) {
+      api
+        .getAcitvityDashboardByUser(session.data?.user.id as string, "all")
+        .then((_res) => {
+          setActivityData(_res?.data);
+        });
+      dispatch(
+        actionGetUserDashBoardById(
+          session.data?.user.id as string,
+          (res) => {
+            setDashboard(res);
+          },
+          () => {}
+        )
+      );
+    }
   }, [query, filterDates]);
   return (
     <>
+      <Stack
+        width="full"
+        direction={{ base: "column-reverse", md: "column-reverse" }}
+        style={{ height: "100%" }}
+        gap={6}
+        mb={5}
+      >
+        {dashboard ? (
+          <Grid
+            templateColumns={{
+              base: "repeat(1, 1fr)",
+              md: "repeat(2, 1fr)",
+            }}
+            templateRows={{
+              base: "repeat(1, 1fr)",
+              md: "repeat(1, 1fr)",
+            }}
+            gap={6}
+          >
+            {activityData && (
+              <VStack height={"full"}>
+                <TitleData>Activity Points:</TitleData>
+                <Box
+                  style={{
+                    width: "100%",
+                    padding: "10px",
+                    borderRadius: "10px",
+                    border: "1px solid " + Colors(colorMode === "dark").PRIMARY,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                >
+                  <Line
+                    title="Activity Points"
+                    about="This is the activity points of this user"
+                    datasetIdKey="id"
+                    data={{
+                      labels: activityData.map((item) =>
+                        helper.formatDate(item.activity_date)
+                      ),
+                      datasets: [
+                        {
+                          label: "Activity Points",
+                          data: activityData.map((item) => item.total_points),
+                          fill: false,
+                          backgroundColor: Colors(colorMode === "dark").PRIMARY,
+                          borderColor: Colors(colorMode === "dark").PRIMARY,
+                          borderWidth: 1,
+                        },
+                      ],
+                    }}
+                    style={{
+                      height: "100%",
+                    }}
+                  />
+                </Box>
+              </VStack>
+            )}
+            <VStack>
+              <HStack w={"full"}>
+                <Spacer />
+                <HStack spacing={0}>
+                  {filterData.map((filter, index) => (
+                    <Button
+                      style={{
+                        background:
+                          selectedFilter.value === filter.value
+                            ? Colors(colorMode === "dark").PRIMARY
+                            : "transparent",
+                        color:
+                          selectedFilter.value === filter.value
+                            ? "white"
+                            : Colors(colorMode === "dark").PRIMARY,
+                        padding: "5px 10px",
+                      }}
+                      key={index}
+                      variant={"ghost"}
+                      rounded={"md"}
+                      onClick={() => setSelectedFilter(filter)}
+                    >
+                      {filter.label}
+                    </Button>
+                  ))}
+                </HStack>
+              </HStack>
+              <StasGroup
+                // @ts-ignore
+                filter={selectedFilter.value}
+                dashboard={dashboard}
+              />
+            </VStack>
+          </Grid>
+        ) : null}
+      </Stack>
       {/* filter by date to date */}
       <HStack w={"full"}>
         <Input
@@ -278,5 +450,12 @@ function TabActivity({
     </>
   );
 }
-
+const TitleData = styled(Text, {
+  baseStyle: {
+    fontSize: "20px",
+    fontWeight: "bold",
+    width: "100%",
+    marginBottom: "10px",
+  },
+});
 export default TabActivity;

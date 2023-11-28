@@ -61,7 +61,10 @@ function TagItem({
           onClick={() => {
             typeof onClick === "function"
               ? onClick()
-              : router.push(router.basePath + `/search/tag/${tag.name}`);
+              : router.push(
+                  router.basePath +
+                    `/search/tag/${tag.id}`
+                );
           }}
           _hover={{
             boxShadow: "0 0 0 2px orange",

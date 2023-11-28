@@ -20,10 +20,10 @@ function PageContainer({ children }: Props) {
   const dispatch = useDispatch();
   const session = useSession();
   React.useEffect(() => {
-    let checkUser =
-      sessionStorage.getItem("next-auth.session-token")?.toString() ?? null;
     const intervalId = setInterval(() => {
-      checkUser &&
+      let checkUser =
+        sessionStorage.getItem("next-auth.session-token")?.toString() ?? null;
+      if (checkUser !== "undefined") {
         dispatch(
           // @ts-ignore
           ActionGetBadgeNotification(
@@ -33,6 +33,9 @@ function PageContainer({ children }: Props) {
             (err: any) => {}
           )
         );
+      } else {
+        setBadgeNumber(0);
+      }
     }, 3000);
 
     // Clear the interval when the component unmounts
