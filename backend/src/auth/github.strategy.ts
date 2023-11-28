@@ -6,8 +6,8 @@ import { Injectable } from "@nestjs/common";
 export class GithubStrategy extends PassportStrategy(Strategy, "github") {
   constructor() {
     super({
-      clientID: "600881c5b204132ea4c2",
-      clientSecret: "8c0bc5b45c2fb5f098af89ab566a5225d48b3ba0",
+      clientID: "dc2d33ef9576cdc8219c",
+      clientSecret: "9ff283d4fefb607ae8f6e59135d9b19556037656",
       callbackURL: `${process.env.URL_API}/api/auth/github/callback`,
     });
   }
