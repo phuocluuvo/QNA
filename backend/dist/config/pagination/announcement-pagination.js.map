@@ -1,0 +1,1 @@
+{"version":3,"file":"announcement-pagination.js","sourceRoot":"","sources":["../../../src/config/pagination/announcement-pagination.ts"],"names":[],"mappings":";;;AAGa,QAAA,0BAA0B,GAAiC;IACtE,eAAe,EAAE;QACf,OAAO;QACP,aAAa;QACb,iBAAiB;QACjB,WAAW;QACX,WAAW;KACZ;IACD,iBAAiB,EAAE,CAAC,OAAO,CAAC;IAC5B,aAAa,EAAE,CAAC,CAAC,WAAW,EAAE,MAAM,CAAC,CAAC;CACvC,CAAC"}

@@ -1,0 +1,23 @@
+export declare const reputationActivityPoint: {
+    create_question: number;
+    update_question: number;
+    create_answer: number;
+    update_answer: number;
+    create_comment: number;
+    update_comment: number;
+    up_vote: number;
+    cancle_up_vote: number;
+    change_down_vote_to_up_vote: number;
+    accept_answer: number;
+    delete_question: number;
+    delete_answer: number;
+    delete_comment: number;
+    down_vote: number;
+    cancle_down_vote: number;
+    change_up_vote_to_down_vote: number;
+    un_accept_answer: number;
+    block_question: number;
+    un_block_question: number;
+    verify_question: number;
+    verify_tag: number;
+};

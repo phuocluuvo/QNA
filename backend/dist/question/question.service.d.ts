@@ -1,0 +1,56 @@
+import { Repository } from "typeorm";
+import { Question } from "./entity/question.entity";
+import { CreateQuestionDto } from "./dto/create-question.dto";
+import { PaginateQuery } from "nestjs-paginate";
+import { UpdateQuestionDto } from "./dto/update-question.dto";
+import { VoteService } from "../vote/vote.service";
+import { VoteQuestionDto } from "../vote/dto/vote-question.dto";
+import { TagService } from "../tag/tag.service";
+import { ActivityService } from "../activity/activity.service";
+import { NotificationService } from "../notification/notification.service";
+import { QuestionState } from "../enums/question-state.enum";
+import { QuestionTimeTypeEnum } from "src/enums/question-type.enum";
+import { UsersService } from "src/users/users.service";
+import { HistoryService } from "../history/history.service";
+import { BookmarkService } from "../bookmark/bookmark.service";
+export declare class QuestionService {
+    private readonly questionRepository;
+    private readonly voteService;
+    private readonly tagService;
+    private readonly activityService;
+    private readonly notificationService;
+    private readonly userService;
+    private readonly historyService;
+    private readonly bookmarkService;
+    constructor(questionRepository: Repository<Question>, voteService: VoteService, tagService: TagService, activityService: ActivityService, notificationService: NotificationService, userService: UsersService, historyService: HistoryService, bookmarkService: BookmarkService);
+    find(query: PaginateQuery, tagNames: string, loginUser: any): Promise<import("nestjs-paginate").Paginated<Question>>;
+    findOneById(id: string): Promise<Question>;
+    create(questionDto: CreateQuestionDto, userId: string): Promise<Question>;
+    update(id: string, questionDto: UpdateQuestionDto): Promise<Question>;
+    remove(question: Question): Promise<Question>;
+    getQuestionAndIncreaseViewCount(questionId: string, userId: string): Promise<Question>;
+    updateVote(userId: string, questionVoteDto: VoteQuestionDto): Promise<Question>;
+    private increaseViewCount;
+    createWithActivity(questionDto: CreateQuestionDto, userId: string): Promise<Question>;
+    updateWithActivity(id: string, questionDto: UpdateQuestionDto, oldQuestion: Question, userId: string): Promise<Question>;
+    removeWithActivity(question: Question, userId: string): Promise<Question>;
+    related(query: PaginateQuery, tagNames: string): Promise<import("nestjs-paginate").Paginated<Question>>;
+    censoring(questionId: string, userId: string, state: QuestionState): Promise<Question>;
+    getCountQuestionByTime(timeType: QuestionTimeTypeEnum): Promise<number>;
+    getCountQuestion(): Promise<{
+        data: {
+            all: number;
+            currentDay: number;
+            currentMonth: number;
+            currentQuarter: number;
+            currentYear: number;
+        };
+    }>;
+    getTop5ByViews(): Promise<Question[]>;
+    getTop5ByVotes(): Promise<Question[]>;
+    getTop5ByAnswers(): Promise<Question[]>;
+    getQuestionHistory(query: PaginateQuery, questionId: string): Promise<import("nestjs-paginate").Paginated<import("../history/entity/history.entity").History>>;
+    replaceTag(newTagId: string, oldTagId: string): Promise<import("../tag/entity/tag.entity").Tag>;
+    checkReport(questionId: string): Promise<boolean>;
+    getCountReport(questionId: string): Promise<number>;
+}

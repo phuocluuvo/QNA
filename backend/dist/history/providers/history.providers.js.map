@@ -1,0 +1,1 @@
+{"version":3,"file":"history.providers.js","sourceRoot":"","sources":["../../../src/history/providers/history.providers.ts"],"names":[],"mappings":";;;AACA,6DAAmD;AAEtC,QAAA,gBAAgB,GAAG;IAC9B;QACE,OAAO,EAAE,oBAAoB;QAC7B,UAAU,EAAE,CAAC,UAAsB,EAAE,EAAE,CAAC,UAAU,CAAC,aAAa,CAAC,wBAAO,CAAC;QACzE,MAAM,EAAE,CAAC,aAAa,CAAC;KACxB;CACF,CAAC"}

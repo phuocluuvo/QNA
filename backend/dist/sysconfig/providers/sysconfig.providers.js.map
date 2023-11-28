@@ -1,0 +1,1 @@
+{"version":3,"file":"sysconfig.providers.js","sourceRoot":"","sources":["../../../src/sysconfig/providers/sysconfig.providers.ts"],"names":[],"mappings":";;;AACA,iEAAuD;AAE1C,QAAA,kBAAkB,GAAG;IAChC;QACE,OAAO,EAAE,sBAAsB;QAC/B,UAAU,EAAE,CAAC,UAAsB,EAAE,EAAE,CAAC,UAAU,CAAC,aAAa,CAAC,4BAAS,CAAC;QAC3E,MAAM,EAAE,CAAC,aAAa,CAAC;KACxB;CACF,CAAC"}

@@ -1,0 +1,1 @@
+{"version":3,"file":"bookmark-pagination.js","sourceRoot":"","sources":["../../../src/config/pagination/bookmark-pagination.ts"],"names":[],"mappings":";;;AAGa,QAAA,sBAAsB,GAA6B;IAC9D,eAAe,EAAE,CAAC,WAAW,EAAE,WAAW,CAAC;IAC3C,aAAa,EAAE,CAAC,CAAC,WAAW,EAAE,MAAM,CAAC,CAAC;IACtC,SAAS,EAAE,CAAC,UAAU,EAAE,QAAQ,EAAE,iBAAiB,EAAE,YAAY,CAAC;CACnE,CAAC"}
