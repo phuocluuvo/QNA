@@ -104,7 +104,15 @@ export async function AuthApi(
         error.response.status == STATUS.BAD_REQUEST)
     ) {
       // @ts-ignore
-      toast.error(getErrorMessageFromCodeString(error.response.data?.message));
+      if (
+        error.response?.config.url?.startsWith(
+          "http://trongphan5301.click/api/notification/badgeNumber"
+        )
+      )
+        toast.error(
+          // @ts-ignore
+          getErrorMessageFromCodeString(error.response.data?.message)
+        );
       console.log("error.response.status", error.response.status);
       console.log("error.response.data", error.response);
       if (sessionUser) {
