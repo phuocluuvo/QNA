@@ -148,7 +148,10 @@ let AuthService = class AuthService {
     }
     async refreshTokens(userId, refreshToken) {
         const user = await this.usersService.findById(userId);
-        const isBlock = user.state === user_state_enum_1.UserState.BLOCKED;
+        let isBlock = true;
+        if (user.state) {
+            isBlock = user.state === user_state_enum_1.UserState.BLOCKED;
+        }
         if (isBlock)
             throw new common_1.BadRequestException(message_constants_1.message.USER_IS_BLOCK);
         if (!user || !user.refreshToken)
