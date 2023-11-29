@@ -42,7 +42,7 @@ services:
       MYSQL_DATABASE: QNA_database
       GOOGLE_CLIENT_ID: 408074599990-tsmj1qpfc5okviescmhk49m89qno1hmg.apps.googleusercontent.com
       GOOGLE_CLIENT_SECRET: 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
-      URL_WEB: http://localhost:3000
+      URL_WEB: https://questionandanswerit.vercel.app
       URL_API: http://trongphan5301.click
       GMAIL_USER: questionandanswerit@gmail.com
       GMAIL_PASSWORD: cksy vmya goao qwne
