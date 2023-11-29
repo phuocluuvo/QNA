@@ -43,7 +43,7 @@ export class UsersController {
    * @returns Promise<UserDto> The profile of the authenticated user.
    */
   @ApiOperation({
-    summary: "get info user",
+    summary: "get profile",
   })
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)

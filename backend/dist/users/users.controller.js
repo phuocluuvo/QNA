@@ -99,7 +99,7 @@ let UsersController = class UsersController {
 exports.UsersController = UsersController;
 __decorate([
     (0, swagger_1.ApiOperation)({
-        summary: "get info user",
+        summary: "get profile",
     }),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(accessToken_guard_1.AccessTokenGuard),
