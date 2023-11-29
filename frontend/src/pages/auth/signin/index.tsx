@@ -124,11 +124,11 @@ export default function SignIn() {
     }, 1000);
   }
   function LoginSocialHandle(type: "github" | "google") {
-    const baseURL = "http://trongphan5301.click";
+    const baseURL = "https://trongphan5301.click";
     window.location.href = `${baseURL}/api/auth/${type}`;
   }
 
-  function ResetPassword({
+  function ResetPassword({  
     uuid,
     password,
   }: {

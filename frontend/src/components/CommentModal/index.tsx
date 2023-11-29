@@ -40,7 +40,7 @@ function CommentModal({
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Modal Title</ModalHeader>
+        <ModalHeader>History Report Comments</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <VStack

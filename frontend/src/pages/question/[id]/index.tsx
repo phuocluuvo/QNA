@@ -13,15 +13,26 @@ export default function RedirectPage() {
 
   useEffect(() => {
     if (id) {
+      const url = new URL(window.location.href);
+      const bookmark = url.hash.substring(1);
+      console.log(bookmark);
+      console.log("url____", url, window.location.href);
       api
         .getQuestion({ id: id as string })
         // @ts-ignore
         .then((res: { data: QuestionType }) => {
           // @ts-ignore
           setTitle(res.data.title);
-          router.replace(
-            `/question/${id}/${removeVietnameseTones(res.data.title)}`
-          );
+          if (bookmark)
+            router.replace(
+              `/question/${id}/${removeVietnameseTones(
+                res.data.title
+              )}#${bookmark}`
+            );
+          else
+            router.replace(
+              `/question/${id}/${removeVietnameseTones(res.data.title)}`
+            );
         })
         .catch((err) => {
           console.error(err);

@@ -3,7 +3,7 @@ import { url } from "./url";
 import { getSession, signIn } from "next-auth/react";
 import _ from "lodash";
 import { STATUS } from "../constant/StatusCode.enum";
-const BASE_URL = "http://trongphan5301.click";
+const BASE_URL = "https://trongphan5301.click";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 export const apiFormData = axios.create({
@@ -79,7 +79,6 @@ export async function AuthApi(
       JSON.stringify(sessionUser)
     );
   }
-  console.log("before: ", sessionUser?.accessToken);
 
   const config = {
     method: method,
@@ -104,7 +103,15 @@ export async function AuthApi(
         error.response.status == STATUS.BAD_REQUEST)
     ) {
       // @ts-ignore
-      toast.error(getErrorMessageFromCodeString(error.response.data?.message));
+      if (
+        error.response?.config.url?.startsWith(
+          "https://trongphan5301.click/api/notification/badgeNumber"
+        )
+      )
+        toast.error(
+          // @ts-ignore
+          getErrorMessageFromCodeString(error.response.data?.message)
+        );
       console.log("error.response.status", error.response.status);
       console.log("error.response.data", error.response);
       if (sessionUser) {

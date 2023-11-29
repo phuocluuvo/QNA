@@ -36,7 +36,7 @@ import {
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BiFilterAlt } from "react-icons/bi";
 import { useDispatch } from "react-redux";
 const limitations = [20];
@@ -54,6 +54,7 @@ function UsersListPage() {
     users: null,
     search: "",
   });
+  const [hydrated, setHydrated] = useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const router = useRouter();
   const query = router.query;
@@ -147,10 +148,18 @@ function UsersListPage() {
       { shallow: true }
     );
   };
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+  if (!hydrated) {
+    return null;
+  }
   return (
     <>
       <Head>
-        <title>User - Question Dân It</title>
+        <title>{getTranslate("USERS")}</title>
+        <meta name="description" content={getTranslate("USERS_DESCRIPTION")} />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
       <Box
         display={"flex"}
