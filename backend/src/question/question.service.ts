@@ -524,9 +524,25 @@ export class QuestionService {
     }
 
     try {
-      await this.questionRepository.query(
-        `UPDATE question_tag SET tag_id = '${newTagId}' WHERE tag_id = '${oldTagId}'`,
+      const questions = await this.questionRepository.query(
+        `SELECT * FROM question_tag WHERE tag_id = '${oldTagId}'`,
       );
+
+      for (const question of questions) {
+        const check = await this.questionRepository.query(
+          `SELECT count(*) as numberQuestion FROM question_tag WHERE question_id = '${question.question_id}' AND tag_id = '${newTagId}'`,
+        );
+        if (check[0].numberQuestion == 0) {
+          await this.questionRepository.query(
+            `UPDATE question_tag SET tag_id = '${newTagId}' WHERE question_id = '${question.question_id}' AND tag_id = '${oldTagId}'`,
+          );
+        } else {
+          await this.questionRepository.query(
+            `DELETE FROM question_tag WHERE question_id = '${question.question_id}' AND tag_id = '${newTagId}'`,
+          );
+        }
+      }
+
       await this.tagService.remove(oldTag);
     } catch (error) {
       throw new BadRequestException(`Error replace tag`);
