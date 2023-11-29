@@ -138,4 +138,11 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateUserAdminDto.prototype, "location", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    (0, class_transformer_1.Expose)(),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], CreateUserAdminDto.prototype, "activityPoint", void 0);
 //# sourceMappingURL=create-user-admin.dto.js.map

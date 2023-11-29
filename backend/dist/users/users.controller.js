@@ -89,6 +89,12 @@ let UsersController = class UsersController {
         const userId = req.user.sub;
         return this.usersService.AddEmail(userId, email);
     }
+    async addActivityPoint(activityPoint) {
+        console.log(typeof activityPoint);
+        if (typeof activityPoint != "number")
+            throw new common_1.BadRequestException("activityPoint must be greater than 0");
+        return this.usersService.addActivityPoint(activityPoint);
+    }
 };
 exports.UsersController = UsersController;
 __decorate([
@@ -203,6 +209,19 @@ __decorate([
     __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "addEmail", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({
+        summary: "Add point all user",
+    }),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.UseGuards)(accessToken_guard_1.AccessTokenGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)(role_enum_1.Role.ADMIN),
+    (0, common_1.Put)("addActivityPoint"),
+    __param(0, (0, common_1.Body)("activityPoint")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "addActivityPoint", null);
 exports.UsersController = UsersController = __decorate([
     (0, swagger_1.ApiTags)("user"),
     (0, common_1.Controller)("user"),

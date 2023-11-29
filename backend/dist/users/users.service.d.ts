@@ -36,4 +36,5 @@ export declare class UsersService {
     AddEmail(id: string, email: string): Promise<any>;
     updateUuidForAddEmail(user: any): Promise<any>;
     confirmEmail(uuid: string): Promise<any>;
+    addActivityPoint(pointChange: number): Promise<import("typeorm").UpdateResult>;
 }

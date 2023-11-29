@@ -16,4 +16,5 @@ export declare class UsersController {
     createUserForAdmin(id: string, createUserDto: CreateUserAdminDto): Promise<UserDto>;
     updateUserForAdmin(id: string, updateUserDto: UpdateUserDto): Promise<UserDto>;
     addEmail(req: any, email: string): Promise<any>;
+    addActivityPoint(activityPoint: number): Promise<any>;
 }

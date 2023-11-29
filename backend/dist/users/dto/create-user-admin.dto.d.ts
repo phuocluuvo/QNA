@@ -16,4 +16,5 @@ export declare class CreateUserAdminDto {
     role: Role;
     about: string;
     location: string;
+    activityPoint: number;
 }
