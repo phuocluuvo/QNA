@@ -10,6 +10,7 @@ import {
   Spacer,
   Stack,
   Text,
+  Tooltip,
   VStack,
   styled,
   useColorMode,
@@ -159,17 +160,23 @@ export default function Home() {
           </VStack>
           <VStack flex={1} alignItems={"flex-end"}>
             <HStack>
-              <Button
-              variant={"main_button"}
-                size={"sm"}
-                onClick={() => {
-                  router.push({
-                    pathname: "/question/create",
-                  });
-                }}
+              <Tooltip
+                label={session.data ? "" : getTranslate("NEED_TO_LOGIN")}
+                hasArrow
               >
-                {getTranslate("ASK_QUESTION")}
-              </Button>
+                <Button
+                  isDisabled={!session.data?.user?.id}
+                  variant={"main_button"}
+                  size={"sm"}
+                  onClick={() => {
+                    router.push({
+                      pathname: "/question/create",
+                    });
+                  }}
+                >
+                  {getTranslate("ASK_QUESTION")}
+                </Button>
+              </Tooltip>
               <HStack spacing={0}>
                 <FilterButton
                   style={{
@@ -437,6 +444,7 @@ export default function Home() {
         </Flex>
       </VStack>
       <VStack flex={{ base: 1, md: 0.2 }} w={"full"} p={0} m={0}>
+        <Annoucements />
         <TabsQuestion
           router={router}
           getTranslate={getTranslate}
@@ -444,7 +452,6 @@ export default function Home() {
             flex: 1,
           }}
         />
-        <Annoucements />
         <TagList
           router={router}
           getTranslate={getTranslate}

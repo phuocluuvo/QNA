@@ -100,5 +100,6 @@
   "MODIFIED_AT": "Modified at {0}",
   "EDIT": "Edit",
   "FORGOT_PASSWORD": "Forgot password",
-  "ASK_QUESTION": "Ask Question"
+  "ASK_QUESTION": "Ask Question",
+  "NEED_TO_LOGIN": "You need to login to do this action"
 }
