@@ -3,6 +3,7 @@ import {
   IsEmail,
   IsEnum,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   IsUrl,
@@ -122,4 +123,10 @@ export class CreateUserAdminDto {
   @Expose()
   @IsOptional()
   location: string;
+
+  @ApiProperty()
+  @Expose()
+  @IsNumber()
+  @IsOptional()
+  activityPoint: number;
 }
