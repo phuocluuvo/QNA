@@ -1,10 +1,12 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
   Param,
   Patch,
   Post,
+  Put,
   Query,
   Request,
   Res,
@@ -210,5 +212,21 @@ export class UsersController {
   ): Promise<any> {
     const userId = req.user.sub;
     return this.usersService.AddEmail(userId, email);
+  }
+
+  @ApiOperation({
+    summary: "Add point all user",
+  })
+  @ApiBearerAuth()
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @Put("addActivityPoint")
+  async addActivityPoint(
+    @Body("activityPoint") activityPoint: number,
+  ): Promise<any> {
+    console.log(typeof activityPoint);
+    if (typeof activityPoint != "number")
+      throw new BadRequestException("activityPoint must be greater than 0");
+    return this.usersService.addActivityPoint(activityPoint);
   }
 }

@@ -591,4 +591,12 @@ export class UsersService {
     user.uuid_created_at = null;
     return this.update(user.id, user);
   }
+
+  async addActivityPoint(pointChange: number) {
+    return this.userRepository
+      .createQueryBuilder("user")
+      .update(User)
+      .set({ activityPoint: () => `activity_point + ${pointChange}` })
+      .execute();
+  }
 }
