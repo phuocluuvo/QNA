@@ -218,7 +218,7 @@ export class AuthService {
    * @returns Promise<accessToken: string; refreshToken: string > The tokens.
    */
   async getTokens(userId: string, username: string, role: Role) {
-    const accessTokenExpiresIn = 15 * 60; // 15 minutes in seconds
+    const accessTokenExpiresIn = 60 * 60;
     const refreshTokenExpiresIn = 7 * 24 * 60 * 60; //
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(

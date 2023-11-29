@@ -120,7 +120,7 @@ let AuthService = class AuthService {
         return hashedRefreshToken;
     }
     async getTokens(userId, username, role) {
-        const accessTokenExpiresIn = 15 * 60;
+        const accessTokenExpiresIn = 60 * 60;
         const refreshTokenExpiresIn = 7 * 24 * 60 * 60;
         const [accessToken, refreshToken] = await Promise.all([
             this.jwtService.signAsync({
