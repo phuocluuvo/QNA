@@ -50,7 +50,7 @@ let QuestionController = class QuestionController {
             !ability.can(action_enum_1.Action.Update, question)) {
             throw new common_1.ForbiddenException(message_constants_1.message.NOT_FOUND.QUESTION);
         }
-        return this.questionService.getQuestionAndIncreaseViewCount(id, req.user["sub"]);
+        return this.questionService.getQuestionAndIncreaseViewCount(id, req.user["sub"], req.ip);
     }
     async findHistory(id, query) {
         return this.questionService.getQuestionHistory(query, id);

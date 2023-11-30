@@ -25,6 +25,7 @@ exports.RedisCacheModule = RedisCacheModule = __decorate([
                     });
                     return {
                         store: store,
+                        ttl: 60 * 60 * 24 * 7,
                     };
                 },
             }),

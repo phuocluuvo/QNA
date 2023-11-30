@@ -20,6 +20,7 @@ const create_sysconfig_dto_1 = require("./dto/create-sysconfig.dto");
 const class_transformer_1 = require("class-transformer");
 const update_sysconfig_dto_1 = require("./dto/update-sysconfig.dto");
 const message_constants_1 = require("../constants/message.constants");
+const typeorm_transactional_1 = require("typeorm-transactional");
 let SysconfigService = class SysconfigService {
     constructor(sysconfigRepository, cacheManager) {
         this.sysconfigRepository = sysconfigRepository;
@@ -51,6 +52,9 @@ let SysconfigService = class SysconfigService {
     }
     async create(sysconfigDto, userId) {
         await this.cacheManager.del("sysconfig-using");
+        if (sysconfigDto && sysconfigDto.isUse == true) {
+            await this.sysconfigRepository.query("UPDATE sysconfig SET is_use = false WHERE is_use = true");
+        }
         const sysconfigDtoTrans = (0, class_transformer_1.plainToClass)(create_sysconfig_dto_1.CreateSysconfigDto, sysconfigDto, {
             excludeExtraneousValues: true,
         });
@@ -59,6 +63,9 @@ let SysconfigService = class SysconfigService {
     }
     async update(id, sysconfigDto, userId) {
         await this.cacheManager.del("sysconfig-using");
+        if (sysconfigDto && sysconfigDto.isUse == true) {
+            await this.sysconfigRepository.query("UPDATE sysconfig SET is_use = false WHERE is_use = true");
+        }
         const sysconfigDtoTrans = (0, class_transformer_1.plainToClass)(update_sysconfig_dto_1.UpdateSysconfigDto, sysconfigDto, {
             excludeExtraneousValues: true,
         });
@@ -83,6 +90,12 @@ let SysconfigService = class SysconfigService {
     }
 };
 exports.SysconfigService = SysconfigService;
+__decorate([
+    (0, typeorm_transactional_1.Transactional)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_sysconfig_dto_1.UpdateSysconfigDto, String]),
+    __metadata("design:returntype", Promise)
+], SysconfigService.prototype, "update", null);
 exports.SysconfigService = SysconfigService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)("SYSCONFIG_REPOSITORY")),

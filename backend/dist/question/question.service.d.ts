@@ -13,6 +13,7 @@ import { QuestionTimeTypeEnum } from "src/enums/question-type.enum";
 import { UsersService } from "src/users/users.service";
 import { HistoryService } from "../history/history.service";
 import { BookmarkService } from "../bookmark/bookmark.service";
+import { Cache } from "cache-manager";
 export declare class QuestionService {
     private readonly questionRepository;
     private readonly voteService;
@@ -22,13 +23,14 @@ export declare class QuestionService {
     private readonly userService;
     private readonly historyService;
     private readonly bookmarkService;
-    constructor(questionRepository: Repository<Question>, voteService: VoteService, tagService: TagService, activityService: ActivityService, notificationService: NotificationService, userService: UsersService, historyService: HistoryService, bookmarkService: BookmarkService);
+    private cacheManager;
+    constructor(questionRepository: Repository<Question>, voteService: VoteService, tagService: TagService, activityService: ActivityService, notificationService: NotificationService, userService: UsersService, historyService: HistoryService, bookmarkService: BookmarkService, cacheManager: Cache);
     find(query: PaginateQuery, tagNames: string, loginUser: any): Promise<import("nestjs-paginate").Paginated<Question>>;
     findOneById(id: string): Promise<Question>;
     create(questionDto: CreateQuestionDto, userId: string): Promise<Question>;
     update(id: string, questionDto: UpdateQuestionDto): Promise<Question>;
     remove(question: Question): Promise<Question>;
-    getQuestionAndIncreaseViewCount(questionId: string, userId: string): Promise<Question>;
+    getQuestionAndIncreaseViewCount(questionId: string, userId: string, ip: string): Promise<Question>;
     updateVote(userId: string, questionVoteDto: VoteQuestionDto): Promise<Question>;
     private increaseViewCount;
     createWithActivity(questionDto: CreateQuestionDto, userId: string): Promise<Question>;

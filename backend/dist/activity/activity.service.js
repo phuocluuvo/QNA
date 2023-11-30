@@ -74,7 +74,6 @@ let ActivityService = class ActivityService {
             requiredActivity = sysconfigUsing.createQuestionDaily;
             questionPointCheck = sysconfigUsing.questionCreatePointCheck;
         }
-        console.log(requiredActivity, questionPointCheck);
         const activity = await this.activityRepository.count({
             where: {
                 user: { id: userId },

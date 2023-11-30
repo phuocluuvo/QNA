@@ -37,8 +37,9 @@ const question_type_enum_1 = require("../enums/question-type.enum");
 const users_service_1 = require("../users/users.service");
 const history_service_1 = require("../history/history.service");
 const bookmark_service_1 = require("../bookmark/bookmark.service");
+const cache_manager_1 = require("@nestjs/cache-manager");
 let QuestionService = class QuestionService {
-    constructor(questionRepository, voteService, tagService, activityService, notificationService, userService, historyService, bookmarkService) {
+    constructor(questionRepository, voteService, tagService, activityService, notificationService, userService, historyService, bookmarkService, cacheManager) {
         this.questionRepository = questionRepository;
         this.voteService = voteService;
         this.tagService = tagService;
@@ -47,6 +48,7 @@ let QuestionService = class QuestionService {
         this.userService = userService;
         this.historyService = historyService;
         this.bookmarkService = bookmarkService;
+        this.cacheManager = cacheManager;
     }
     async find(query, tagNames, loginUser) {
         const tags = tagNames ? tagNames.split(",") : [];
@@ -106,7 +108,7 @@ let QuestionService = class QuestionService {
     async remove(question) {
         return this.questionRepository.remove(question);
     }
-    async getQuestionAndIncreaseViewCount(questionId, userId) {
+    async getQuestionAndIncreaseViewCount(questionId, userId, ip) {
         try {
             const question = await this.questionRepository.findOne({
                 where: { id: questionId },
@@ -115,7 +117,7 @@ let QuestionService = class QuestionService {
             if (!question) {
                 throw new common_1.NotFoundException(message_constants_1.message.NOT_FOUND.QUESTION);
             }
-            return await this.increaseViewCount(question, userId);
+            return await this.increaseViewCount(question, userId, ip);
         }
         catch (error) {
             const question = await this.questionRepository.findOne({
@@ -125,7 +127,7 @@ let QuestionService = class QuestionService {
             if (!question) {
                 throw new common_1.NotFoundException(message_constants_1.message.NOT_FOUND.QUESTION);
             }
-            return await this.increaseViewCount(question, userId);
+            return await this.increaseViewCount(question, userId, ip);
         }
     }
     async updateVote(userId, questionVoteDto) {
@@ -144,9 +146,14 @@ let QuestionService = class QuestionService {
             throw new Error("Error updating vote");
         }
     }
-    async increaseViewCount(question, userId) {
-        question.views += 1;
-        const result = await this.questionRepository.save(question);
+    async increaseViewCount(question, userId, ip) {
+        const cache = await this.cacheManager.get(ip);
+        const result = question;
+        if (!cache) {
+            question.views += 1;
+            await this.questionRepository.save(question);
+            await this.cacheManager.set(ip, "view", { ttl: 60 * 5 });
+        }
         result.vote = [];
         if (userId) {
             const voteInfo = await this.voteService.getVote({
@@ -354,7 +361,7 @@ __decorate([
 __decorate([
     (0, typeorm_transactional_1.Transactional)(),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [question_entity_1.Question, String]),
+    __metadata("design:paramtypes", [question_entity_1.Question, String, String]),
     __metadata("design:returntype", Promise)
 ], QuestionService.prototype, "increaseViewCount", null);
 __decorate([
@@ -392,6 +399,7 @@ exports.QuestionService = QuestionService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)("QUESTION_REPOSITORY")),
     __param(7, (0, common_1.Inject)((0, common_1.forwardRef)(() => bookmark_service_1.BookmarkService))),
+    __param(8, (0, common_1.Inject)(cache_manager_1.CACHE_MANAGER)),
     __metadata("design:paramtypes", [typeorm_1.Repository,
         vote_service_1.VoteService,
         tag_service_1.TagService,
@@ -399,6 +407,6 @@ exports.QuestionService = QuestionService = __decorate([
         notification_service_1.NotificationService,
         users_service_1.UsersService,
         history_service_1.HistoryService,
-        bookmark_service_1.BookmarkService])
+        bookmark_service_1.BookmarkService, Object])
 ], QuestionService);
 //# sourceMappingURL=question.service.js.map
