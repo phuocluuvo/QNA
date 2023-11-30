@@ -34,6 +34,8 @@ import { QuestionTimeTypeEnum } from "src/enums/question-type.enum";
 import { UsersService } from "src/users/users.service";
 import { HistoryService } from "../history/history.service";
 import { BookmarkService } from "../bookmark/bookmark.service";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Cache } from "cache-manager";
 
 @Injectable()
 export class QuestionService {
@@ -48,6 +50,7 @@ export class QuestionService {
     private readonly historyService: HistoryService,
     @Inject(forwardRef(() => BookmarkService))
     private readonly bookmarkService: BookmarkService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   /**
@@ -171,12 +174,14 @@ export class QuestionService {
    *
    * @param questionId - The ID of the question.
    * @param userId logged in user id
+   * @param ip
    * @returns The question with an increased view count.
    * @throws NotFoundException if the question does not exist.
    */
   async getQuestionAndIncreaseViewCount(
     questionId: string,
     userId: string,
+    ip: string,
   ): Promise<Question> {
     try {
       const question = await this.questionRepository.findOne({
@@ -186,7 +191,7 @@ export class QuestionService {
       if (!question) {
         throw new NotFoundException(message.NOT_FOUND.QUESTION);
       }
-      return await this.increaseViewCount(question, userId);
+      return await this.increaseViewCount(question, userId, ip);
     } catch (error) {
       const question = await this.questionRepository.findOne({
         where: { id: questionId },
@@ -195,7 +200,7 @@ export class QuestionService {
       if (!question) {
         throw new NotFoundException(message.NOT_FOUND.QUESTION);
       }
-      return await this.increaseViewCount(question, userId);
+      return await this.increaseViewCount(question, userId, ip);
     }
   }
 
@@ -237,12 +242,24 @@ export class QuestionService {
    * Increase view count of a question.
    * @param question - The question to increase view count.
    * @param userId - The ID of the user viewing the question.
+   * @param ip
    * @private
    */
   @Transactional()
-  private async increaseViewCount(question: Question, userId: string) {
-    question.views += 1;
-    const result = await this.questionRepository.save(question);
+  private async increaseViewCount(
+    question: Question,
+    userId: string,
+    ip: string,
+  ) {
+    const cache = await this.cacheManager.get(ip);
+
+    const result = question;
+    if (!cache) {
+      question.views += 1;
+      await this.questionRepository.save(question);
+      await this.cacheManager.set(ip, "view", { ttl: 60 * 5 } as any);
+    }
+
     result.vote = [];
 
     if (userId) {

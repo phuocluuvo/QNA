@@ -224,7 +224,6 @@ export class UsersController {
   async addActivityPoint(
     @Body("activityPoint") activityPoint: number,
   ): Promise<any> {
-    console.log(typeof activityPoint);
     if (typeof activityPoint != "number")
       throw new BadRequestException("activityPoint must be greater than 0");
     return this.usersService.addActivityPoint(activityPoint);
