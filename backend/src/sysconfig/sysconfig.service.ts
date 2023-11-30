@@ -8,6 +8,7 @@ import { plainToClass } from "class-transformer";
 import { UpdateSysconfigDto } from "./dto/update-sysconfig.dto";
 import { User } from "../users/entity/users.entity";
 import { message } from "../constants/message.constants";
+import { Transactional } from "typeorm-transactional";
 
 @Injectable()
 export class SysconfigService {
@@ -53,6 +54,13 @@ export class SysconfigService {
     userId: string,
   ): Promise<Sysconfig> {
     await this.cacheManager.del("sysconfig-using");
+
+    if (sysconfigDto && sysconfigDto.isUse == true) {
+      await this.sysconfigRepository.query(
+        "UPDATE sysconfig SET is_use = false WHERE is_use = true",
+      );
+    }
+
     const sysconfigDtoTrans = plainToClass(CreateSysconfigDto, sysconfigDto, {
       excludeExtraneousValues: true,
     });
@@ -60,20 +68,30 @@ export class SysconfigService {
     return await this.sysconfigRepository.save(sysconfigDtoTrans);
   }
 
+  @Transactional()
   async update(
     id: string,
     sysconfigDto: UpdateSysconfigDto,
     userId: string,
   ): Promise<Sysconfig> {
     await this.cacheManager.del("sysconfig-using");
+
+    if (sysconfigDto && sysconfigDto.isUse == true) {
+      await this.sysconfigRepository.query(
+        "UPDATE sysconfig SET is_use = false WHERE is_use = true",
+      );
+    }
+
     const sysconfigDtoTrans = plainToClass(UpdateSysconfigDto, sysconfigDto, {
       excludeExtraneousValues: true,
     });
+
     const sysconfig = await this.sysconfigRepository.preload({
       id: id,
       ...sysconfigDtoTrans,
     });
     sysconfig["latestEditUser"] = { id: userId } as unknown as User;
+
     return await this.sysconfigRepository.save(sysconfig);
   }
 
