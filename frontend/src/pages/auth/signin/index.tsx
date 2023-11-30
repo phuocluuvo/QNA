@@ -262,8 +262,8 @@ export default function SignIn() {
           {/* Facebook  */}
           <Formik
             initialValues={{
-              username: "trong123123",
-              password: "Kocomk123@",
+              username: "",
+              password: "@",
             }}
             onSubmit={(values, actions) => {
               LoginHandle(values, actions);

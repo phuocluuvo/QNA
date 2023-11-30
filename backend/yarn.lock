@@ -2269,12 +2269,13 @@ cache-manager-redis-store@^3.0.1:
     redis "^4.3.1"
 
 cache-manager@^5.2.3, cache-manager@<=5:
-  version "5.2.3"
-  resolved "https://registry.npmjs.org/cache-manager/-/cache-manager-5.2.3.tgz"
-  integrity sha512-9OErI8fksFkxAMJ8Mco0aiZSdphyd90HcKiOMJQncSlU1yq/9lHHxrT8PDayxrmr9IIIZPOAEfXuGSD7g29uog==
+  version "5.3.1"
+  resolved "https://registry.npmjs.org/cache-manager/-/cache-manager-5.3.1.tgz"
+  integrity sha512-9HP6nc1ZqyZgcVEpy5XS2ns9MYE6cPEM6InA1wQhR6M7GviJzLH2NTFYnf3NEfRmLE351NCSkDo2VISX8dlG+w==
   dependencies:
     lodash.clonedeep "^4.5.0"
-    lru-cache "^9.1.2"
+    lru-cache "^10.0.2"
+    promise-coalesce "^1.1.1"
 
 call-bind@^1.0.0, call-bind@^1.0.2:
   version "1.0.2"
@@ -5359,6 +5360,11 @@ lower-case@^1.1.1:
   resolved "https://registry.npmjs.org/lower-case/-/lower-case-1.1.4.tgz"
   integrity sha512-2Fgx1Ycm599x+WGpIYwJOvsjmXFzTSc34IwDWALRA/8AopUKAVPwfJ+h5+f85BCp0PWmmJcWzEpxOpoXycMpdA==
 
+lru-cache@^10.0.2, "lru-cache@^9.1.1 || ^10.0.0":
+  version "10.1.0"
+  resolved "https://registry.npmjs.org/lru-cache/-/lru-cache-10.1.0.tgz"
+  integrity sha512-/1clY/ui8CzjKFyjdvwPWJUYKiFVXG2I2cY0ssG7h4+hwk+XOIX7ZSG9Q7TW8TW3Kp3BUSqgFWBLgL4PJ+Blag==
+
 lru-cache@^5.1.1:
   version "5.1.1"
   resolved "https://registry.npmjs.org/lru-cache/-/lru-cache-5.1.1.tgz"
@@ -5382,11 +5388,6 @@ lru-cache@^8.0.0:
   version "8.0.5"
   resolved "https://registry.npmjs.org/lru-cache/-/lru-cache-8.0.5.tgz"
   integrity sha512-MhWWlVnuab1RG5/zMRRcVGXZLCXrZTgfwMikgzCegsPnG62yDQo5JnqKkrK4jO5iKqDAZGItAqN5CtKBCBWRUA==
-
-"lru-cache@^9.1.1 || ^10.0.0", lru-cache@^9.1.2:
-  version "9.1.2"
-  resolved "https://registry.npmjs.org/lru-cache/-/lru-cache-9.1.2.tgz"
-  integrity sha512-ERJq3FOzJTxBbFjZ7iDs+NiK4VI9Wz+RdrrAB8dio1oV+YvdPzUEE4QNiT2VD51DkIbCYRUUzCRkssXCHqSnKQ==
 
 macos-release@^2.5.0:
   version "2.5.1"
@@ -6830,6 +6831,11 @@ process@^0.11.10:
   version "0.11.10"
   resolved "https://registry.npmjs.org/process/-/process-0.11.10.tgz"
   integrity sha512-cdGef/drWFoydD1JsMzuFf8100nZl+GT+yacc2bEced5f9Rjk4z+WtFUTBu9PhOi9j/jfmBPu0mMEY4wIdAF8A==
+
+promise-coalesce@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.npmjs.org/promise-coalesce/-/promise-coalesce-1.1.1.tgz"
+  integrity sha512-k7+VaIwZc5dRfSF6RELqRY1+LCmcCkrnuNV9HzIpA6iwRHKke+j9yb0LBTTHQ2RRgf6AlMl9TntuTzcgV/BZwg==
 
 promise@^7.0.1:
   version "7.3.1"

@@ -105,6 +105,7 @@ export class QuestionController {
     return this.questionService.getQuestionAndIncreaseViewCount(
       id,
       req.user["sub"],
+      req.ip,
     );
   }
 

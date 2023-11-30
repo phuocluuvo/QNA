@@ -100,5 +100,6 @@
   "MODIFIED_AT": "Chỉnh sửa lúc {0}",
   "EDIT": "Chỉnh sửa",
   "FORGOT_PASSWORD": "Quên mật khẩu",
-  "ASK_QUESTION": "Đặt câu hỏi"
+  "ASK_QUESTION": "Đặt câu hỏi",
+  "NEED_TO_LOGIN": "Đăng nhập để thực hiện hành động này"
 }

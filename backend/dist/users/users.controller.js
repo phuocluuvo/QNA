@@ -90,7 +90,6 @@ let UsersController = class UsersController {
         return this.usersService.AddEmail(userId, email);
     }
     async addActivityPoint(activityPoint) {
-        console.log(typeof activityPoint);
         if (typeof activityPoint != "number")
             throw new common_1.BadRequestException("activityPoint must be greater than 0");
         return this.usersService.addActivityPoint(activityPoint);
