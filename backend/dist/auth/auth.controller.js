@@ -45,22 +45,32 @@ let AuthController = class AuthController {
     }
     async googleAuth() { }
     async googleAuthRedirect(req, res) {
-        const info = await this.authService.signInWithGoogle(req.user);
-        if (info.refreshToken) {
-            res.redirect(`${process.env.URL_WEB}/auth/signin/?refreshToken=${info.refreshToken}`);
+        try {
+            const info = await this.authService.signInWithGoogle(req.user);
+            if (info.refreshToken) {
+                res.redirect(`${process.env.URL_WEB}/auth/signin/?refreshToken=${info.refreshToken}`);
+            }
+            else {
+                res.redirect(`${process.env.URL_WEB}/auth/signin/?error=singin failed`);
+            }
         }
-        else {
-            res.redirect(`${process.env.URL_WEB}/auth/signin/?error=1`);
+        catch (err) {
+            res.redirect(`${process.env.URL_WEB}/auth/signin/?error=${err.message}`);
         }
     }
     async githubAuth() { }
     async githubAuthRedirect(req, res) {
-        const info = await this.authService.signInWithGithub(req.user);
-        if (info.refreshToken) {
-            res.redirect(`${process.env.URL_WEB}/auth/signin/?refreshToken=${info.refreshToken}`);
+        try {
+            const info = await this.authService.signInWithGithub(req.user);
+            if (info.refreshToken) {
+                res.redirect(`${process.env.URL_WEB}/auth/signin/?refreshToken=${info.refreshToken}`);
+            }
+            else {
+                res.redirect(`${process.env.URL_WEB}/auth/signin/?error=singin failed`);
+            }
         }
-        else {
-            res.redirect(`${process.env.URL_WEB}/auth/signin/?error=1`);
+        catch (err) {
+            res.redirect(`${process.env.URL_WEB}/auth/signin/?error=${err.message}`);
         }
     }
     async forgotPassword(username) {
