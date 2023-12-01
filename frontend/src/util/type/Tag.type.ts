@@ -1,4 +1,5 @@
 import { Status } from "./Status.type";
+import { UserType } from "./User.type";
 
 interface Tag {
   id: string;
@@ -8,6 +9,7 @@ interface Tag {
   state: "pending" | "verified" | "blocked";
   createdAt: string;
   updatedAt: string;
+  user: UserType;
 }
 export type TagListType = {
   data: Array<Tag>;
