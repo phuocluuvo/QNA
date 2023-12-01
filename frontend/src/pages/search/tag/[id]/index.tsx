@@ -39,9 +39,13 @@ import {
 import TagList from "@/components/TagList";
 import { TagListType, TagType } from "@/util/type/Tag.type";
 import actionSearchTags from "@/API/redux/actions/tags/ActionSearchTag";
-import actionGetTag from "@/API/redux/actions/tags/ActionGetTag";
+import {
+  actionGetTag,
+  actionGetTagByName,
+} from "@/API/redux/actions/tags/ActionGetTag";
 import { ActionTypes } from "@/API/constant/ActionTypes.enum";
 import _ from "lodash";
+import Author from "@/components/Author";
 const limitations = [5, 10, 15, 20];
 
 export default function TagPage() {
@@ -78,6 +82,7 @@ export default function TagPage() {
       page: pageNumber || defaultPage,
       ...(router.query.id && {
         "filter.tags": `${encodeURIComponent(router.query.id as string)}`,
+        // "filter.state": `$eq:${router.query.select ?? ""}`,
       }),
       sortBy: router.query.sortBy
         ? `${router.query.sortBy}:${router.query.orderBy || defaultOrderBy}`
@@ -101,11 +106,11 @@ export default function TagPage() {
     );
     // if (questionList?.data.length === 0)
     dispatch(
-      actionGetTag(
+      actionGetTagByName(
         router.query.id as string,
-        (res: TagListType) => {
-          if (res.data.length > 0) {
-            setTagDetail(res.data.at(0));
+        (res: TagType) => {
+          if (res) {
+            setTagDetail(res);
           }
         },
         () => {
@@ -157,11 +162,12 @@ export default function TagPage() {
   return (
     <Fragment>
       <Head>
-        <title>Question Dân It</title>
+        <title>{tagDetail?.name} - Question Dân It</title>
         <meta
           name="description"
-          content="The website answers the question about IT"
+          content={`Questions has tagged ${tagDetail?.name}`}
         />
+        <meta name="keywords" content={tagDetail?.name} />
         <link rel="icon" href="/images/favicon.ico" sizes="any" />
       </Head>
       <Flex
@@ -189,10 +195,18 @@ export default function TagPage() {
                 fontSize: "xs",
               }}
             >
-              {questionList && questionList?.data.length > 0
-                ? tagDetail?.content
-                : ""}
+              {tagDetail?.content}
             </Text>
+            {tagDetail?.user && (
+              <HStack>
+                <Text fontSize="xs">Veried by </Text>
+                <Author
+                  user={tagDetail?.user}
+                  type="simple"
+                  sizeAvatar={"xs"}
+                />
+              </HStack>
+            )}
           </VStack>
           <HStack
             w={"full"}

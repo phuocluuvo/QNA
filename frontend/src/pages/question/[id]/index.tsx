@@ -29,10 +29,10 @@ export default function RedirectPage() {
                 res.data.title
               )}#${bookmark}`
             );
-          else
-            router.replace(
-              `/question/${id}/${removeVietnameseTones(res.data.title)}`
-            );
+
+          router.replace(
+            `/question/${id}/${removeVietnameseTones(res.data.title)}`
+          );
         })
         .catch((err) => {
           console.error(err);

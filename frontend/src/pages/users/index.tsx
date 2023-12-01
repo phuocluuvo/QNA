@@ -109,7 +109,7 @@ function UsersListPage() {
       limit: limit || defaultLimit,
       page: pageNumber || defaultPage,
       ...(router.query.select && {
-        "filter.role": `$eq:${router.query.select}`,
+        "filter.role": `${router.query.select}`,
       }),
       sortBy: router.query.sortBy
         ? `${router.query.sortBy}:${router.query.orderBy || defaultOrderBy}`

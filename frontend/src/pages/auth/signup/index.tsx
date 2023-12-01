@@ -25,6 +25,7 @@ import { FormSignUp } from "@/API/type/Form.type";
 import LinkButton from "@/components/LinkButton";
 import { Colors } from "@/assets/constant/Colors";
 import { signIn } from "next-auth/react";
+import api from "@/API/api";
 function Login() {
   const { colorMode } = useColorMode();
   const dispatch = useDispatch();
@@ -70,20 +71,21 @@ function Login() {
       fullname: values.fullname,
     };
     setTimeout(() => {
-      dispatch(
-        actionSignUp(
-          // @ts-ignore
-          { ...form, role: "admin" },
-          (res: { data: any }) => {
-            // save to local storage
-            // localStorage.setItem("userLogin", JSON.stringify(res.data));
-            signIn();
-          },
-          () => {
-            console.log("Error");
+      api
+        .requestSignUp(form)
+        .then((res) => {
+          if (res.data) {
+            router.replace("/auth/signin");
           }
-        )
-      );
+          actions.setSubmitting(false);
+        })
+        .catch((err) => {
+          console.log(err.response.data);
+          actions.setErrors({
+            email: getTranslate("ERROR_EMAIL_EXIST"),
+          });
+          actions.setSubmitting(false);
+        });
       actions.setSubmitting(false);
     }, 1000);
   }
@@ -263,7 +265,7 @@ function Login() {
               variant={"link"}
               // textStyle={{ paddingLeft: 1, minW: "unset", maxW: "unset" }}
               colorScheme="gray"
-              onClick={() => signIn()}
+              onClick={() => router.replace("/auth/signin")}
             >
               {getTranslate("LOGIN")}
             </Button>

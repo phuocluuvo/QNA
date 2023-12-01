@@ -122,7 +122,7 @@ function TagsPage() {
         <title>Tags - Question Dân IT</title>
         <meta
           name="description"
-          content="The website answers the question about IT"
+          content={getTranslate("TAG_DESCRIPTION")}
         />
       </Head>
       <VStack alignItems={"start"}>
