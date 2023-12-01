@@ -101,5 +101,9 @@
   "EDIT": "Chỉnh sửa",
   "FORGOT_PASSWORD": "Quên mật khẩu",
   "ASK_QUESTION": "Đặt câu hỏi",
-  "NEED_TO_LOGIN": "Đăng nhập để thực hiện hành động này"
+  "NEED_TO_LOGIN": "Đăng nhập để thực hiện hành động này",
+  "ERROR_EMAIL_EXIST": "Email đã tồn tại",
+  "ENTER_USERNAME": "Nhập tên đăng nhập",
+  "USER_IS_BLOCK": "Tài khoản đã bị khoá",
+  "ALERT": "Thông báo"
 }

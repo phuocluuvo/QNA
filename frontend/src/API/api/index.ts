@@ -77,13 +77,12 @@ const createAnswer = (form: FormCreateAnswer) => {
 };
 
 const getAnswerList = (form: FormGetAnswer) => {
-  return api.get(url.ANSWER, {
-    params: {
-      page: form.page,
-      limit: form.limit,
-      question_id: form.question_id,
-    },
-  });
+  let urlParams = url.ANSWER + "?";
+  for (let key in form) {
+    // @ts-ignore
+    urlParams += key + "=" + form[key] + "&";
+  }
+  return AuthApi(REQUEST_METHOD.GET, urlParams);
 };
 
 const approveAnswer = (form: FormApproveAnswer) => {

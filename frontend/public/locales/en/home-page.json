@@ -101,5 +101,9 @@
   "EDIT": "Edit",
   "FORGOT_PASSWORD": "Forgot password",
   "ASK_QUESTION": "Ask Question",
-  "NEED_TO_LOGIN": "You need to login to do this action"
+  "NEED_TO_LOGIN": "You need to login to do this action",
+  "ERROR_EMAIL_EXIST": "Email already exists",
+  "ENTER_USERNAME": "Enter your username",
+  "USER_IS_BLOCK": "User is blocked",
+  "ALERT": "Alert"
 }

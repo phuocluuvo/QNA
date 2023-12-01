@@ -104,7 +104,7 @@ export async function AuthApi(
     ) {
       // @ts-ignore
       if (
-        error.response?.config.url?.startsWith(
+        !error.response?.config.url?.startsWith(
           "https://trongphan5301.click/api/notification/badgeNumber"
         )
       )
@@ -140,10 +140,15 @@ export async function AuthApi(
   }
 }
 
-function getErrorMessageFromCodeString(code: string) {
+function getErrorMessageFromCodeString(
+  code: string,
+  isHaveLoggedIn: boolean
+): string {
   if (code === "NOT_VOTE_MY_SELF")
     return "You cannot vote for your question/answer";
   if (code === "Unauthorized")
-    return "You need to be logged in to perform this action";
+    if (isHaveLoggedIn) return "Your session is over. Please login again";
+    else return "You are not logged in. Please login to continue";
+  if (code === "PASSWORD_IS_NOT_CORRECT") return "Password is not correct";
   return code;
 }
