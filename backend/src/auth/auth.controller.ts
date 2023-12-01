@@ -106,13 +106,17 @@ export class AuthController {
   @Get("/google/callback")
   @UseGuards(AuthGuard("google"))
   async googleAuthRedirect(@Req() req, @Res() res) {
-    const info = await this.authService.signInWithGoogle(req.user);
-    if (info.refreshToken) {
-      res.redirect(
-        `${process.env.URL_WEB}/auth/signin/?refreshToken=${info.refreshToken}`,
-      );
-    } else {
-      res.redirect(`${process.env.URL_WEB}/auth/signin/?error=1`);
+    try {
+      const info = await this.authService.signInWithGoogle(req.user);
+      if (info.refreshToken) {
+        res.redirect(
+          `${process.env.URL_WEB}/auth/signin/?refreshToken=${info.refreshToken}`,
+        );
+      } else {
+        res.redirect(`${process.env.URL_WEB}/auth/signin/?error=singin failed`);
+      }
+    } catch (err) {
+      res.redirect(`${process.env.URL_WEB}/auth/signin/?error=${err.message}`);
     }
   }
 
@@ -123,13 +127,17 @@ export class AuthController {
   @Get("/github/callback")
   @UseGuards(AuthGuard("github"))
   async githubAuthRedirect(@Req() req, @Res() res) {
-    const info = await this.authService.signInWithGithub(req.user);
-    if (info.refreshToken) {
-      res.redirect(
-        `${process.env.URL_WEB}/auth/signin/?refreshToken=${info.refreshToken}`,
-      );
-    } else {
-      res.redirect(`${process.env.URL_WEB}/auth/signin/?error=1`);
+    try {
+      const info = await this.authService.signInWithGithub(req.user);
+      if (info.refreshToken) {
+        res.redirect(
+          `${process.env.URL_WEB}/auth/signin/?refreshToken=${info.refreshToken}`,
+        );
+      } else {
+        res.redirect(`${process.env.URL_WEB}/auth/signin/?error=singin failed`);
+      }
+    } catch (err) {
+      res.redirect(`${process.env.URL_WEB}/auth/signin/?error=${err.message}`);
     }
   }
 
