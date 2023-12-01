@@ -252,13 +252,13 @@ export class QuestionService {
     ip: string,
   ) {
     const key = ip + question.id;
-    const cache = await this.cacheManager.get(ip);
-
+    const cache = await this.cacheManager.get(key);
     const result = question;
+
     if (!cache) {
       question.views += 1;
       await this.questionRepository.save(question);
-      await this.cacheManager.set(key, "view", { ttl: 60 * 5 } as any);
+      await this.cacheManager.set(key, "view", { ttl: 40 } as any);
     }
 
     result.vote = [];
