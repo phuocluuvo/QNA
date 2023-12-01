@@ -311,7 +311,7 @@ function AnswerItem({
               )}#${answer.id}`}
               color={"blue.500"}
               // @ts-ignore
-              scroll={false}
+              scroll={"false"}
             >
               {answer.question.title}
             </Link>
@@ -367,30 +367,33 @@ function AnswerItem({
                     py={2}
                     flexWrap={"wrap"}
                   >
-                    <Text fontSize={"xs"}>{comment.content}</Text>
                     <Text fontSize={"xs"}>
-                      {helper.formatDate(
-                        comment.createdAt,
-                        false,
-                        "H:mm A - ddd, DD/MM/YYYY"
-                      )}{" "}
+                      {comment.content}{" "}
+                      <Text as="span" fontSize={"xs"}>
+                       - {helper.formatDate(
+                          comment.createdAt,
+                          false,
+                          "H:mm A - ddd, DD/MM/YYYY"
+                        )}{" "}
+                      </Text> -{" "}
+                      <Button
+                        as="span"
+                        variant={"link"}
+                        colorScheme="facebook"
+                        onClick={() =>
+                          router.push(
+                            `/user/${comment.user.id ?? session.data?.user.id}`
+                          )
+                        }
+                        _hover={{
+                          textDecoration: "underline",
+                        }}
+                      >
+                        <Text fontSize={"xs"}>
+                          {comment.user.fullname ?? session.data?.user.fullname}
+                        </Text>
+                      </Button>
                     </Text>
-                    <Button
-                      variant={"link"}
-                      colorScheme="facebook"
-                      onClick={() =>
-                        router.push(
-                          `/user/${comment.user.id ?? session.data?.user.id}`
-                        )
-                      }
-                      _hover={{
-                        textDecoration: "underline",
-                      }}
-                    >
-                      <Text fontSize={"xs"}>
-                        {comment.user.fullname ?? session.data?.user.fullname}
-                      </Text>
-                    </Button>
                   </HStack>
                 ))}
             </VStack>

@@ -1,8 +1,10 @@
 import { TagType } from "@/util/type/Tag.type";
+import { CheckCircleIcon, InfoIcon } from "@chakra-ui/icons";
 import {
   Badge,
   Box,
   HStack,
+  Icon,
   Popover,
   PopoverArrow,
   PopoverBody,
@@ -12,10 +14,12 @@ import {
   PopoverTrigger,
   Tag,
   Text,
+  Tooltip,
   useDisclosure,
 } from "@chakra-ui/react";
 import router from "next/router";
 import React, { useEffect, useState } from "react";
+import { BiCircle } from "react-icons/bi";
 
 function TagItem({
   tag,
@@ -61,10 +65,7 @@ function TagItem({
           onClick={() => {
             typeof onClick === "function"
               ? onClick()
-              : router.push(
-                  router.basePath +
-                    `/search/tag/${tag.id}`
-                );
+              : router.push(router.basePath + `/search/tag/${tag.name}`);
           }}
           _hover={{
             boxShadow: "0 0 0 2px orange",
@@ -83,17 +84,21 @@ function TagItem({
             >
               {tag.name}
             </Tag>
-            <Badge
-              colorScheme={
-                tag.state === "verified"
-                  ? "green"
-                  : tag.state === "blocked"
-                  ? "red"
-                  : "gray"
+            <Tooltip
+              label={
+                tag.state === "pending"
+                  ? "The tag is pending. This tag is waiting for verification .But you still can use this to create question"
+                  : "The tag was verified."
               }
             >
-              {tag.state}
-            </Badge>
+              {tag.state === "verified" ? (
+                <Icon as={CheckCircleIcon} color="green" />
+              ) : tag.state === "pending" ? (
+                <Icon as={InfoIcon} color="orange" />
+              ) : (
+                <BiCircle />
+              )}
+            </Tooltip>
           </HStack>
           {type === "normal" && (
             <Text

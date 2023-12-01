@@ -617,14 +617,8 @@ function NotificationItem({
             </Text>
           )}
           {item.activity?.objectType === OBJECT_ACTIVITY_TYPE.ANSWER && (
-            <EditerMarkdown
-              source={item.activity.answer?.content}
-              style={{
-                fontSize: "16px",
-                backgroundColor: "transparent",
-                color: colorMode === "dark" ? "white" : "black",
-              }}
-            />
+            // @ts-ignore
+            <Text>{markdownToPlainText(item.activity.answer?.content).slice(0, 200)}...</Text>
           )}
           {item.activity?.objectType === OBJECT_ACTIVITY_TYPE.QUESTION && (
             <Text

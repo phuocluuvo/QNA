@@ -31,8 +31,7 @@ function Navigator({ getTranslate, isMobile }) {
     await api.signOut().then(async (res) => {
       await signOut({ redirect: false, callbackUrl: "/user/signin" })
         .then((res) => {
-          signIn();
-          console.log("logout success", res);
+          routes.replace("/auth/signin")
           localStorage.removeItem("userLogin");
           sessionStorage.removeItem("next-auth.session-token");
           toast.success("Logout success");
