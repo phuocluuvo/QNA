@@ -189,7 +189,7 @@ function DashBoard() {
                 color: Colors(colorMode === "dark").PRIMARY,
               }}
             >
-              reputation points
+              {getTranslate("ACTIVITY_POINTS")}
             </span>
           </Heading>
 

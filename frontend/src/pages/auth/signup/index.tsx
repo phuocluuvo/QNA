@@ -63,6 +63,35 @@ function Login() {
     }
     return error;
   }
+  function validateUsername(value: string) {
+    let error;
+    if (!value) {
+      error = getTranslate("ERROR_USERNAME_REQUIRED");
+    }
+    if (value.match(/[^a-z\d]/g)) {
+      error = getTranslate("ERROR_USERNAME_SPECIAL");
+    }
+    if (value.match(/\s/g)) {
+      error = getTranslate("ERROR_USERNAME_SPACE");
+    }
+    // longer than 6 smaller than 20
+    if (value.length < 6 || value.length > 20) {
+      error = getTranslate("ERROR_USERNAME_LENGTH");
+    }
+    return error;
+  }
+  function validateFullname(value: string) {
+    let error;
+    if (!value) {
+      error = getTranslate("ERROR_FULLNAME_REQUIRED");
+    }
+    // length 6 - 20 characters
+    if (value.length < 6 || value.length > 50) {
+      error = getTranslate("ERROR_FULLNAME_LENGTH");
+    }
+
+    return error;
+  }
   function SignUpHandle(values: FormSignUp, actions: any) {
     let form: FormSignUp = {
       email: values.email,
@@ -123,7 +152,7 @@ function Login() {
                     borderRadius: "10px",
                   }}
                 >
-                  <Field name="username">
+                  <Field name="username" validate={validateUsername}>
                     {/* @ts-ignore  */}
                     {({ field, form }) => (
                       <FormControl
@@ -136,17 +165,22 @@ function Login() {
                           variant={"filled"}
                           {...field}
                           required
+                          onKeyDown={(e) => {
+                            if (e.key === " ") {
+                              e.preventDefault();
+                            }
+                          }}
                           i18nIsDynamicList={false}
                           type="text"
                           placeholder={getTranslate("USERNAME_PLACEHOLDER")}
                         />
-                        <FormErrorMessage>
+                        <FormErrorMessage maxW={300}>
                           {form.errors.username}
                         </FormErrorMessage>
                       </FormControl>
                     )}
                   </Field>
-                  <Field name="fullname">
+                  <Field name="fullname" validate={validateFullname}>
                     {/* @ts-ignore  */}
                     {({ field, form }) => (
                       <FormControl
