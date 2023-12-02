@@ -34,14 +34,36 @@ let UsersService = class UsersService {
         this.emailService = emailService;
     }
     async getAllUser(query, state, role) {
-        const queryBuilder = await this.userRepository.createQueryBuilder("user");
+        const queryBuilder = await this.userRepository.createQueryBuilder("users");
+        console.log(query);
         if (state) {
             queryBuilder.andWhere({ state: state });
         }
         if (role) {
             queryBuilder.andWhere({ role: role });
         }
-        return (0, nestjs_paginate_1.paginate)(query, queryBuilder, user_pagination_1.userPaginateConfig);
+        console.log(await this.transToArray(query));
+        return (0, nestjs_paginate_1.paginate)(query, queryBuilder, {
+            ...user_pagination_1.userPaginateConfig,
+            ...(await this.transToArray(query)),
+        });
+    }
+    async transToArray(input) {
+        if (typeof input.sortBy === "string") {
+            return {
+                defaultSortBy: [input.sortBy.split(":")],
+            };
+        }
+        else if (Array.isArray(input.sortBy)) {
+            return {
+                defaultSortBy: input.sortBy.map((item) => {
+                    return Array.isArray(item) ? item : item.split(":");
+                }),
+            };
+        }
+        else {
+            return input;
+        }
     }
     async create(createUserDto) {
         try {

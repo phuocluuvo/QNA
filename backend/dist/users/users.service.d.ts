@@ -12,6 +12,7 @@ export declare class UsersService {
     private readonly emailService;
     constructor(userRepository: Repository<User>, emailService: EmailService);
     getAllUser(query: PaginateQuery, state: string, role: string): Promise<import("nestjs-paginate").Paginated<User>>;
+    private transToArray;
     create(createUserDto: CreateUserDto): Promise<User>;
     find(obj: any): Promise<User | undefined>;
     findOne(username: string): Promise<User | undefined>;
