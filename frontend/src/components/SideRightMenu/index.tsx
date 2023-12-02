@@ -48,7 +48,9 @@ function SideRightMenu() {
   }
   const sesssion = useSession();
   function checkRoute() {
-    return !route.pathname.startsWith("/auth");
+    return (
+      !route.pathname.includes("/auth")
+    );
   }
 
   return (

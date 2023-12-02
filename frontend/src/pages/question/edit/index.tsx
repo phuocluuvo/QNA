@@ -38,7 +38,7 @@ import { useRouter } from "next/router";
 import { TagType } from "@/util/type/Tag.type";
 import actionSearchTags from "@/API/redux/actions/tags/ActionSearchTag";
 import _ from "lodash";
-import { CloseIcon } from "@chakra-ui/icons";
+import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import { LanguageHelper } from "@/util/Language/Language.util";
 import { Pages } from "@/assets/constant/Pages";
 import { FormCreateQuestion } from "@/API/type/Form.type";
@@ -431,7 +431,16 @@ function EditQuestion() {
                                   }),
                                 }}
                               >
-                                {tag.name}
+                                {typeof tag !== "string" ? tag.name : tag}{" "}
+                                {typeof tag !== "string" &&
+                                tag.state === "verified" ? (
+                                  <Tooltip
+                                    label={"This tag was verified"}
+                                    aria-label={"Verified"}
+                                  >
+                                    <CheckIcon color={"green"} ml={2} />
+                                  </Tooltip>
+                                ) : null}
                               </Tag>
                             </Tooltip>
                           ))

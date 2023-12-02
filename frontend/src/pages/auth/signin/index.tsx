@@ -22,6 +22,14 @@ import {
   useColorMode,
   useDisclosure,
   useToast,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+  AlertDialogCloseButton,
+  Link,
 } from "@chakra-ui/react";
 import { Field, Form, Formik } from "formik";
 import React, { useEffect } from "react";
@@ -30,7 +38,6 @@ import { Pages } from "@/assets/constant/Pages";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
 import { getCsrfToken, getSession, signIn } from "next-auth/react";
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import LoginButton from "@/components/LoginButton";
 import { useDispatch } from "react-redux";
 import { ActionGetBadgeNotification } from "@/API/redux/actions/user/ActionGetNotificationBadge";
@@ -43,6 +50,7 @@ import { UserType } from "@/util/type/User.type";
 import { actionRestPassword } from "@/API/redux/actions/user/ActionResetPassword";
 import helper from "@/util/helper";
 export default function SignIn() {
+  const cancelRef = React.useRef();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [showResetPassword, setShowResetPassword] = React.useState(false);
   const { colorMode } = useColorMode();
@@ -54,6 +62,7 @@ export default function SignIn() {
   const { setBadgeNumber } = React.useContext(LayoutContext);
   const [username, setUsername] = React.useState<string>("");
   const usernameRef = React.useRef<HTMLInputElement>(null);
+  const alert = useDisclosure();
   const [statePassword, setStatePassword] = React.useState({
     newPassword: "",
     confirmPassword: "",
@@ -128,7 +137,7 @@ export default function SignIn() {
     window.location.href = `${baseURL}/api/auth/${type}`;
   }
 
-  function ResetPassword({  
+  function ResetPassword({
     uuid,
     password,
   }: {
@@ -149,7 +158,7 @@ export default function SignIn() {
               title: getTranslate("RESET_PASSWORD_SUCCESS"),
               status: "success",
             });
-            signIn();
+            router.replace("/auth/signin");
           }
         },
         () => {}
@@ -157,6 +166,7 @@ export default function SignIn() {
     );
   }
   const token = router.query.refreshToken;
+  const error = router.query.error;
   useEffect(() => {
     if (router.query.refreshToken) {
       signIn("credentials", {
@@ -184,6 +194,23 @@ export default function SignIn() {
       });
     }
   }, [router.query.refreshToken]);
+  useEffect(() => {
+    if (router.query.error) {
+      alert.onOpen();
+      // toast({
+      //   title: getErrorParams(error as string),
+      //   status: "error",
+      // });
+    }
+  }, [router.query.error]);
+  function getErrorParams(err: string): string {
+    switch (err) {
+      case "USER_IS_BLOCK":
+        return getTranslate("USER_IS_BLOCK");
+      default:
+        return getTranslate("LOGIN_ERROR");
+    }
+  }
   useEffect(() => {
     if (router.query.uuid) {
       setShowResetPassword(true);
@@ -263,7 +290,7 @@ export default function SignIn() {
           <Formik
             initialValues={{
               username: "",
-              password: "@",
+              password: "",
             }}
             onSubmit={(values, actions) => {
               LoginHandle(values, actions);
@@ -363,11 +390,11 @@ export default function SignIn() {
       <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Enter your username</ModalHeader>
+          <ModalHeader>{getTranslate("ENTER_USERNAME")}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Input
-              placeholder="Enter your username"
+              placeholder={getTranslate("ENTER_USERNAME")}
               value={username ?? usernameRef.current?.value}
               required
               onChange={(e) => {
@@ -406,7 +433,7 @@ export default function SignIn() {
           <ModalCloseButton />
           <ModalBody>
             <Input
-              placeholder="Enter your username"
+              placeholder={getTranslate("USERNAME_PLACEHOLDER")}
               value={statePassword.newPassword}
               required
               onChange={(e) => {
@@ -419,7 +446,7 @@ export default function SignIn() {
               }}
             />
             <Input
-              placeholder="Enter your username"
+              placeholder={getTranslate("PASSWORD_PLACEHOLDER")}
               value={statePassword.confirmPassword}
               required
               onChange={(e) => {
@@ -462,6 +489,73 @@ export default function SignIn() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+      <AlertDialog
+        motionPreset="slideInBottom"
+        // @ts-ignore
+        leastDestructiveRef={cancelRef}
+        onClose={alert.onClose}
+        isOpen={alert.isOpen}
+        isCentered
+      >
+        <AlertDialogOverlay />
+
+        <AlertDialogContent>
+          <AlertDialogHeader>{getTranslate("ALERT")}</AlertDialogHeader>
+          <AlertDialogCloseButton />
+          <AlertDialogBody>
+            <Text
+              style={{
+                fontWeight: "bold",
+                fontSize: "1.5rem",
+              }}
+            >
+              {getErrorParams(error as string)}
+            </Text>
+            <Text>Something wrongs?</Text>
+            <Link
+              variant={"ghost"}
+              style={{
+                fontWeight: "bold",
+              }}
+              onClick={(e) => {
+                const subject = encodeURIComponent("Error from user");
+                const body = encodeURIComponent(`
+                Hello Admin,
+                
+                I have a problem with my account: [Your account name]
+                
+                Error: ${error}
+
+                Details: [Enter your detail here]
+                `);
+
+                window.location.href = `mailto:voluu0702@gmail.com?subject${subject}=&body=${body}`;
+                e.preventDefault();
+              }}
+            >
+              Mail to us
+            </Link>{" "}
+            or{" "}
+            <Link
+              style={{
+                fontWeight: "bold",
+              }}
+              onClick={(e) => {
+                window.location.href = `tel:0333751890`;
+                e.preventDefault();
+              }}
+            >
+              Contact us: 0333751890
+            </Link>
+          </AlertDialogBody>
+          <AlertDialogFooter>
+            {/* @ts-ignore */}
+            <Button ref={cancelRef} onClick={alert.onClose}>
+              {getTranslate("CONFIRM")}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Container>
   );
 }

@@ -178,7 +178,9 @@ export default function Home() {
                 </Button>
               </Tooltip>
               <HStack spacing={0}>
+                {/* All button */}
                 <FilterButton
+                  size={"sm"}
                   style={{
                     borderColor:
                       filter === "no_answer"
@@ -188,8 +190,36 @@ export default function Home() {
                     borderEndEndRadius: 0,
                     borderStartEndRadius: 0,
                   }}
+                  isActive={!filter}
+                  onClick={() => {
+                    router.replace(
+                      {
+                        pathname: router.pathname,
+                        query: {
+                          ...router.query,
+                          select: "",
+                          limit: 10,
+                          page: 1,
+                        },
+                      },
+                      undefined,
+                      { shallow: true }
+                    );
+                  }}
+                >
+                  {getTranslate("ALL")}
+                </FilterButton>
+                <FilterButton
+                  style={{
+                    borderColor:
+                      filter === "no_answer"
+                        ? Colors(colorMode === "dark").PRIMARY
+                        : "transparent",
+                    padding: "5px 10px",
+                    borderRadius: 0,
+                  }}
                   size={"sm"}
-                  isActive={filter === "no_answer" || !filter}
+                  isActive={filter === "no_answer"}
                   onClick={() => {
                     router.replace(
                       {

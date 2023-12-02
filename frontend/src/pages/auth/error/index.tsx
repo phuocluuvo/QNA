@@ -40,17 +40,6 @@ function CustomError({ statusCode }: { statusCode: number }) {
       <Text my={10} display={statusCode !== 500 ? "flex" : "none"}>
         You will be redirected to the homepage in {countdown} seconds.
       </Text>
-      <Image
-        alt="404"
-        width={100}
-        height={100}
-        style={{
-          objectFit: "contain",
-          margin: "auto",
-          display: "flex",
-        }}
-        src={erorUrlImage}
-      />
       <Button variant={"link"} leftIcon={<ArrowBackIcon />} as="a" href="/">
         Go Home
       </Button>

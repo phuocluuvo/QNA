@@ -175,7 +175,7 @@ function TabProfile({
               >
                 {activityData && (
                   <VStack height={"full"}>
-                    <TitleData>Activity Points:</TitleData>
+                    <TitleData>{getTranslate("ACTIVITY_POINTS")}:</TitleData>
                     <Box
                       style={{
                         width: "100%",
@@ -277,7 +277,7 @@ function TabProfile({
                       fontStyle: "italic",
                     }}
                   >
-                    This user has not written anything about themselves yet
+                    {getTranslate("NO_ABOUT")}
                   </Text>
                 ) : (
                   <EditerMarkdown

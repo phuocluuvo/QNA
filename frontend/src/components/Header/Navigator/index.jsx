@@ -10,7 +10,9 @@ import {
   MenuList,
   MenuItem,
   useToast,
+  cookieStorageManager,
 } from "@chakra-ui/react";
+import Cookies from "js-cookie";
 import React from "react";
 import LinkButton from "@/components/LinkButton";
 import { Colors } from "@/assets/constant/Colors";
@@ -29,12 +31,18 @@ function Navigator({ getTranslate, isMobile }) {
   const routes = useRouter();
   const LogoutHandle = async () => {
     await api.signOut().then(async (res) => {
+      localStorage.clear();
+      sessionStorage.clear();
+      const allCookies = Cookies.get();
+      for (let cookie in allCookies) {
+        Cookies.remove(cookie);
+      }
       await signOut({ redirect: false, callbackUrl: "/user/signin" })
         .then((res) => {
-          signIn();
-          console.log("logout success", res);
-          localStorage.removeItem("userLogin");
-          sessionStorage.removeItem("next-auth.session-token");
+          routes.replace("/auth/signin");
+          localStorage.clear();
+          sessionStorage.clear();
+
           toast.success("Logout success");
         })
         .catch((err) => {

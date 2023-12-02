@@ -154,6 +154,7 @@ function TabActivity({
       api
         .getAcitvityDashboardByUser(session.data?.user.id as string, "all")
         .then((_res) => {
+          console.log("__getAcitvityDashboardByUser", _res);
           setActivityData(_res?.data);
         });
       dispatch(
@@ -190,7 +191,7 @@ function TabActivity({
           >
             {activityData && (
               <VStack height={"full"}>
-                <TitleData>Activity Points:</TitleData>
+                <TitleData>{getTranslate("ACTIVITY_POINTS")}</TitleData>
                 <Box
                   style={{
                     width: "100%",
@@ -343,8 +344,8 @@ function TabActivity({
           <Thead>
             <Tr>
               <Th>{getTranslate("ACTIVITY")}</Th>
-              <Th>Date</Th>
-              <Th isNumeric>Point Received</Th>
+              <Th>{getTranslate("DATE")}</Th>
+              <Th isNumeric>{getTranslate("POINT_RECEIVED")}</Th>
             </Tr>
           </Thead>
           <Tbody>

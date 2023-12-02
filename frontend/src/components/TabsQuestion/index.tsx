@@ -24,7 +24,7 @@ import {
   QuestionType,
 } from "@/util/type/Question.type";
 import { NextRouter } from "next/router";
-import helper from "@/util/helper";
+import helper, { removeVietnameseTones } from "@/util/helper";
 type Props = {
   questions?: string;
   containerStyles?: BoxProps;
@@ -122,7 +122,7 @@ function TabsQuestion({
             >
               {state.questionsNew && state.questionsNew.length > 0
                 ? state.questionsNew.map((question) => (
-                    <HStack w={"full"}>
+                    <HStack w={"full"} key={question.id}>
                       <Box
                         style={{
                           fontSize: "sm",
@@ -151,7 +151,7 @@ function TabsQuestion({
                         onClick={() =>
                           // @ts-ignore
                           router.push(
-                            router.basePath + `/question/${question.id}`
+                            router.basePath + `/question/${question.id}/${removeVietnameseTones(question.title)}`
                           )
                         }
                         transition={"all 0.2s ease-in-out"}
@@ -205,7 +205,7 @@ function TabsQuestion({
                         onClick={() =>
                           // @ts-ignore
                           router.push(
-                            router.basePath + `/question/${question.id}`
+                            router.basePath + `/question/${question.id}/${removeVietnameseTones(question.title)}`
                           )
                         }
                         transition={"all 0.2s ease-in-out"}

@@ -187,17 +187,21 @@ function QuestionItem({
               {question.state}
             </Badge>
           </Tooltip>
-          <Link
-            onClick={() => {
-              typeof onClick === "function"
-                ? onClick()
-                : // @ts-ignore
-                  router.push(router.basePath + `/question/${question.id}`);
+          <Text
+            _hover={{
+              textDecoration: "underline",
             }}
+            as={"a"}
+            href={
+              router.basePath +
+              `/question/${question.id}/${removeVietnameseTones(
+                question.title
+              )}`
+            }
             fontWeight={"semibold"}
-            w={"100%"}
-            h={"30px"}
-            noOfLines={1}
+            maxW={"lg"}
+            w={type === "minimals" ? "100%" : "60vw"}
+            isTruncated
             paddingTop={{
               base: 0,
               md: 2,
@@ -213,7 +217,7 @@ function QuestionItem({
               {getTranslate("TITLE")}:
             </span>{" "}
             {question.title}
-          </Link>
+          </Text>
         </Stack>{" "}
         <Text
           style={{
@@ -232,8 +236,8 @@ function QuestionItem({
         {type === "minimals" ? null : (
           <HStack w={"full"} alignItems={"flex-end"} pb={2}>
             <HStack flexWrap={"wrap"}>
-              {question.tagNames?.map((tag) => (
-                <TagQuestion tag={tag} key={tag} />
+              {question.tags?.map((tag) => (
+                <TagQuestion tag={tag} key={tag.id} />
               ))}
             </HStack>
             <Spacer />

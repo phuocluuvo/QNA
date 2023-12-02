@@ -1,5 +1,6 @@
 import { TagType } from "@/util/type/Tag.type";
-import { Tag, TagProps, Text } from "@chakra-ui/react";
+import { CheckIcon } from "@chakra-ui/icons";
+import { Tag, TagProps, Text, Tooltip } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import React from "react";
 
@@ -37,7 +38,12 @@ function TagQuestion({ tag, style, displayQuestionNumber = false }: Props) {
           )
         }
       >
-        {typeof tag !== "string" ? tag.name : tag}
+        {typeof tag !== "string" ? tag.name : tag}{" "}
+        {typeof tag !== "string" && tag.state === "verified" ? (
+          <Tooltip label={"This tag was verified"} aria-label={"Verified"}>
+            <CheckIcon color={"green"} ml={2} />
+          </Tooltip>
+        ) : null}
       </Tag>{" "}
       {!isTagNames && displayQuestionNumber ? (
         <Text> x {tag.questionsNumber}</Text>

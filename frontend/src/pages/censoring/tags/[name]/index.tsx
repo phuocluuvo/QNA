@@ -1,4 +1,4 @@
-import actionGetTag from "@/API/redux/actions/tags/ActionGetTag";
+import {actionGetTag} from "@/API/redux/actions/tags/ActionGetTag";
 import { TagListType, TagType } from "@/util/type/Tag.type";
 import { Badge, Box, Container, Heading, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";

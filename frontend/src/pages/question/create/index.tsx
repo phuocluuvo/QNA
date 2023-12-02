@@ -1,5 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
   Box,
   Button,
   Collapse,
@@ -8,6 +13,7 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
+  Grid,
   HStack,
   IconButton,
   Input,
@@ -19,6 +25,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Stack,
   Tag,
   Text,
   Textarea,
@@ -26,7 +33,11 @@ import {
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
-// const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+import {
+  createQuestionRules,
+  writeAGoodQuestion,
+  writeAGoodQuestionVie,
+} from "./rule.js";
 import dynamic from "next/dynamic";
 import { Field, Form, Formik, FormikHelpers } from "formik";
 import helper from "@/util/helper";
@@ -37,7 +48,7 @@ import { useRouter } from "next/router";
 import { TagType } from "@/util/type/Tag.type";
 import actionSearchTags from "@/API/redux/actions/tags/ActionSearchTag";
 import _ from "lodash";
-import { CloseIcon } from "@chakra-ui/icons";
+import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import { LanguageHelper } from "@/util/Language/Language.util";
 import { Pages } from "@/assets/constant/Pages";
 import { FormCreateQuestion } from "@/API/type/Form.type";
@@ -75,6 +86,7 @@ function CreateQuestion() {
     tagName: "",
     tagContent: "",
   });
+
   const { isOpen, onOpen, onClose } = useDisclosure();
   const finalRef = React.useRef(null);
   const route = useRouter();
@@ -86,8 +98,12 @@ function CreateQuestion() {
       helper.mappingState(oldState, { bodyQuestion: value })
     );
   };
-
-  const { getTranslate } = LanguageHelper(Pages.HOME);
+  const questionRules: string = createQuestionRules;
+  const [focused, SetFocused] = useState({
+    title: false,
+    bodyQuestion: false,
+  });
+  const { getTranslate, getCurrentLanguage } = LanguageHelper(Pages.HOME);
   const validateTitle = (value: string) => {
     let error;
     if (!value) {
@@ -169,6 +185,8 @@ function CreateQuestion() {
           console.log("createTagHandle", res);
           addTagHandle(res);
           onClose();
+          state.tagContent = "";
+          state.tagName = "";
         },
         () => {
           onClose();
@@ -228,7 +246,13 @@ function CreateQuestion() {
     return isExist;
   }
   return (
-    <Container my={0} minW={{ lg: "70%", base: "90%" }} maxH={"30vh"}>
+    <Stack
+      m={0}
+      w={"full"}
+      minW={{ lg: "70%", base: "100%" }}
+      gap={10}
+      flexDirection={"column-reverse"}
+    >
       <Formik
         initialValues={{
           title: state.title,
@@ -251,12 +275,21 @@ function CreateQuestion() {
                     <FormLabel>
                       {getTranslate("QUESTION_TITLE")}
                       <Text fontSize="sm" color="gray.500">
-                        Be specific and imagine you’re asking a question to
-                        another person
+                        {getTranslate("QUESTION_TITLE_DESCRIPTION")}
                       </Text>
                     </FormLabel>
                     <Input
                       {...field}
+                      onFocus={() => {
+                        SetFocused((oldState) =>
+                          helper.mappingState(oldState, { title: true })
+                        );
+                      }}
+                      onBlur={() => {
+                        SetFocused((oldState) =>
+                          helper.mappingState(oldState, { title: false })
+                        );
+                      }}
                       id="title"
                       placeholder="title"
                       type="text"
@@ -276,7 +309,7 @@ function CreateQuestion() {
                     <FormLabel>
                       {getTranslate("QUESTION_TAG")}*
                       <Text fontSize="sm" color="gray.500">
-                        Add up to 5 tags to describe what your question is about
+                        {getTranslate("QUESTION_TAG_DESCRIPTION")}
                       </Text>
                     </FormLabel>
                     <HStack
@@ -379,14 +412,25 @@ function CreateQuestion() {
                                   }),
                                 }}
                               >
-                                {tag.name}
+                                {typeof tag !== "string" ? tag.name : tag}{" "}
+                                {typeof tag !== "string" &&
+                                tag.state === "verified" ? (
+                                  <Tooltip
+                                    label={"This tag was verified"}
+                                    aria-label={"Verified"}
+                                  >
+                                    <CheckIcon color={"green"} ml={2} />
+                                  </Tooltip>
+                                ) : null}
                               </Tag>
                             </Tooltip>
                           ))
                         ) : (
                           <Text fontSize={"sm"} color={"gray.500"}>
-                            No results found. Do you want to create a '
-                            {state.searchTagId}' tag?{" "}
+                            {getTranslate("CANNOT_FIND_TAG").replace(
+                              "{tagname}",
+                              state.searchTagId
+                            )}
                             <Button
                               variant={"link"}
                               colorScheme={"orange"}
@@ -421,8 +465,7 @@ function CreateQuestion() {
                     <FormLabel>
                       {getTranslate("QUESTION_CONTENT")}*
                       <Text fontSize="sm" color="gray.500">
-                        Your question needs to be as detailed as possible for
-                        people to answer it correctly.
+                        {getTranslate("QUESTION_CONTENT_DESCRIPTION")}
                       </Text>
                     </FormLabel>
                     <Box data-color-mode={colorMode}>
@@ -445,12 +488,6 @@ function CreateQuestion() {
                         }}
                       />
 
-                      <Divider
-                        my={{
-                          base: "10px",
-                          md: "20px",
-                        }}
-                      />
                       <Box data-color-mode={colorMode}>
                         <EditerMarkdown
                           source={state.bodyQuestion}
@@ -461,63 +498,6 @@ function CreateQuestion() {
                         />
                       </Box>
                     </Box>
-                    {/* <ReactQuill
-                      id="body"
-                      theme="snow"
-                      value={state.bodyQuestion}
-                      onChange={(value) =>
-                        // @ts-ignore
-                        setState((oldState) =>
-                          helper.mappingState(oldState, {
-                            bodyQuestion: value,
-                          })
-                        )
-                      }
-                      modules={{
-                        toolbar: [
-                          [{ header: [1, 2, false] }],
-                          [
-                            "bold",
-                            "italic",
-                            "underline",
-                            "strike",
-                            "blockquote",
-                          ],
-                          [
-                            { list: "ordered" },
-                            { list: "bullet" },
-                            { indent: "-1" },
-                            { indent: "+1" },
-                          ],
-                          ["link", "image", "code-block"],
-                          ["clean"],
-                        ],
-                      }}
-                      formats={[
-                        "bold",
-                        "italic",
-                        "underline",
-                        "strike",
-                        "blockquote",
-                        "link",
-                        "image",
-                        "video",
-                        "code-block",
-                        "list",
-                        "bullet",
-                        "indent",
-                        "header",
-                        "align",
-                        "color",
-                        "background",
-                        "font",
-                        "size",
-                        "clean",
-                      ]}
-                      bounds={".app"}
-                      placeholder={"Create Question"}
-                      tabIndex={1}
-                    /> */}
                     <FormErrorMessage>{form.errors.body}</FormErrorMessage>
                   </FormControl>
                 )}
@@ -537,6 +517,45 @@ function CreateQuestion() {
           </Form>
         )}
       </Formik>
+      {/* rules box */}
+      <Box
+        style={{
+          width: "100%",
+          border: "1px solid",
+          borderColor: colorMode === "light" ? "gray.200" : "gray.700",
+          borderRadius: "5px",
+          padding: "10px",
+          height: "fit-content",
+          backgroundColor: colorMode === "light" ? "#fff" : "#1a202c",
+        }}
+      >
+        <Accordion defaultIndex={[0]} allowMultiple>
+          <AccordionItem>
+            <Text>
+              <AccordionButton>
+                <Box as="span" flex="1" textAlign="left">
+                  {getTranslate("HOW_TO_WRITE_A_QUESTION")}
+                </Box>
+                <AccordionIcon />
+              </AccordionButton>
+            </Text>
+            <AccordionPanel pb={4}>
+              <EditerMarkdown
+                source={
+                  getCurrentLanguage().code === "vi"
+                    ? writeAGoodQuestionVie
+                    : writeAGoodQuestion
+                }
+                style={{
+                  backgroundColor: colorMode === "light" ? "#fff" : "#1a202c",
+                  fontSize: "14px",
+                  color: colorMode === "light" ? "#000" : "#fff",
+                }}
+              />
+            </AccordionPanel>
+          </AccordionItem>
+        </Accordion>
+      </Box>
       <Modal finalFocusRef={finalRef} isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
@@ -591,7 +610,7 @@ function CreateQuestion() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-    </Container>
+    </Stack>
   );
 }
 

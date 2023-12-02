@@ -763,7 +763,7 @@ function Question() {
                             onClick={() =>
                               // @ts-ignore
                               router.push(
-                                router.basePath + `/question/${question.id}`
+                                router.basePath + `/question/${question.id}/${removeVietnameseTones(question.title)}`
                               )
                             }
                             transition={"all 0.2s ease-in-out"}
