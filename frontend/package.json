@@ -33,6 +33,7 @@
     "formik": "^2.4.4",
     "framer-motion": "^10.16.4",
     "i18next": "^23.4.6",
+    "js-cookie": "^3.0.5",
     "jwt-decode": "^3.1.2",
     "moment": "^2.29.4",
     "naughty-words": "^1.2.0",
