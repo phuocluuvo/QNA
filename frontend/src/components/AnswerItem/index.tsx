@@ -297,6 +297,7 @@ function AnswerItem({
                   style={{
                     fontSize: "16px",
                     backgroundColor: "transparent",
+                    maxWidth: "50vw",
                   }}
                 />
               </Box>
@@ -370,12 +371,14 @@ function AnswerItem({
                     <Text fontSize={"xs"}>
                       {comment.content}{" "}
                       <Text as="span" fontSize={"xs"}>
-                       - {helper.formatDate(
+                        -{" "}
+                        {helper.formatDate(
                           comment.createdAt,
                           false,
                           "H:mm A - ddd, DD/MM/YYYY"
                         )}{" "}
-                      </Text> -{" "}
+                      </Text>{" "}
+                      -{" "}
                       <Button
                         as="span"
                         variant={"link"}

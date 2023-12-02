@@ -1,4 +1,6 @@
 import { Colors } from "@/assets/constant/Colors";
+import { Pages } from "@/assets/constant/Pages";
+import { LanguageHelper } from "@/util/Language/Language.util";
 import { UserType } from "@/util/type/User.type";
 import { LinkIcon, TimeIcon } from "@chakra-ui/icons";
 import {
@@ -34,6 +36,7 @@ function UserInfoProfile({ user }: { user: UserType }) {
   const { colorMode } = useColorMode();
   const router = useRouter();
   const toast = useToast();
+  const { getTranslate } = LanguageHelper(Pages.HOME);
   function getFormatedDateFromNow(date: string | undefined) {
     return moment(date).diff(moment(), "minutes") > -60
       ? moment(date).diff(moment(), "minutes") * -1
@@ -134,7 +137,7 @@ function UserInfoProfile({ user }: { user: UserType }) {
               color: Colors(colorMode === "dark").PRIMARY,
             }}
           >
-            reputation points
+            {getTranslate("ACTIVITY_POINTS")}
           </span>
         </Heading>
         <Stack

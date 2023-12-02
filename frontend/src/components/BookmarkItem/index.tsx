@@ -4,7 +4,7 @@ import { Colors } from "@/assets/constant/Colors";
 import { Pages } from "@/assets/constant/Pages";
 import { LayoutContext } from "@/provider/LayoutProvider";
 import { LanguageHelper } from "@/util/Language/Language.util";
-import helper from "@/util/helper";
+import helper, { removeVietnameseTones } from "@/util/helper";
 import { BookmarkType } from "@/util/type/Bookmark.type";
 import { CollectionType } from "@/util/type/Collection.type";
 import {
@@ -40,6 +40,7 @@ import {
   Input,
   Select,
   useToast,
+  Link,
 } from "@chakra-ui/react";
 import { NextRouter } from "next/router";
 import React, { useContext, useEffect } from "react";
@@ -221,35 +222,36 @@ function BookmarkItem({
               </MenuList>
             </Menu>
           </TopItemContainer>
-          <Button
+          <Link
+            w={"100%"}
+            maxW={"50vw"}
             style={{
               textAlign: "left",
-              width: "100%",
               justifyContent: "flex-start",
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-              whiteSpace: "nowrap",
               paddingBlock: "10px",
             }}
+            isTruncated
             colorScheme={bookmark.question.state === "blocked" ? "red" : "blue"}
-            variant={"link"}
             fontSize={{
-              base: "xs",
+              base: "sm",
               md: "lg",
             }}
-            onClick={() => {
-              router.push(`/question/${bookmark.question.id}`);
-            }}
+            href={
+              router.basePath +
+              `/question/${bookmark.question.id}/${removeVietnameseTones(
+                bookmark.question.title
+              )}}`
+            }
           >
             {bookmark.question.title}
-          </Button>
-          <Box display={"flex"} w={"full"}>
+          </Link>
+          <HStack display={"flex"} w={"full"}>
             {bookmark?.question?.tagNames?.map((tag) => (
               <Tag size={"sm"} variant={"solid"}>
                 {tag}
               </Tag>
             ))}
-          </Box>
+          </HStack>
           <SmallText
             display={{
               md: "none",

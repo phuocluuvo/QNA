@@ -3,6 +3,8 @@ import { DashBoardUserType } from "@/util/type/User.type";
 import { Divider, Grid, HStack, useColorMode } from "@chakra-ui/react";
 import React from "react";
 import StasDashBoard from "../StasDashboard";
+import { LanguageHelper } from "@/util/Language/Language.util";
+import { Pages } from "@/assets/constant/Pages";
 
 function StasGroup({
   dashboard,
@@ -11,6 +13,7 @@ function StasGroup({
   dashboard: DashBoardUserType;
   filter: "quarter" | "year" | "month";
 }) {
+  const { getTranslate } = LanguageHelper(Pages.HOME);
   const { colorMode } = useColorMode();
   return (
     <Grid
@@ -27,30 +30,30 @@ function StasGroup({
       }}
     >
       <StasDashBoard
-        title="Activity Point"
+        title={getTranslate("ACTIVITY_POINTS")}
         value={dashboard?.activityPoint}
-        bottomText="Total Activity Point"
+        bottomText={getTranslate("TOTAL_ACTIVITY_POINTS")}
       />
 
       {dashboard[filter] && (
         <StasDashBoard
-          title="Question"
+          title={getTranslate("QUESTIONS")}
           value={dashboard[filter].questionCount}
-          bottomText="Total Questions"
+          bottomText={getTranslate("TOTAL_QUESTIONS")}
         />
       )}
       {dashboard[filter] && (
         <StasDashBoard
-          title="Answer"
+          title={getTranslate("ANSWERS")}
           value={dashboard[filter].answerCount}
-          bottomText="Total Answers"
+          bottomText={getTranslate("TOTAL_ANSWERS")}
         />
       )}
       {dashboard[filter] && (
         <StasDashBoard
-          title="Votes"
+          title={getTranslate("VOTES")}
           value={dashboard[filter].voteCount}
-          bottomText="Total Vote times"
+          bottomText={getTranslate("TOTAL_VOTES")}
         />
       )}
     </Grid>

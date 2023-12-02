@@ -192,7 +192,12 @@ function QuestionItem({
               textDecoration: "underline",
             }}
             as={"a"}
-           href={router.basePath + `/question/${question.id}/${removeVietnameseTones(question.title)}`}
+            href={
+              router.basePath +
+              `/question/${question.id}/${removeVietnameseTones(
+                question.title
+              )}`
+            }
             fontWeight={"semibold"}
             maxW={"lg"}
             w={type === "minimals" ? "100%" : "60vw"}
@@ -231,8 +236,8 @@ function QuestionItem({
         {type === "minimals" ? null : (
           <HStack w={"full"} alignItems={"flex-end"} pb={2}>
             <HStack flexWrap={"wrap"}>
-              {question.tagNames?.map((tag) => (
-                <TagQuestion tag={tag} key={tag} />
+              {question.tags?.map((tag) => (
+                <TagQuestion tag={tag} key={tag.id} />
               ))}
             </HStack>
             <Spacer />

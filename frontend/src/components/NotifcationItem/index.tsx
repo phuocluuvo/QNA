@@ -601,7 +601,7 @@ function NotificationItem({
           {item.activity?.objectType === OBJECT_ACTIVITY_TYPE.COMMENT && (
             <Text
               w={"fit-content"}
-              textOverflow={"ellipsis"}
+              isTruncated
               style={{
                 fontSize: "16px",
                 backgroundColor: "transparent",
@@ -616,9 +616,17 @@ function NotificationItem({
               ...
             </Text>
           )}
-          {item.activity?.objectType === OBJECT_ACTIVITY_TYPE.ANSWER && (
-            // @ts-ignore
-            <Text>{markdownToPlainText(item.activity.answer?.content).slice(0, 200)}...</Text>
+          {item.activity?.objectType === OBJECT_ACTIVITY_TYPE.ANSWER && (            
+            <Text
+              isTruncated
+              w={"100%"}
+              maxW={"50vw"}
+              display={type === "small" ? "none" : ""}
+            >
+              {/* @ts-ignore */}
+              {markdownToPlainText(item.activity.answer?.content)}
+              ...
+            </Text>
           )}
           {item.activity?.objectType === OBJECT_ACTIVITY_TYPE.QUESTION && (
             <Text

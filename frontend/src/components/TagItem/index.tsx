@@ -1,5 +1,5 @@
 import { TagType } from "@/util/type/Tag.type";
-import { CheckCircleIcon, InfoIcon } from "@chakra-ui/icons";
+import { CheckCircleIcon, CheckIcon, InfoIcon } from "@chakra-ui/icons";
 import {
   Badge,
   Box,
@@ -92,7 +92,7 @@ function TagItem({
               }
             >
               {tag.state === "verified" ? (
-                <Icon as={CheckCircleIcon} color="green" />
+                <Icon as={CheckIcon} color="green" />
               ) : tag.state === "pending" ? (
                 <Icon as={InfoIcon} color="orange" />
               ) : (
