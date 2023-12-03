@@ -30,7 +30,11 @@ const google_strategy_1 = require("../auth/google.strategy");
 const announcement_module_1 = require("../announcement/announcement.module");
 const github_strategy_1 = require("../auth/github.strategy");
 const sysconfig_module_1 = require("../sysconfig/sysconfig.module");
+const search_middleware_1 = require("../middleware/search.middleware");
 let AppModule = class AppModule {
+    configure(consumer) {
+        consumer.apply(search_middleware_1.SearchMiddleware).forRoutes("*");
+    }
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
