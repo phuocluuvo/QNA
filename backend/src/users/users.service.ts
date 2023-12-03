@@ -28,7 +28,9 @@ export class UsersService {
   ) {}
 
   async getAllUser(query: PaginateQuery, state: string, role: string) {
-    const queryBuilder = await this.userRepository.createQueryBuilder("user");
+    const queryBuilder = await this.userRepository.createQueryBuilder("users");
+
+    console.log(query);
 
     if (state) {
       queryBuilder.andWhere({ state: state });
@@ -38,7 +40,28 @@ export class UsersService {
       queryBuilder.andWhere({ role: role });
     }
 
-    return paginate<User>(query, queryBuilder, userPaginateConfig);
+    console.log(await this.transToArray(query));
+
+    return paginate(query, queryBuilder, {
+      ...userPaginateConfig,
+      ...(await this.transToArray(query)),
+    });
+  }
+
+  private async transToArray(input) {
+    if (typeof input.sortBy === "string") {
+      return {
+        defaultSortBy: [input.sortBy.split(":")],
+      };
+    } else if (Array.isArray(input.sortBy)) {
+      return {
+        defaultSortBy: input.sortBy.map((item) => {
+          return Array.isArray(item) ? item : item.split(":");
+        }),
+      };
+    } else {
+      return input;
+    }
   }
 
   /**
