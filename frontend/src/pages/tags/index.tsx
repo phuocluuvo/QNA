@@ -88,35 +88,40 @@ function TagsPage() {
       )
     );
   }
+  React.useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      handleSearchTag(state.search);
+    }, 100);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [state.search]);
+  const handleSearchTag = (search: string) => {
+    const defaultLimit = limitations[0];
+    const defaultPage = 1;
+    const queryParams = {
+      limit: limit || defaultLimit,
+      page: pageNumber || defaultPage,
+      search: search,
+      searchBy: "name",
+    };
+    dispacth(
+      actionGetTagList(
+        queryParams,
+        (res: TagListType) => {
+          // @ts-ignore
+          setState((oldState) => helper.mappingState(oldState, { tags: res }));
+        },
+        // @ts-ignore
+        (err: any) => {
+          console.log(err);
+        }
+      )
+    );
+  };
   function searchTags(search: string) {
     setState(
       // @ts-ignoref
-      (oldState) => helper.mappingState(oldState, { search: search }),
-      ({ search }) => {
-        const defaultLimit = limitations[0];
-        const defaultPage = 1;
-        const queryParams = {
-          limit: limit || defaultLimit,
-          page: pageNumber || defaultPage,
-          search: search,
-          searchBy: "name",
-        };
-        dispacth(
-          actionGetTagList(
-            queryParams,
-            (res: TagListType) => {
-              // @ts-ignore
-              setState((oldState) =>
-                helper.mappingState(oldState, { tags: res })
-              );
-            },
-            // @ts-ignore
-            (err: any) => {
-              console.log(err);
-            }
-          )
-        );
-      }
+      (oldState) => helper.mappingState(oldState, { search: search })
     );
   }
   const pageNumClick = (pageNumber: number, limit: number) => {

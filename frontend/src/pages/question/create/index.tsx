@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Accordion,
   AccordionButton,
@@ -61,6 +61,7 @@ import actionCreateTag from "@/API/redux/actions/tags/ActionCreateTag";
 import actionUpdateQuestion from "@/API/redux/actions/question/ActionUpdateQuesiton";
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
+import TagQuestion from "@/components/TagQuestion";
 const MDEditor = dynamic(
   () => import("@uiw/react-md-editor").then((mod) => mod.default),
   { ssr: false }
@@ -108,6 +109,17 @@ function CreateQuestion() {
     title: false,
     bodyQuestion: false,
   });
+  const validateTags = (value?: Set<TagType>) => {
+    let error = undefined;
+    if (!value) {
+      error = "Tags is required";
+    } else if (value.size < 1) {
+      error = "Tags is required";
+    } else if (value.size >= 5) {
+      error = "Tags reach the number of tag can added";
+    }
+    return error;
+  };
   const { getTranslate, getCurrentLanguage } = LanguageHelper(Pages.HOME);
   const validateTitle = (value: string) => {
     let error;
@@ -140,9 +152,22 @@ function CreateQuestion() {
       );
     }
   };
-  const debouncedSearchTag = _.debounce((value) => {
-    searchTag(value);
-  }, 500);
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      searchTag(state.searchTagId);
+      if (state.searchTagId === "")
+        setState(
+          // @ts-ignore
+          (oldState) =>
+            helper.mappingState(oldState, {
+              resultsTagIds: new Set(),
+            })
+        );
+    }, 100);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [state.searchTagId]);
+
   const addTagHandle = (tag: TagType) => {
     setState(
       // @ts-ignore
@@ -174,9 +199,6 @@ function CreateQuestion() {
     setState((oldState) =>
       helper.mappingState(oldState, { searchTagId: value })
     );
-
-    // Use the debounced function
-    debouncedSearchTag(value);
   };
   const createTagHandle = () => {
     let form = {
@@ -331,44 +353,24 @@ function CreateQuestion() {
                     >
                       {state.selectedTags && state.selectedTags.size > 0
                         ? Array.from(state.selectedTags).map((tag) => (
-                            <Tag
-                              size={"md"}
-                              variant="solid"
-                              colorScheme="orange"
-                              cursor={"pointer"}
-                              display={"flex"}
-                              minW={"fit-content"}
-                            >
-                              <Text
-                                minW={"fit-content"}
-                                fontSize={"xs"}
-                                flex={"1"}
-                                noOfLines={1}
-                              >
-                                {tag?.name}
-                              </Text>
-                              <IconButton
-                                variant={"ghost"}
-                                colorScheme="orange"
-                                _hover={{
-                                  bg: "transparent",
-                                  color: "whiteAlpha.700",
-                                }}
-                                aria-label="delete"
-                                size="xs"
-                                onClick={() => {
-                                  removeTagHandle(tag);
-                                }}
-                                icon={<CloseIcon />}
-                              />
-                            </Tag>
+                            <TagQuestion
+                              type="minimals"
+                              tag={tag}
+                              key={tag.id}
+                              onCancelClick={() => removeTagHandle(tag)}
+                            />
                           ))
                         : null}
                       <Input
                         {...field}
                         variant={"unstyled"}
+                        isDisabled={
+                          state.selectedTags &&
+                          state.selectedTags?.size > 1 &&
+                          validateTags(state.selectedTags)
+                        }
                         id="resultsTagIds"
-                        placeholder="Search a tag"
+                        placeholder={validateTags(state.selectedTags)?? "Search tag"}
                         type="text"
                         value={state.searchTagId}
                         onChange={(e) => {
@@ -395,42 +397,20 @@ function CreateQuestion() {
                           {state.resultsTagIds &&
                           state.resultsTagIds.size > 0 ? (
                             Array.from(state.resultsTagIds).map((tag) => (
-                              <Tooltip
+                              <TagQuestion
+                                style={{
+                                  ...(checkTagExist(tag) && {
+                                    opacity: "0.5",
+                                    cursor: "not-allowed",
+                                  }),
+                                }}
+                                type="minimals"
+                                tag={tag}
                                 key={tag.id}
-                                label={
-                                  tag.content ||
-                                  "No content yet. Need update later"
-                                }
-                                hasArrow
-                                arrowPadding={5}
-                              >
-                                <Tag
-                                  size={"md"}
-                                  variant="solid"
-                                  colorScheme="orange"
-                                  cursor={"pointer"}
-                                  onClick={() => {
-                                    !checkTagExist(tag) && addTagHandle(tag);
-                                  }}
-                                  style={{
-                                    ...(checkTagExist(tag) && {
-                                      opacity: "0.5",
-                                      cursor: "not-allowed",
-                                    }),
-                                  }}
-                                >
-                                  {typeof tag !== "string" ? tag.name : tag}{" "}
-                                  {typeof tag !== "string" &&
-                                  tag.state === "verified" ? (
-                                    <Tooltip
-                                      label={"This tag was verified"}
-                                      aria-label={"Verified"}
-                                    >
-                                      <CheckIcon color={"green"} ml={2} />
-                                    </Tooltip>
-                                  ) : null}
-                                </Tag>
-                              </Tooltip>
+                                onClick={() => {
+                                  !checkTagExist(tag) && addTagHandle(tag);
+                                }}
+                              />
                             ))
                           ) : (
                             <></>
@@ -459,6 +439,19 @@ function CreateQuestion() {
                           </Button>
                         </Text>
                       </Box>
+                      <Text
+                        style={{
+                          fontSize: "12px",
+                          color: "tomato",
+                          marginTop: "5px",
+                          textAlign: "left",
+                          fontWeight: "bold",
+                        }}
+                        opacity={validateTags(state.selectedTags) ? 1 : 0}
+                        transition={"all 0.2s ease-in-out"}
+                      >
+                        {validateTags(state.selectedTags)}
+                      </Text>
                     </Collapse>
                     <FormErrorMessage>
                       {form.errors.resultsTagIds}

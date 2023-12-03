@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Alert,
   AlertDescription,
@@ -164,9 +164,21 @@ function EditQuestion() {
       );
     }
   };
-  const debouncedSearchTag = _.debounce((value) => {
-    searchTag(value);
-  }, 500);
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      searchTag(state.searchTagId);
+      if (state.searchTagId === "")
+        setState(
+          // @ts-ignore
+          (oldState) =>
+            helper.mappingState(oldState, {
+              resultsTagIds: new Set(),
+            })
+        );
+    }, 100);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [state.searchTagId]);
   const addTagHandle = (tag: TagType) => {
     setState(
       // @ts-ignore
@@ -205,9 +217,6 @@ function EditQuestion() {
     setState((oldState) =>
       helper.mappingState(oldState, { searchTagId: value })
     );
-
-    // Use the debounced function
-    debouncedSearchTag(value);
   };
   const createTagHandle = () => {
     let form = {
@@ -376,12 +385,12 @@ function EditQuestion() {
                         {...field}
                         variant={"unstyled"}
                         id="selectedTags"
-                        placeholder={
+                        placeholder={validateTags(state.selectedTags)}
+                        isDisabled={
+                          state.selectedTags &&
+                          state.selectedTags?.size > 1 &&
                           validateTags(state.selectedTags)
-                            ? "You reach the number of tag can added"
-                            : "Search a tag"
                         }
-                        isDisabled={validateTags(state.selectedTags)}
                         type="text"
                         value={state.searchTagId}
                         onChange={(e) => {

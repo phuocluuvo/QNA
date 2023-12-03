@@ -18,7 +18,7 @@ import {
 } from "@chakra-ui/react";
 import QuestionItem from "@/components/QuestionItem";
 import TabsQuestion from "@/components/TabsQuestion";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import actionGetQuestionList from "@/API/redux/actions/question/ActionGetQuestionList";
 import { QuestionListType } from "@/util/type/Question.type";
 import { useRouter } from "next/router";
@@ -37,6 +37,8 @@ import {
 import TagList from "@/components/TagList";
 import { useSession } from "next-auth/react";
 import Annoucements from "@/components/Annoucements";
+import { ActionTypes } from "@/API/constant/ActionTypes.enum";
+import LoadingQuestionList from "@/components/Loading/LoadingQuestion";
 
 const limitations = [5, 10, 15, 20];
 
@@ -60,6 +62,7 @@ export default function Home() {
   const [valueSort, setValueSort] = useState("title");
   const [isDecending, setIsDecending] = useState("DESC");
   const { isOpen, onToggle } = useDisclosure();
+  const quesitonType = useSelector((state: any) => state.questionReducer.type);
   useEffect(() => {
     const defaultLimit = 10;
     const defaultPage = 1;
@@ -399,14 +402,19 @@ export default function Home() {
               ))}
             </HStack>
           </Flex>
-          {questionList?.data.map((question, index) => (
-            <QuestionItem
-              key={index}
-              question={question}
-              isLast={index === questionList?.data.length - 1}
-              isDarkMode={colorMode === "dark"}
-            />
-          ))}
+          {quesitonType === ActionTypes.REQUEST_GET_QUESTION_LIST ? (
+            <LoadingQuestionList />
+          ) : (
+            quesitonType === ActionTypes.SUCCESS_GET_QUESTION_LIST &&
+            questionList?.data.map((question, index) => (
+              <QuestionItem
+                key={index}
+                question={question}
+                isLast={index === questionList?.data.length - 1}
+                isDarkMode={colorMode === "dark"}
+              />
+            ))
+          )}
           <Flex
             alignItems={"center"}
             justifyContent={"center"}
