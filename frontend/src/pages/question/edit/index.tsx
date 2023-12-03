@@ -1,5 +1,8 @@
 import React, { useRef } from "react";
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
   Box,
   Button,
   Collapse,
@@ -23,6 +26,7 @@ import {
   Text,
   Textarea,
   Tooltip,
+  VStack,
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
@@ -294,14 +298,13 @@ function EditQuestion() {
                     <FormLabel>
                       {getTranslate("QUESTION_TITLE")}
                       <Text fontSize="sm" color="gray.500">
-                        Be specific and imagine you’re asking a question to
-                        another person
+                        {getTranslate("QUESTION_TITLE_DESCRIPTION")}
                       </Text>
                     </FormLabel>
                     <Input
                       {...field}
                       id="title"
-                      placeholder="title"
+                      placeholder={getTranslate("QUESTION_TITLE_PLACEHOLDER")}
                       type="text"
                       required
                     />
@@ -319,7 +322,7 @@ function EditQuestion() {
                     <FormLabel>
                       {getTranslate("QUESTION_TAG")}*
                       <Text fontSize="sm" color="gray.500">
-                        Add up to 5 tags to describe what your question is about
+                        {getTranslate("QUESTION_TAG_DESCRIPTION")}
                       </Text>
                     </FormLabel>
                     <HStack
@@ -404,74 +407,73 @@ function EditQuestion() {
                         flexWrap={"wrap"}
                         gap={"2"}
                       >
-                        {state.resultsTagIds && state.resultsTagIds.size > 0 ? (
-                          Array.from(state.resultsTagIds).map((tag) => (
-                            <Tooltip
-                              key={tag.id}
-                              label={
-                                tag.content ||
-                                "No content yet. Need update later"
-                              }
-                              hasArrow
-                              arrowPadding={5}
-                            >
-                              <Tag
-                                size={"md"}
-                                variant="solid"
-                                colorScheme="orange"
-                                cursor={"pointer"}
-                                onClick={() => {
-                                  !checkTagExist(tag) && addTagHandle(tag);
-                                }}
-                                position={"relative"}
-                                style={{
-                                  ...(checkTagExist(tag) && {
-                                    opacity: "0.5",
-                                    cursor: "not-allowed",
-                                  }),
-                                }}
+                        <HStack flexWrap={"wrap"}>
+                          {state.resultsTagIds &&
+                          state.resultsTagIds.size > 0 ? (
+                            Array.from(state.resultsTagIds).map((tag) => (
+                              <Tooltip
+                                key={tag.id}
+                                label={
+                                  tag.content ||
+                                  "No content yet. Need update later"
+                                }
+                                hasArrow
+                                arrowPadding={5}
                               >
-                                {typeof tag !== "string" ? tag.name : tag}{" "}
-                                {typeof tag !== "string" &&
-                                tag.state === "verified" ? (
-                                  <Tooltip
-                                    label={"This tag was verified"}
-                                    aria-label={"Verified"}
-                                  >
-                                    <CheckIcon color={"green"} ml={2} />
-                                  </Tooltip>
-                                ) : null}
-                              </Tag>
-                            </Tooltip>
-                          ))
-                        ) : (
-                          <HStack>
-                            <Box
-                              dangerouslySetInnerHTML={{
-                                __html: getTranslate("NO_TAG_FOUND").replace(
-                                  "{tagname}",
-                                  `${state.searchTagId}`
-                                ),
-                              }}
-                            />
-                            <Button
-                              variant={"link"}
-                              colorScheme={"orange"}
-                              onClick={() => {
-                                setState(
-                                  // @ts-ignore
-                                  (oldState) =>
-                                    helper.mappingState(oldState, {
-                                      tagName: state.searchTagId,
+                                <Tag
+                                  size={"md"}
+                                  variant="solid"
+                                  colorScheme="orange"
+                                  cursor={"pointer"}
+                                  onClick={() => {
+                                    !checkTagExist(tag) && addTagHandle(tag);
+                                  }}
+                                  style={{
+                                    ...(checkTagExist(tag) && {
+                                      opacity: "0.5",
+                                      cursor: "not-allowed",
                                     }),
-                                  () => onOpen()
-                                );
-                              }}
-                            >
-                              {getTranslate("CREATE_NEW_TAG")}
-                            </Button>
-                          </HStack>
-                        )}
+                                  }}
+                                >
+                                  {typeof tag !== "string" ? tag.name : tag}{" "}
+                                  {typeof tag !== "string" &&
+                                  tag.state === "verified" ? (
+                                    <Tooltip
+                                      label={"This tag was verified"}
+                                      aria-label={"Verified"}
+                                    >
+                                      <CheckIcon color={"green"} ml={2} />
+                                    </Tooltip>
+                                  ) : null}
+                                </Tag>
+                              </Tooltip>
+                            ))
+                          ) : (
+                            <></>
+                          )}
+                        </HStack>
+                        <Text fontSize={"sm"} color={"gray.500"}>
+                          {getTranslate("CANNOT_FIND_TAG").replace(
+                            "{tagname}",
+                            state.searchTagId
+                          )}
+                          <Button
+                            variant={"link"}
+                            colorScheme={"orange"}
+                            onClick={() => {
+                              setState(
+                                // @ts-ignore
+                                (oldState) =>
+                                  helper.mappingState(oldState, {
+                                    tagName: state.searchTagId,
+                                  }),
+                                () => onOpen()
+                              );
+                            }}
+                          >
+                            {getTranslate("CREATE_NEW_TAG")}
+                          </Button>
+                        </Text>
                       </Box>
                     </Collapse>
                     {/* Error */}
@@ -499,8 +501,7 @@ function EditQuestion() {
                     <FormLabel>
                       {getTranslate("QUESTION_CONTENT")}
                       <Text fontSize="sm" color="gray.500">
-                        Your question needs to be as detailed as possible for
-                        people to answer it correctly.
+                        {getTranslate("QUESTION_CONTENT_DESCRIPTION")}
                       </Text>
                     </FormLabel>
                     <Box data-color-mode={colorMode}>
@@ -559,58 +560,57 @@ function EditQuestion() {
       <Modal finalFocusRef={finalRef} isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Create a tag</ModalHeader>
+          <ModalHeader>{getTranslate("CREATE_TAG_TITLE")}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Text fontSize={"sm"} color={"gray.500"}>
-              Please enter a tag name.
-            </Text>
-            <Input
-              id="name-tag"
-              placeholder="Enter name"
-              type="text"
-              value={state.tagName}
-              onChange={(e) => {
-                // @ts-ignore
-                setState((oldState) =>
-                  helper.mappingState(oldState, { tagName: e.target.value })
-                );
-              }}
-              required
-            />
-            <Text fontSize={"sm"} color={"gray.500"}>
-              Please enter a tag description
-            </Text>
-            <Textarea
-              id="content-tag"
-              placeholder="Enter content"
-              value={state.tagContent}
-              onChange={(e) => {
-                // @ts-ignore
-                setState((oldState) =>
-                  helper.mappingState(oldState, { tagContent: e.target.value })
-                );
-              }}
-              required
-            />
+            <Alert status="info" mb={3}>
+              <AlertIcon />
+              <AlertDescription mr={2}>
+                {getTranslate("CREATE_TAG_DESCRIPTION")}
+              </AlertDescription>
+            </Alert>
+            <VStack>
+              <Input
+                id="name-tag"
+                placeholder={getTranslate("TAG_NAME_PLACEHOLDER")}
+                type="text"
+                value={state.tagName}
+                onChange={(e) => {
+                  // @ts-ignore
+                  setState((oldState) =>
+                    helper.mappingState(oldState, { tagName: e.target.value })
+                  );
+                }}
+                required
+              />
+              <Textarea
+                id="content-tag"
+                placeholder={getTranslate("TAG_CONTENT_PLACEHOLDER")}
+                value={state.tagContent}
+                onChange={(e) => {
+                  // @ts-ignore
+                  setState((oldState) =>
+                    helper.mappingState(oldState, {
+                      tagContent: e.target.value,
+                    })
+                  );
+                }}
+                required
+              />
+            </VStack>
           </ModalBody>
 
           <ModalFooter>
             <Button variant={"ghost"} mr={3} onClick={onClose}>
-              Close
+              {getTranslate("CLOSE")}
             </Button>
             <Button
-              isDisabled={
-                !state.tagName ||
-                !state.tagContent ||
-                validateTags(state.selectedTags) !== undefined
-              }
               colorScheme="orange"
               onClick={() => {
                 createTagHandle();
               }}
             >
-              Create
+              {getTranslate("CREATE")}
             </Button>
           </ModalFooter>
         </ModalContent>

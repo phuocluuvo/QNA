@@ -105,19 +105,21 @@ export default function TagPage() {
       )
     );
     // if (questionList?.data.length === 0)
-    dispatch(
-      actionGetTagByName(
-        router.query.id as string,
-        (res: TagType) => {
-          if (res) {
-            setTagDetail(res);
+    setTimeout(() => {
+      dispatch(
+        actionGetTagByName(
+          router.query.id as string,
+          (res: TagType) => {
+            if (res) {
+              setTagDetail(res);
+            }
+          },
+          () => {
+            console.log("error");
           }
-        },
-        () => {
-          console.log("error");
-        }
-      )
-    );
+        )
+      );
+    }, 500);
   }, [router.query]);
   useEffect(() => {
     setHydrated(true);

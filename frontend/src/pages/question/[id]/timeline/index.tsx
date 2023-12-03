@@ -1,8 +1,10 @@
 import { actionGetQuestionHistory } from "@/API/redux/actions/question/ActionGetQuestionList";
+import { Pages } from "@/assets/constant/Pages";
 import HistoryItem from "@/components/HistoryItem";
 import LinkButton from "@/components/LinkButton";
 import TitleHeader from "@/components/Title";
 import { LayoutContext } from "@/provider/LayoutProvider";
+import { LanguageHelper } from "@/util/Language/Language.util";
 import { QuestionHistoryListType } from "@/util/type/Question.type";
 import {
   Box,
@@ -28,7 +30,8 @@ import { useDispatch } from "react-redux";
 
 function TimelinePage() {
   const dispacth = useDispatch();
-
+  const [hydrated, setHydrated] = useState(false);
+  const { getTranslate } = LanguageHelper(Pages.HOME);
   const [timeline, setTimeline] = useState<QuestionHistoryListType | null>(
     null
   );
@@ -51,29 +54,37 @@ function TimelinePage() {
       )
     );
   }, []);
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+  if (!hydrated) {
+    return null;
+  }
   return (
     <Container maxW={{ base: "fit-content", md: "100%" }} pos={"relative"}>
       <HStack>
         <LinkButton
           style={{
-            m: 0,
+            marginBlock: 5,
             pl: 0,
           }}
-          text="Back to question"
-          href={`/question/${currentQuestion?.id}`}
+          text={getTranslate("BACK_TO_QUESTION")}
+          href={`/question/${currentQuestion?.id}/${currentQuestion?.title}`}
         />
         <Spacer />
       </HStack>
-      <TitleHeader title={`Timeline for ${currentQuestion?.title}`} />
+      <TitleHeader
+        title={getTranslate("TIMELINE_FOR") + ": " + currentQuestion?.title}
+      />
       {timeline ? (
         <TableContainer>
           <Table variant="simple">
             <Thead>
               <Tr>
-                <Th>When</Th>
-                <Th>What</Th>
-                <Th>By</Th>
-                <Th>Comment</Th>
+                <Th>{getTranslate("WHEN")}</Th>
+                <Th>{getTranslate("WHAT")}</Th>
+                <Th>{getTranslate("BY")}</Th>
+                <Th>{getTranslate("COMMENT")}</Th>
               </Tr>
             </Thead>
             <Tbody>

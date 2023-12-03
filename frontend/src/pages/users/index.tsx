@@ -309,7 +309,7 @@ function UsersListPage() {
               searchUsers(e.target.value);
             }}
             autoFocus={true}
-            placeholder={"Search user"}
+            placeholder={getTranslate("SEARCH_USER_PLACEHOLDER")}
             style={{
               width: "20%",
             }}

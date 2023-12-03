@@ -19,6 +19,7 @@ import TabActivity from "@/components/TabActivity";
 import SavesQuestion from "@/components/TabSaves";
 import TabProfile from "@/components/TabProfile";
 import UserInfoProfile from "@/components/UserInfo";
+import TabsProfileActivity from "@/components/TabsProfileActivity";
 const DEFAULT_USER: UserType = {
   fullname: "",
   email: "",
@@ -117,7 +118,7 @@ function DashBoard() {
         </TabList>
         <TabPanels>
           <CustomTabPanel>
-            <TabActivity getTranslate={getTranslate} />
+            <TabsProfileActivity user={state} />
           </CustomTabPanel>
           <CustomTabPanel>
             <TabProfile user={state} router={router} />

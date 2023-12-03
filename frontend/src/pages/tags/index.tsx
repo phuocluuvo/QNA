@@ -7,16 +7,29 @@ import useStateWithCallback from "@/hooks/useStateWithCallback";
 import { LanguageHelper } from "@/util/Language/Language.util";
 import helper from "@/util/helper";
 import { TagListType } from "@/util/type/Tag.type";
-import { Search2Icon } from "@chakra-ui/icons";
+import { InfoIcon, Search2Icon } from "@chakra-ui/icons";
 import {
   Button,
   Flex,
   HStack,
+  IconButton,
   Input,
   Spacer,
   Text,
   VStack,
   useColorMode,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Alert,
+  AlertTitle,
+  AlertDescription,
+  AlertIcon,
 } from "@chakra-ui/react";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -32,7 +45,7 @@ function TagsPage() {
     tags: null,
     search: "",
   });
-
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const { getTranslate } = LanguageHelper(Pages.HOME);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [close, setClose] = React.useState(false);
@@ -119,14 +132,23 @@ function TagsPage() {
   return (
     <>
       <Head>
-        <title>Tags - Question Dân IT</title>
-        <meta
-          name="description"
-          content={getTranslate("TAG_DESCRIPTION")}
-        />
+        <title>{getTranslate("TAGS")} - Question Dân IT</title>
+        <meta name="description" content={getTranslate("TAG_DESCRIPTION")} />
       </Head>
       <VStack alignItems={"start"}>
-        <TitleHeader title={getTranslate("TAGS")} />
+        <HStack w={"full"}>
+          <TitleHeader title={getTranslate("TAGS")} />
+          <IconButton
+            aria-label="Search database"
+            icon={<InfoIcon />}
+            variant={"ghost"}
+            colorScheme="blue"
+            onClick={onOpen}
+            style={{
+              marginLeft: "auto",
+            }}
+          />
+        </HStack>
         <Text
           maxW={{ base: "100%", md: "50%" }}
           style={{
@@ -226,6 +248,48 @@ function TagsPage() {
             <Spacer />
           </Flex>
         </Flex>
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>{getTranslate("TAGS")}</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              {getTranslate("TAG_DESCRIPTION")}
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  marginBlock: "10px",
+                }}
+              >
+                {getTranslate("TAG_HAVE_STATE").replace("{0}", "2")}
+              </Text>
+              <VStack alignItems={"start"}>
+                <Alert colorScheme="yellow">
+                  <VStack alignItems={"start"}>
+                    <AlertTitle>{getTranslate("PENDING")}</AlertTitle>
+                    <AlertDescription>
+                      {getTranslate("PENDING_TAG_DESCRIPTION")}
+                    </AlertDescription>
+                  </VStack>
+                </Alert>
+                <Alert colorScheme="teal" alignItems={"start"}>
+                  <VStack alignItems={"start"}>
+                    <AlertTitle>{getTranslate("VERIFIED")}</AlertTitle>
+                    <AlertDescription>
+                      {getTranslate("VERIFIED_TAG_DESCRIPTION")}
+                    </AlertDescription>
+                  </VStack>
+                </Alert>
+              </VStack>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button colorScheme="gray" mr={3} onClick={onClose}>
+                {getTranslate("CLOSE")}
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       </VStack>
     </>
   );
