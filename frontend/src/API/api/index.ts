@@ -43,7 +43,8 @@ const getQuestionList = (params: GetQuesionParams) => {
     // @ts-ignore
     paramToURL += key + "=" + params[key] + "&";
   }
-  return AuthApi("GET", paramToURL);
+  console.log("paramToURL", paramToURL);
+  return AuthApi(REQUEST_METHOD.GET, paramToURL);
 };
 
 const getQuestionWithRelatedTags = (params: GetQuesionParams) => {
@@ -301,14 +302,38 @@ const deleteBookmark = (bookmarkId: string) => {
 const getAnouncements = () => {
   return AuthApi(REQUEST_METHOD.GET, url.ANNOUNCEMENT);
 };
-const getAllQuesitonByUser = (userId: string, type: "votes" | "createdAt") => {
+const getAllQuesitonByUser = (
+  userId: string,
+  type: "votes" | "createdAt",
+  limit = 10,
+  params?: GetQuesionParams
+) => {
+  if (params) {
+    let paramToURL = url.QUESTION + "?";
+    for (let key in params) {
+      // @ts-ignore
+      paramToURL += key + "=" + params[key] + "&";
+    }
+    return api.get(paramToURL);
+  }
   return api.get(
-    url.QUESTION + `?filter.user.id=${userId}&limit=10&sortBy=${type}:DESC`
+    url.QUESTION +
+      `?filter.user.id=${userId}&limit=${limit}&sortBy=${type}:DESC`
   );
 };
-const getAllAnswerByUser = (userId: string, type: "votes" | "createdAt") => {
-  let _url =
-    url.ANSWER + `?filter.user.id=${userId}&limit=10&sortBy=${type}:DESC`;
+const getAllAnswerByUser = (
+  userId: string,
+  type: "votes" | "createdAt",
+  params: any
+) => {
+  let _url = url.ANSWER;
+  if (params) {
+    _url += "?";
+    for (let key in params) {
+      // @ts-ignore
+      _url += key + "=" + params[key] + "&";
+    }
+  } else url + `?filter.user.id=${userId}&limit=10&sortBy=${type}:DESC`;
   return api.get(_url);
 };
 const getAllTagsByUser = (

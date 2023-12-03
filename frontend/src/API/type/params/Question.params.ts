@@ -5,4 +5,5 @@ export type GetQuesionParams = {
   sortBy?: string;
   search?: string;
   searchBy?: string;
+  "filter.user.id"?: string;
 };

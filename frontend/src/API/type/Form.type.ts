@@ -29,6 +29,8 @@ export type FormGetAnswer = {
   question_id: number | string;
   page: number;
   limit: number;
+  "filter.user.id"?: string;
+  sortBy?: string;
 };
 
 export type FormVote = {
