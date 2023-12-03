@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { AnswerModule } from "../answer/answer.module";
@@ -21,6 +21,7 @@ import { GoogleStrategy } from "src/auth/google.strategy";
 import { AnnouncementModule } from "src/announcement/announcement.module";
 import { GithubStrategy } from "src/auth/github.strategy";
 import { SysconfigModule } from "../sysconfig/sysconfig.module";
+import { SearchMiddleware } from "../middleware/search.middleware";
 
 @Module({
   imports: [
@@ -47,4 +48,8 @@ import { SysconfigModule } from "../sysconfig/sysconfig.module";
   controllers: [AppController],
   providers: [AppService, GoogleStrategy, GithubStrategy],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(SearchMiddleware).forRoutes("*");
+  }
+}
