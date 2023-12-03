@@ -1,14 +1,14 @@
+import { Pages } from "@/assets/constant/Pages";
+import { LanguageHelper } from "@/util/Language/Language.util";
 import { TagType } from "@/util/type/Tag.type";
-import { CheckCircleIcon, CheckIcon, InfoIcon } from "@chakra-ui/icons";
+import { CheckIcon, InfoIcon } from "@chakra-ui/icons";
 import {
-  Badge,
   Box,
   HStack,
   Icon,
   Popover,
   PopoverArrow,
   PopoverBody,
-  PopoverCloseButton,
   PopoverContent,
   PopoverHeader,
   PopoverTrigger,
@@ -32,14 +32,21 @@ function TagItem({
 }) {
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
   const [mouseIn, setMouseIn] = useState(false);
+  const { getTranslate } = LanguageHelper(Pages.HOME);
   useEffect(() => {
     if (mouseIn) {
-      onToggle();
+      onOpen();
+    } else {
+      onClose();
     }
   }, [mouseIn]);
-  const handleMouseOver = () => {};
+  const handleMouseOver = () => {
+    setMouseIn(true);
+  };
 
-  const handleMouseOut = () => {};
+  const handleMouseOut = () => {
+    setMouseIn(false);
+  };
 
   return (
     <Popover
@@ -51,7 +58,7 @@ function TagItem({
     >
       <PopoverTrigger>
         <Box
-          onMouseOver={() => handleMouseOver()}
+          onMouseEnter={() => handleMouseOver()}
           onMouseLeave={() => handleMouseOut()}
           w={
             type === "simple" ? "100%" : { base: "100%", md: "48%", xl: "23%" }
@@ -118,15 +125,38 @@ function TagItem({
               marginBottom: "10px",
             }}
           >
-            Used by {tag.questionsNumber} question
+            {getTranslate("USED_BY").replace(
+              "{0}",
+              tag.questionsNumber.toString()
+            )}
           </Text>
         </Box>
       </PopoverTrigger>
       <PopoverContent>
         <PopoverArrow />
-        <PopoverCloseButton />
-        <PopoverHeader>Confirmation!</PopoverHeader>
-        <PopoverBody>Are you sure you want to have that milkshake?</PopoverBody>
+        <PopoverHeader>{tag.name}</PopoverHeader>
+        <PopoverBody>
+          <Text
+            style={{
+              fontSize: "14px",
+              marginBottom: "10px",
+            }}
+            noOfLines={3}
+          >
+            {tag.content}
+          </Text>
+          <Text
+            style={{
+              fontSize: "12px",
+              marginBottom: "10px",
+            }}
+          >
+            {getTranslate("USED_BY").replace(
+              "{0}",
+              tag.questionsNumber.toString()
+            )}
+          </Text>
+        </PopoverBody>
       </PopoverContent>
     </Popover>
   );

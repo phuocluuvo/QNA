@@ -1,5 +1,7 @@
 import api from "@/API/api";
 import actionGetAllAnnouncements from "@/API/redux/actions/announcement/actionAnnouncement";
+import { Pages } from "@/assets/constant/Pages";
+import { LanguageHelper } from "@/util/Language/Language.util";
 import { markdownToPlainText } from "@/util/helper";
 import {
   AnnouncementListType,
@@ -36,6 +38,7 @@ const EditerMarkdown = dynamic(
   { ssr: false }
 );
 function Annoucements() {
+  const { getTranslate } = LanguageHelper(Pages.HOME);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const dispatch = useDispatch();
   const { colorMode } = useColorMode();
@@ -80,7 +83,7 @@ function Annoucements() {
           borderTopRightRadius: "5px",
         }}
       >
-        Annoucements 🎉
+        {getTranslate("ANNOUNCEMENT")} 🎉
       </Heading>
       <VStack divider={<Divider />} padding="10px">
         {annoucements?.data.map((annoucement) => (
@@ -109,7 +112,7 @@ function Annoucements() {
                   justifyContent: "flex-end",
                 }}
               >
-                Learn More
+                {getTranslate("LEARN_MORE")}
               </Button>
             </HStack>
           </Box>
@@ -134,12 +137,8 @@ function Annoucements() {
           </ModalBody>
 
           <ModalFooter>
-            <Button
-              mr={3}
-              variant={"ghost"}
-              onClick={onClose}
-            >
-              Close
+            <Button mr={3} variant={"ghost"} onClick={onClose}>
+              {getTranslate("CLOSE")}
             </Button>
           </ModalFooter>
         </ModalContent>

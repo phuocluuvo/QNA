@@ -20,6 +20,8 @@ import helper from "@/util/helper";
 import { useSession } from "next-auth/react";
 import Author from "../Author";
 import dynamic from "next/dynamic";
+import { LanguageHelper } from "@/util/Language/Language.util";
+import { Pages } from "@/assets/constant/Pages";
 const EditerMarkdown = dynamic(
   () =>
     import("@uiw/react-md-editor").then((mod) => {
@@ -36,6 +38,7 @@ function CommentModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
+  const { getTranslate } = LanguageHelper(Pages.HOME);
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -95,7 +98,7 @@ function CommentModal({
 
         <ModalFooter>
           <Button variant={"ghost"} colorScheme="blue" mr={3} onClick={onClose}>
-            Close
+            {getTranslate("CLOSE")}
           </Button>
         </ModalFooter>
       </ModalContent>

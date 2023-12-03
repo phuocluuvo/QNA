@@ -56,7 +56,7 @@ function EditQuesitonModal({
 
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={onClose}>
-              Close
+               {getTranslate("CLOSE")}
             </Button>
             <Button variant="ghost">Secondary Action</Button>
           </ModalFooter>

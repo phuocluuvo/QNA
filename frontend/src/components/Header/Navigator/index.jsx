@@ -37,9 +37,9 @@ function Navigator({ getTranslate, isMobile }) {
       for (let cookie in allCookies) {
         Cookies.remove(cookie);
       }
-      await signOut({ redirect: false, callbackUrl: "/user/signin" })
+      await signOut({ redirect: false })
         .then((res) => {
-          routes.replace("/auth/signin");
+          signIn();
           localStorage.clear();
           sessionStorage.clear();
 
