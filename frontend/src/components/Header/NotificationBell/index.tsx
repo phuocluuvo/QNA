@@ -118,7 +118,7 @@ function NotificationBell() {
   }
   return (
     <Box display={session.data?.user ? "flex" : "none"}>
-      <Popover>
+      <Popover isLazy placement="bottom">
         <PopoverTrigger>
           <Box pos="relative">
             {badgeNumber > 0 ? (
@@ -221,7 +221,7 @@ function NotificationBell() {
               textAlign={"center"}
               color={"blue"}
             >
-              See all
+              {getTranslate("SEE_ALL")}
             </Box>
           </PopoverFooter>
         </PopoverContent>

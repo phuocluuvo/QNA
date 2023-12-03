@@ -78,6 +78,11 @@ function Author({
                 ? "blue"
                 : "whatsapp"
             }
+            // @ts-ignore
+            fontSize={{
+              sm: "xs",
+              md: sizeAvatar ?? "xs",
+            }}
           >
             {user.role}
           </Badge>
@@ -85,7 +90,11 @@ function Author({
         <HStack>
           <Text
             {...nameStyle}
-            fontSize={sizeAvatar ?? "xs"}
+            // @ts-ignore
+            fontSize={{
+              sm: "xs",
+              md: sizeAvatar ?? "xs",
+            }}
             cursor={"pointer"}
             // colorScheme="blue"
             color={colorMode === "dark" ? "lightblue" : "blue.500"}
@@ -117,13 +126,27 @@ function Author({
         </HStack>
         {/* @ts-ignore */}
         {headingText ? (
-          <Text {...headingTextStyle} fontSize={sizeAvatar ?? "xs"}>
+          <Text
+            {...headingTextStyle}
+            // @ts-ignore
+            fontSize={{
+              sm: "xs",
+              md: sizeAvatar ?? "xs",
+            }}
+          >
             {headingText}
           </Text>
         ) : null}
 
         {bottomText ? (
-          <Text {...bottomTextStyle} fontSize={sizeAvatar ?? "xs"}>
+          <Text
+            {...bottomTextStyle}
+            // @ts-ignore
+            fontSize={{
+              sm: "xs",
+              md: sizeAvatar ?? "xs",
+            }}
+          >
             {bottomText}
           </Text>
         ) : null}

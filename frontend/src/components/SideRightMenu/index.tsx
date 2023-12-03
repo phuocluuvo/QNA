@@ -1,14 +1,6 @@
 import {
-  Accordion,
-  AccordionButton,
-  AccordionIcon,
-  AccordionItem,
-  AccordionPanel,
   Box,
   Button,
-  HStack,
-  Spacer,
-  Text,
   VStack,
   useMediaQuery,
 } from "@chakra-ui/react";
@@ -16,27 +8,13 @@ import React from "react";
 import { useRouter } from "next/router";
 import { RiBookmark2Fill, RiQuestionnaireFill } from "react-icons/ri";
 import {
-  FaBell,
-  FaHashtag,
-  FaQuestion,
-  FaSave,
-  FaTag,
   FaTags,
   FaUser,
-  FaUserCheck,
 } from "react-icons/fa";
 import { LanguageHelper } from "@/util/Language/Language.util";
 import { Pages } from "@/assets/constant/Pages";
 import { LayoutContext } from "@/provider/LayoutProvider";
 import { useSession } from "next-auth/react";
-import {
-  BiBookBookmark,
-  BiCheckShield,
-  BiData,
-  BiSave,
-  BiUser,
-} from "react-icons/bi";
-import Annoucements from "../Annoucements";
 function SideRightMenu() {
   const route = useRouter();
   const { getTranslate } = LanguageHelper(Pages.HOME);
