@@ -153,7 +153,7 @@ function AnswerEditor({
               background={colorMode === "light" ? "gray.100" : "gray.700"}
               border={"none"}
               isLoading={props.isSubmitting}
-              isDisabled={!sessions.data?.user?.id}
+              isDisabled={!sessions.data?.user?.id || state.content === ""}
             >
               {getTranslate("ANSWER")}
             </Button>

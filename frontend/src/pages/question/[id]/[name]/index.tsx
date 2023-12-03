@@ -689,7 +689,12 @@ function Question() {
                 <VStack divider={<Divider />}>
                   {state.answerList &&
                     state.answerList?.data?.map((answer) => (
-                      <div id={answer.id}>
+                      <div
+                        id={answer.id}
+                        style={{
+                          width: "100%",
+                        }}
+                      >
                         <AnswerItem
                           key={answer.id}
                           answer={answer}

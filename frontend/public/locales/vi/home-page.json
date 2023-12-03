@@ -163,5 +163,6 @@
   "RELATED_QUESTION_WITH_TAG": "Các câu hỏi liên quan với thẻ",
   "USER_TITLE": "Tiêu đề",
   "LOCATION": "Vị trí",
-  "USED_BY": "Được sử dụng bởi {0} câu hỏi"
+  "USED_BY": "Được sử dụng bởi {0} câu hỏi",
+  "TOP_QUESTION": "Top câu hỏi"
 }

@@ -333,7 +333,7 @@ const getAllAnswerByUser = (
       // @ts-ignore
       _url += key + "=" + params[key] + "&";
     }
-  } else url + `?filter.user.id=${userId}&limit=10&sortBy=${type}:DESC`;
+  } else _url += `?filter.user.id=${userId}&limit=10&sortBy=${type}:DESC`;
   return api.get(_url);
 };
 const getAllTagsByUser = (

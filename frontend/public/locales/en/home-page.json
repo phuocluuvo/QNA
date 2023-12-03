@@ -202,5 +202,6 @@
   "RELATED_QUESTION_WITH_TAG": "Related question with similar tag",
   "USER_TITLE": "User Title",
   "LOCATION": "Location",
-  "USED_BY": "Used by {0} questions"
+  "USED_BY": "Used by {0} questions",
+  "TOP_QUESTION": "Top Question"
 }

@@ -123,6 +123,7 @@ function TabProfile({
           undefined
         )
         .then((_res) => {
+          console.log("_res", _res);
           setAnswers(_res?.data);
         });
     }, 500);
