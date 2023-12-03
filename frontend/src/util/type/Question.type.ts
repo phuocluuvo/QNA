@@ -21,7 +21,7 @@ interface Post {
   views: number;
   images?: { url: string }[];
   createdAt: string;
-  updatedDate: string;
+  updatedAt: string;
   status: number;
   user: UserType;
   tags?: Array<TagType>;
