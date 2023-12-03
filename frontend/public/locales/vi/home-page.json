@@ -126,5 +126,8 @@
   "TOTAL_VOTES": "Tổng số lượt đánh giá",
   "NO_ABOUT": "Người dùng này khá lười, chưa có điền thông tin giới thiệu về bản thân gì cả",
   "DATE": "Ngày",
-  "POINT_RECEIVED": "Điểm nhận được"
+  "POINT_RECEIVED": "Điểm nhận được",
+  "ALL_TAG": "Tất cả thẻ",
+  "ALL_ANSWER": "Tất cả câu trả lời",
+  "SUMMARY": "Tổng quan"
 }

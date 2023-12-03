@@ -126,5 +126,8 @@
   "TOTAL_VOTES": "Total Votes",
   "NO_ABOUT": "This user has not written anything about themselves yet",
   "DATE": "Date",
-  "POINT_RECEIVED": "Point Received"
+  "POINT_RECEIVED": "Point Received",
+  "ALL_TAG": "All Tags",
+  "ALL_ANSWER": "All Answers",
+  "SUMMARY": "Summary"
 }
