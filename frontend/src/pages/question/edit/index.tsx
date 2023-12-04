@@ -52,6 +52,7 @@ import actionUpdateQuestion from "@/API/redux/actions/question/ActionUpdateQuesi
 import { useSession } from "next-auth/react";
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
+import TitleHeader from "@/components/Title";
 type State = {
   title: string;
   bodyQuestion: string;
@@ -282,7 +283,8 @@ function EditQuestion() {
     }, 1000);
   };
   return (
-    <Container my={0} minW={{ lg: "70%", base: "90%" }} maxH={"30vh"}>
+    <Container my={0} minW={{ lg: "100%", base: "90%" }} minH={"30vh"}>
+      <TitleHeader title={getTranslate("EDIT_QUESITON")} />
       <Formik
         innerRef={formRef}
         initialValues={{
@@ -542,7 +544,7 @@ function EditQuestion() {
                         <EditerMarkdown
                           source={state.bodyQuestion}
                           style={{
-                            backgroundColor: "transparent",
+                            zIndex: 10,
                           }}
                         />
                       </Box>
