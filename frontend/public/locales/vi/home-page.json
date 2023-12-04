@@ -165,5 +165,19 @@
   "LOCATION": "Vị trí",
   "USED_BY": "Được sử dụng bởi {0} câu hỏi",
   "TOP_QUESTION": "Top câu hỏi",
-  "SEE_ALL": "Xem tất cả"
+  "SEE_ALL": "Xem tất cả",
+  "DELETE_ANSWER_CONFIRM_TITLE": "Bạn có chắc muốn xóa câu trả lời này?",
+  "DELETE": "Xóa",
+  "DELETE_COMFIRM": "Xóa câu trả lời",
+  "DELETE_QUESTION_CONFIRM_TITLE": "Bạn có chắc muốn xóa câu hỏi này?",
+  "DELETE_QUESTION": "Xóa câu hỏi",
+  "DELETE_QUESTION_CONFIRM": "Xóa câu hỏi",
+  "DELETE_COMMENT_CONFIRM_TITLE": "Bạn có chắc muốn xóa bình luận này?",
+  "DELETE_COMMENT": "Xóa bình luận",
+  "DELETE_COMMENT_COMFIRM": "Xóa bình luận",
+  "RESET_TO_DEFAULT": "Khôi phục mặc định",
+  "ANSWER_CONTENT": "Nội dung câu trả lời",
+  "FIX_ANSWER_TITLE": "Cập nhật câu trả lời",
+  "ANSWER_CONTENT_DESCRIPTION": "Câu trả lời của bạn nên thật dễ hiểu và rõ ràng và thật chi tiết để người khác có thể hiểu câu trả lời của bạn.",
+  "CREATED_AT": "Tạo lúc"
 }

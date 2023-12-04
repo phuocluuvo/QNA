@@ -60,6 +60,10 @@ const createQuestion = (form: FormCreateQuestion | null) => {
   return AuthApi(REQUEST_METHOD.POST, url.QUESTION, form);
 };
 
+const deleteQuesiton = (id: string) => {
+  return AuthApi(REQUEST_METHOD.DELETE, url.QUESTION + "/" + id, {});
+};
+
 const voteQuestion = (form: FormVote) => {
   return AuthApi(REQUEST_METHOD.POST, url.VOTE_QUESTION, form);
 };
@@ -77,6 +81,10 @@ const createAnswer = (form: FormCreateAnswer) => {
   return AuthApi(REQUEST_METHOD.POST, url.ANSWER, form);
 };
 
+const getAnswerById = (id: string) => {
+  return AuthApi(REQUEST_METHOD.GET, url.ANSWER + "/" + id);
+};
+
 const getAnswerList = (form: FormGetAnswer) => {
   let urlParams = url.ANSWER + "?";
   for (let key in form) {
@@ -84,6 +92,14 @@ const getAnswerList = (form: FormGetAnswer) => {
     urlParams += key + "=" + form[key] + "&";
   }
   return AuthApi(REQUEST_METHOD.GET, urlParams);
+};
+
+const deleteAnswer = (id: string) => {
+  return AuthApi(REQUEST_METHOD.DELETE, url.ANSWER + "/" + id, {});
+};
+
+const updateAnswer = (id: string, form: FormCreateAnswer) => {
+  return AuthApi(REQUEST_METHOD.PATCH, url.ANSWER + "/" + id, form);
 };
 
 const approveAnswer = (form: FormApproveAnswer) => {
@@ -127,6 +143,10 @@ const voteAnswer = (form: FormVoteAnswer) => {
 
 const createCommentAnswer = (form: FormCommentAnswer) => {
   return AuthApi(REQUEST_METHOD.POST, url.COMMENT, form);
+};
+
+const removeCommentAnswer = (id: string) => {
+  return AuthApi(REQUEST_METHOD.DELETE, url.COMMENT + "/" + id, {});
 };
 
 const getCommentAnswer = (params: GetCommentAnswerParams) => {
@@ -427,4 +447,9 @@ export default {
   createCancelBlockedComment,
   getFlagNumber,
   unBlockQuestion,
+  deleteAnswer,
+  removeCommentAnswer,
+  deleteQuesiton,
+  getAnswerById,
+  updateAnswer,
 };

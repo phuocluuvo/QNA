@@ -32,3 +32,19 @@ export default function actionGetAnswer(
     });
   };
 }
+
+export function actionGetAnswerById(
+  id: string,
+  callbackSuccess: (res: AnswerListType) => void,
+  callbackError: () => void
+) {
+  return (dispatch: any) => {
+    dispatch(requesting());
+    api.getAnswerById(id).then((res: any) => {
+      console.log("getAnswerById:", res);
+      dispatch(
+        responseHandler(res, callbackSuccess, callbackError, false, null, null)
+      );
+    });
+  };
+}
