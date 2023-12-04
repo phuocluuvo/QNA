@@ -131,7 +131,7 @@ export class CommentService {
    * @returns The removed comment.
    */
   async remove(comment: Comment) {
-    return this.commentRepository.remove(comment);
+    return this.commentRepository.softDelete(comment.id);
   }
 
   /**
@@ -213,7 +213,8 @@ export class CommentService {
       comment.user.id,
       activity.id,
     );
-    return this.remove(comment);
+    await this.remove(comment);
+    return comment;
   }
 
   async getCommentHistory(query: PaginateQuery, commentId: string) {
