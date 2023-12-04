@@ -21,7 +21,7 @@ export declare class AnswerService {
     findOne(option: any): Promise<Answer>;
     create(answerDto: CreateAnswerDto, userId: string): Promise<CreateAnswerDto & Answer>;
     update(id: string, answerDto: UpdateAnswerDto): Promise<Answer>;
-    remove(answer: Answer): Promise<Answer>;
+    remove(answer: Answer): Promise<import("typeorm").UpdateResult>;
     updateVote(userId: string, answerVoteDto: VoteAnswerDto): Promise<Answer>;
     approveAnswer(approveAnswerDto: ApproveAnswerDto): Promise<Answer>;
     createWithActivity(answerDto: CreateAnswerDto, userId: string): Promise<CreateAnswerDto & Answer>;

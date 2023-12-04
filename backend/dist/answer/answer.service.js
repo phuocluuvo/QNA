@@ -88,7 +88,7 @@ let AnswerService = class AnswerService {
         return this.answerRepository.save(answer);
     }
     async remove(answer) {
-        return this.answerRepository.remove(answer);
+        return this.answerRepository.softDelete(answer.id);
     }
     async updateVote(userId, answerVoteDto) {
         const answer = await this.findOneById(answerVoteDto.answer_id);
@@ -135,11 +135,11 @@ let AnswerService = class AnswerService {
     }
     async removeWithActivity(answer, userId) {
         const answerId = answer.id;
-        const answerRemove = await this.remove(answer);
+        await this.remove(answer);
         const activity = await this.activityService.create(reputation_enum_1.ReputationActivityTypeEnum.DELETE_ANSWER, reputation_enum_1.ObjectActivityTypeEnum.ANSWER, answerId, userId, answer.user.id);
         await this.activityService.syncPointDelete(answer.id, answer.user.id);
         await this.notificationService.create(notification_constants_1.notificationText.ANSWER.DELETE, notification_constants_1.notificationTextDesc.ANSWER.DELETE, answer.user.id, activity.id);
-        return answerRemove;
+        return answer;
     }
     async approveAnswerWithActivity(approveAnswerDto, answer) {
         const answerApprove = await this.approveAnswer(approveAnswerDto);

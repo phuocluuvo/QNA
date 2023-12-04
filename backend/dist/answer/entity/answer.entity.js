@@ -46,6 +46,10 @@ __decorate([
     __metadata("design:type", Date)
 ], Answer.prototype, "updatedAt", void 0);
 __decorate([
+    (0, typeorm_1.DeleteDateColumn)({ name: "deleted_at" }),
+    __metadata("design:type", Date)
+], Answer.prototype, "deletedAt", void 0);
+__decorate([
     (0, typeorm_1.ManyToOne)(() => question_entity_1.Question, (question) => question.answers, {
         onDelete: "CASCADE",
     }),

@@ -68,6 +68,10 @@ __decorate([
     __metadata("design:type", Date)
 ], Comment.prototype, "updatedAt", void 0);
 __decorate([
+    (0, typeorm_1.DeleteDateColumn)({ name: "deleted_at" }),
+    __metadata("design:type", Date)
+], Comment.prototype, "deletedAt", void 0);
+__decorate([
     (0, typeorm_1.OneToMany)(() => activity_entity_1.Activity, (activity) => activity.comment),
     __metadata("design:type", Array)
 ], Comment.prototype, "activity", void 0);

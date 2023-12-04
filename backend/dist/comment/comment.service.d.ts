@@ -17,7 +17,7 @@ export declare class CommentService {
     findOne(option: any): Promise<Comment>;
     create(commentDto: CreateCommentDto, userId: string): Promise<CreateCommentDto & Comment>;
     update(id: string, commentDto: UpdateCommentDto): Promise<Comment>;
-    remove(comment: Comment): Promise<Comment>;
+    remove(comment: Comment): Promise<import("typeorm").UpdateResult>;
     createWithActivity(commentDto: CreateCommentDto, userId: string): Promise<CreateCommentDto & Comment>;
     updateWithActivity(id: string, commentDto: UpdateCommentDto, oldComment: Comment, userId: string): Promise<Comment>;
     removeWithActivity(comment: Comment, userId: string): Promise<Comment>;

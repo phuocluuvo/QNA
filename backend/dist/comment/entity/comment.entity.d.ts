@@ -13,6 +13,7 @@ export declare class Comment {
     user: User;
     createdAt: Date;
     updatedAt: Date;
+    deletedAt: Date;
     activity: Activity[];
     histories: History[];
 }

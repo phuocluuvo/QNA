@@ -12,6 +12,7 @@ export declare class Answer {
     isApproved: boolean;
     createdAt: Date;
     updatedAt: Date;
+    deletedAt: Date;
     question: Question;
     user: User;
     vote: Vote[];

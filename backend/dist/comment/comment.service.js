@@ -84,7 +84,7 @@ let CommentService = class CommentService {
         return this.commentRepository.save(comment);
     }
     async remove(comment) {
-        return this.commentRepository.remove(comment);
+        return this.commentRepository.softDelete(comment.id);
     }
     async createWithActivity(commentDto, userId) {
         const comment = await this.create(commentDto, userId);
@@ -104,7 +104,8 @@ let CommentService = class CommentService {
     async removeWithActivity(comment, userId) {
         const activity = await this.activityService.create(reputation_enum_1.ReputationActivityTypeEnum.DELETE_COMMENT, reputation_enum_1.ObjectActivityTypeEnum.COMMENT, comment.id, userId, comment.user.id);
         await this.notificationService.create(notification_constants_1.notificationText.COMMENT.DELETE, notification_constants_1.notificationTextDesc.COMMENT.DELETE, comment.user.id, activity.id);
-        return this.remove(comment);
+        await this.remove(comment);
+        return comment;
     }
     async getCommentHistory(query, commentId) {
         return this.historyService.getAnswerHistory(query, commentId);
