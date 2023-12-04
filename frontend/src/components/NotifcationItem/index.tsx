@@ -34,6 +34,8 @@ import { OBJECT_ACTIVITY_TYPE } from "@/util/type/HistoryActivity.enum";
 import _ from "lodash";
 import dynamic from "next/dynamic";
 import Author from "../Author";
+import { LanguageHelper } from "@/util/Language/Language.util";
+import { Pages } from "@/assets/constant/Pages";
 const EditerMarkdown = dynamic(
   () =>
     import("@uiw/react-md-editor").then((mod) => {
@@ -51,7 +53,7 @@ function NotificationItem({
   itemSize?: number;
 }) {
   const { colorMode } = useColorMode();
-
+  const { getTranslate } = LanguageHelper(Pages.HOME);
   const [hydrated, setHydrated] = useState(false);
   const [item, setItem] = React.useState<NotificationType>(notification);
   const [isShowDetail, setIsShowDetail] = React.useState(false);
@@ -616,7 +618,7 @@ function NotificationItem({
               ...
             </Text>
           )}
-          {item.activity?.objectType === OBJECT_ACTIVITY_TYPE.ANSWER && (            
+          {item.activity?.objectType === OBJECT_ACTIVITY_TYPE.ANSWER && (
             <Text
               isTruncated
               w={"100%"}
@@ -668,7 +670,7 @@ function NotificationItem({
           </ModalBody>
           <ModalFooter>
             <Button mr={3} onClick={onClose}>
-              Close
+              {getTranslate("CLOSE")}
             </Button>
           </ModalFooter>
         </ModalContent>

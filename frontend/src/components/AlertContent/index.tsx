@@ -212,7 +212,7 @@ function AlertContent({ question }: { question: QuestionType }) {
   }, [question]);
   return (
     <>
-      {renderItemBaseOnType(question.state)}
+      {renderItemBaseOnType(question?.state)}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
@@ -237,7 +237,7 @@ function AlertContent({ question }: { question: QuestionType }) {
 
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={onClose}>
-              Close
+              {getTranslate("CLOSE")}
             </Button>
             <Button
               variant="ghost"
@@ -246,7 +246,10 @@ function AlertContent({ question }: { question: QuestionType }) {
               }}
               isDisabled={flagReason.length < 10}
             >
-              Submit ({flagNumber} left)
+              {getTranslate("SUBMIT_REPORT").replace(
+                "{0}",
+                flagNumber.toString()
+              )}
             </Button>
           </ModalFooter>
         </ModalContent>

@@ -147,7 +147,10 @@ function TabProfile({ user, router }: { user: UserType; router: NextRouter }) {
     <Box flex={1} display={"flex"}>
       <HStack spacing={4} flex={1} w={"100%"}>
         <VStack justifyContent={"start"} alignItems={"start"}>
-          <Heading size={"sm"}>Profile Public</Heading>
+          <Heading size={"sm"}>{getTranslate("PROFILE")}</Heading>
+          <Text fontSize={"sm"} color="gray.500">
+            {getTranslate("PROFILE_DESCRIPTION")}
+          </Text>
           <Box
             border={"1px solid"}
             borderColor={"gray.200"}
@@ -269,7 +272,7 @@ function TabProfile({ user, router }: { user: UserType; router: NextRouter }) {
                           <FormControl
                             isInvalid={form.errors.name && form.touched.name}
                           >
-                            <FormLabel>Display Name</FormLabel>
+                            <FormLabel>{getTranslate("FULLNAME")}</FormLabel>
                             <Input
                               type="text"
                               minWidth={{
@@ -277,6 +280,7 @@ function TabProfile({ user, router }: { user: UserType; router: NextRouter }) {
                                 md: "30vw",
                               }}
                               {...field}
+                              defaultValue={_user.fullname}
                               placeholder="Your Name"
                             />
                             <FormErrorMessage>
@@ -291,11 +295,12 @@ function TabProfile({ user, router }: { user: UserType; router: NextRouter }) {
                           <FormControl
                             isInvalid={form.errors.title && form.touched.title}
                           >
-                            <FormLabel>Title</FormLabel>
+                            <FormLabel>{getTranslate("USER_TITLE")}</FormLabel>
                             <Input
                               type="text"
                               {...field}
                               placeholder="Your title"
+                              defaultValue={_user.title}
                             />
                             <FormErrorMessage>
                               {form.errors.title}
@@ -305,31 +310,6 @@ function TabProfile({ user, router }: { user: UserType; router: NextRouter }) {
                       </Field>
                     </VStack>
                   </Stack>
-                  <Stack
-                    direction={{
-                      base: "column",
-                      md: "row",
-                    }}
-                  >
-                    <Field name="dob">
-                      {/* @ts-ignore */}
-                      {({ field, form }) => (
-                        <FormControl
-                          isInvalid={form.errors.title && form.touched.title}
-                        >
-                          <FormLabel>{getTranslate("DATE_OF_BIRTH")}</FormLabel>
-                          <Input
-                            {...field}
-                            type="date"
-                            placeholder="Date of Birth"
-                          />
-                          <FormErrorMessage>
-                            {form.errors.title}
-                          </FormErrorMessage>
-                        </FormControl>
-                      )}
-                    </Field>
-                  </Stack>
                   <Field name="location">
                     {/* @ts-ignore */}
                     {({ field, form }) => (
@@ -337,7 +317,12 @@ function TabProfile({ user, router }: { user: UserType; router: NextRouter }) {
                         isInvalid={form.errors.title && form.touched.title}
                       >
                         <FormLabel>{getTranslate("LOCATION")}</FormLabel>
-                        <Input {...field} type="text" placeholder="Location" />
+                        <Input
+                          {...field}
+                          type="text"
+                          placeholder="Location"
+                          defaultValue={_user.location}
+                        />
                         <FormErrorMessage>{form.errors.title}</FormErrorMessage>
                       </FormControl>
                     )}
@@ -351,16 +336,7 @@ function TabProfile({ user, router }: { user: UserType; router: NextRouter }) {
                           width: "100%",
                         }}
                       >
-                        <FormLabel
-                          style={{
-                            marginBottom: 0,
-                          }}
-                        >
-                          About Me
-                        </FormLabel>
-                        <Text fontSize={"sm"} color="gray.500" mb={3}>
-                          A little description about yourself
-                        </Text>
+                        <FormLabel>{getTranslate("ABOUT")}</FormLabel>
                         <MDEditor
                           style={{
                             height: "auto",
@@ -397,7 +373,7 @@ function TabProfile({ user, router }: { user: UserType; router: NextRouter }) {
                     )}
                   </Field>
                   <Heading size={"sm"} m={2} ml={0}>
-                    Social Links
+                    {getTranslate("SOCIAL_LINKS")}
                   </Heading>
                   <Stack
                     direction={{
@@ -424,7 +400,7 @@ function TabProfile({ user, router }: { user: UserType; router: NextRouter }) {
                             <Input
                               type="url"
                               {...field}
-                              placeholder="Your github link"
+                              placeholder={getTranslate("GITHUB_PLACEHOLDER")}
                             />
                             <FormErrorMessage>
                               {form.errors.githubLink}
@@ -450,7 +426,7 @@ function TabProfile({ user, router }: { user: UserType; router: NextRouter }) {
                             <Input
                               type="url"
                               {...field}
-                              placeholder="Your facebook link"
+                              placeholder={getTranslate("FACEBOOK_PLACEHOLDER")}
                             />
                             <FormErrorMessage>
                               {form.errors.facebookLink}
@@ -475,7 +451,7 @@ function TabProfile({ user, router }: { user: UserType; router: NextRouter }) {
                             <Input
                               type="url"
                               {...field}
-                              placeholder="Your twitter link"
+                              placeholder={getTranslate("TWITTER_PLACEHOLDER")}
                             />
                             <FormErrorMessage>
                               {form.errors.twitterLink}
@@ -497,7 +473,10 @@ function TabProfile({ user, router }: { user: UserType; router: NextRouter }) {
                             <InputLeftElement pointerEvents="none">
                               <FaFacebook color="gray.300" />
                             </InputLeftElement>
-                            <Input {...field} placeholder="Your website link" />
+                            <Input
+                              {...field}
+                              placeholder={getTranslate("WEBSITE_PLACEHOLDER")}
+                            />
                             <FormErrorMessage>
                               {form.errors.websiteLink}
                             </FormErrorMessage>

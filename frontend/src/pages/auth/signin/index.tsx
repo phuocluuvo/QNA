@@ -37,7 +37,7 @@ import { LanguageHelper } from "@/util/Language/Language.util";
 import { Pages } from "@/assets/constant/Pages";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
-import { getCsrfToken, getSession, signIn } from "next-auth/react";
+import { getCsrfToken, getSession, signIn, useSession } from "next-auth/react";
 import LoginButton from "@/components/LoginButton";
 import { useDispatch } from "react-redux";
 import { ActionGetBadgeNotification } from "@/API/redux/actions/user/ActionGetNotificationBadge";
@@ -90,6 +90,7 @@ export default function SignIn() {
     }
     return error;
   }
+  const session = useSession();
   function LoginHandle(
     values: { username: string; password: string },
     actions: any
@@ -105,17 +106,18 @@ export default function SignIn() {
         redirect: false,
         callbackUrl: router.query.callbackUrl as string,
       }).then((response) => {
+        console.log("_______response", response);
         if (response && response.ok) {
-          dispatch(
-            // @ts-ignore
-            ActionGetBadgeNotification(
-              (res) => {
-                console.log(res);
-                setBadgeNumber(res);
-              },
-              () => {}
-            )
-          );
+          if (session.data?.user.id)
+            dispatch(
+              // @ts-ignore
+              ActionGetBadgeNotification(
+                (res) => {
+                  setBadgeNumber(res);
+                },
+                () => {}
+              )
+            );
           if (router.query.callbackUrl) {
             router.push(router.query.callbackUrl as string, undefined, {
               shallow: true,

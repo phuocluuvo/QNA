@@ -597,7 +597,7 @@ function Question() {
                                 {getTranslate("MODIFIED_AT").replace(
                                   "{0}",
                                   helper.formatDate(
-                                    state.question.updatedDate,
+                                    state.question.updatedAt,
                                     false,
                                     "H:mm A - ddd, DD/MM/YYYY"
                                   )
@@ -689,7 +689,12 @@ function Question() {
                 <VStack divider={<Divider />}>
                   {state.answerList &&
                     state.answerList?.data?.map((answer) => (
-                      <div id={answer.id}>
+                      <div
+                        id={answer.id}
+                        style={{
+                          width: "100%",
+                        }}
+                      >
                         <AnswerItem
                           key={answer.id}
                           answer={answer}
@@ -727,7 +732,7 @@ function Question() {
                     marginBottom: "10px",
                   }}
                 >
-                  Related questions width similar tags
+                  {getTranslate("RELATED_QUESTION_WITH_TAG")}
                 </Heading>
                 <VStack>
                   {state.relatedQuestions &&
@@ -763,7 +768,10 @@ function Question() {
                             onClick={() =>
                               // @ts-ignore
                               router.push(
-                                router.basePath + `/question/${question.id}/${removeVietnameseTones(question.title)}`
+                                router.basePath +
+                                  `/question/${
+                                    question.id
+                                  }/${removeVietnameseTones(question.title)}`
                               )
                             }
                             transition={"all 0.2s ease-in-out"}

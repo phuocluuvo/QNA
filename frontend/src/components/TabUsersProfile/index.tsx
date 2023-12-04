@@ -39,6 +39,7 @@ import {
   LineElement,
 } from "chart.js";
 import helper from "@/util/helper";
+import { useRouter } from "next/router";
 const EditerMarkdown = dynamic(
   () =>
     import("@uiw/react-md-editor").then((mod) => {
@@ -110,27 +111,37 @@ function TabProfile({
     tags: "questionsNumber",
     dateActivity: "all",
   });
+  const router = useRouter();
   const dispatch = useDispatch();
   const [selectedFilter, setSelectedFilter] = useState(filterData[0]);
   useEffect(() => {
     setTimeout(() => {
-      api.getAllAnswerByUser(user.id as string, sortBy.answers).then((_res) => {
-        setAnswers(_res?.data);
-      });
+      api
+        .getAllAnswerByUser(
+          router.query.id as string,
+          sortBy.answers,
+          undefined
+        )
+        .then((_res) => {
+          console.log("_res", _res);
+          setAnswers(_res?.data);
+        });
     }, 500);
   }, [sortBy.answers]);
   useEffect(() => {
     setTimeout(() => {
-      api.getAcitvityDashboardByUser(user.id as string, "all").then((_res) => {
-        console.log(_res);
-        setActivityData(_res?.data);
-      });
+      api
+        .getAcitvityDashboardByUser(router.query.id as string, "all")
+        .then((_res) => {
+          console.log(_res);
+          setActivityData(_res?.data);
+        });
     }, 500);
   }, [sortBy.questions]);
   useEffect(() => {
     setTimeout(() => {
       api
-        .getAllQuesitonByUser(user.id as string, sortBy.questions)
+        .getAllQuesitonByUser(router.query.id as string, sortBy.questions)
         .then((_res) => {
           setQuestion(_res?.data);
         });
@@ -138,9 +149,11 @@ function TabProfile({
   }, [sortBy.dateActivity]);
   useEffect(() => {
     setTimeout(() => {
-      api.getAllTagsByUser(user.id as string, sortBy.tags).then((_res) => {
-        setTags(_res?.data);
-      });
+      api
+        .getAllTagsByUser(router.query.id as string, sortBy.tags)
+        .then((_res) => {
+          setTags(_res?.data);
+        });
     }, 500);
   }, [sortBy.tags]);
 
@@ -306,7 +319,7 @@ function TabProfile({
                 justifyContent={"space-between"}
                 alignItems={"center"}
               >
-                <TitleData>Top Questions:</TitleData>
+                <TitleData>{getTranslate("TOP_QUESTION")}:</TitleData>
                 <HStack>
                   <Button
                     style={{
@@ -352,7 +365,7 @@ function TabProfile({
                       })
                     }
                   >
-                    Date
+                    {getTranslate("DATE")}
                   </Button>
                 </HStack>
               </HStack>
@@ -432,7 +445,7 @@ function TabProfile({
                       })
                     }
                   >
-                    Date
+                    {getTranslate("DATE")}
                   </Button>
                 </HStack>
               </HStack>
@@ -469,7 +482,7 @@ function TabProfile({
             </SectionContainer>
             <SectionContainer height="full">
               <HStack w={"full"} justifyContent={"space-between"}>
-                <TitleData>Top Tags:</TitleData>
+                <TitleData>{getTranslate("TOP_TAGS")}:</TitleData>
                 <HStack>
                   <Button
                     style={{
@@ -515,7 +528,7 @@ function TabProfile({
                       })
                     }
                   >
-                    Date
+                    {getTranslate("DATE")}
                   </Button>
                 </HStack>
               </HStack>

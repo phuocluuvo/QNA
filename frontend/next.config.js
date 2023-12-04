@@ -3,7 +3,7 @@
 const removeImports = require("next-remove-imports")();
 const nextConfig = {
   i18n: {
-    defaultLocale: "vi",
+    defaultLocale: "en",
     locales: ["en", "vi"],
   },
   images: {

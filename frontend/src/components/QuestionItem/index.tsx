@@ -73,6 +73,7 @@ function QuestionItem({
       mx={{ base: 0, md: 1 }}
       rounded={"md"}
       w={"full"}
+      maxW={type === "normal" ? "50vw" : "full"}
       _hover={{
         boxShadow: "0 0 0 1px " + Colors(isDarkMode).BORDER,
       }}
@@ -182,7 +183,7 @@ function QuestionItem({
             <Badge
               colorScheme={question.state === "blocked" ? "red" : "green"}
               display={question.state === "blocked" ? "block" : "none"}
-              w={"fit-content"}
+              w={"full"}
             >
               {question.state}
             </Badge>
@@ -199,7 +200,11 @@ function QuestionItem({
               )}`
             }
             fontWeight={"semibold"}
-            maxW={"lg"}
+            maxW={{
+              base: "full",
+              md: "45vw",
+              lg: "40vw",
+            }}
             w={type === "minimals" ? "100%" : "60vw"}
             isTruncated
             paddingTop={{
@@ -222,13 +227,23 @@ function QuestionItem({
         <Text
           style={{
             display: type === "normal" ? "none" : "unset",
-            minWidth: "fit-content",
+            minWidth: "full",
           }}
         >
           {helper.formatDate(question.createdAt, false, "ddd, DD/MM/YYYY")}
         </Text>
         {type === "minimals" ? null : (
-          <Text w={"full"} noOfLines={2} fontSize={"sm"} opacity={0.8}>
+          <Text
+            w={"full"}
+            noOfLines={2}
+            maxW={{
+              base: "full",
+              md: "45vw",
+              lg: "40vw",
+            }}
+            fontSize={"sm"}
+            opacity={0.8}
+          >
             {markdownToPlainText(question.content)}
           </Text>
         )}

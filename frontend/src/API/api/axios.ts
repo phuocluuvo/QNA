@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { url } from "./url";
-import { getSession, signIn } from "next-auth/react";
+import { getSession, signIn, signOut } from "next-auth/react";
 import _ from "lodash";
 import { STATUS } from "../constant/StatusCode.enum";
 const BASE_URL = "https://trongphan5301.click";
@@ -53,9 +53,14 @@ async function refreshToken(
     data.statusCode === STATUS.BAD_REQUEST ||
     data.statusCode === STATUS.ACCESS_DENIED
   ) {
-    sessionStorage.removeItem("next-auth.session-token");
-
-    signIn();
+    sessionStorage.clear();
+    signOut().then(
+      () => {
+        toast.success("Sign out successfully");
+        signIn();
+      },
+      () => {}
+    );
   } else {
     console.log("refreshToken:", data);
   }

@@ -97,10 +97,10 @@ function DashBoard() {
         () => {}
       )
     );
-    userId &&
+    router.query.id &&
       dispatch(
         actionGetUserDashBoardById(
-          userId as string,
+          router.query.id as string,
           (res) => {
             setDashboard(res);
           },

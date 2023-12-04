@@ -378,50 +378,34 @@ function TabActivity({
         <HStack spacing={3}>
           {history
             ? history?.meta.totalPages > 1 &&
-              numberOfPages.map((_, index) => {
-                if (
-                  index < 1 || // first page
-                  index > numberOfPages.length - 2 || // last page
-                  (pageNumber && Math.abs(pageNumber - index - 1) <= 1) // 1 page around current page
-                ) {
-                  return (
-                    <Button
-                      key={index}
-                      size={"xs"}
-                      variant={"outline"}
-                      bg={
-                        pageNumber
-                          ? pageNumber === index + 1
-                            ? "orange.500"
-                            : Colors(colorMode === "dark").PRIMARY_BG
-                          : index == 0
-                          ? "orange.500"
-                          : Colors(colorMode === "dark").PRIMARY_BG
-                      }
-                      color={
-                        pageNumber
-                          ? pageNumber === index + 1
-                            ? "white"
-                            : Colors(colorMode === "dark").BORDER
-                          : index == 0
-                          ? "white"
-                          : Colors(colorMode === "dark").BORDER
-                      }
-                      onClick={() => pageNumClick(index + 1, limit)}
-                    >
-                      {index + 1}
-                    </Button>
-                  );
-                } else if (
-                  (index === 1 && pageNumber > 3) || // after first page and current page is greater than 3
-                  (index === numberOfPages.length - 2 &&
-                    pageNumber < numberOfPages.length - 2) // before last page and current page is less than total pages - 2
-                ) {
-                  return <Text key={index}>...</Text>;
-                } else {
-                  return null;
-                }
-              })
+              numberOfPages.map((_, index) => (
+                <Button
+                  key={index}
+                  size={"xs"}
+                  variant={"outline"}
+                  bg={
+                    pageNumber
+                      ? pageNumber === index + 1
+                        ? "orange.500"
+                        : Colors(colorMode === "dark").PRIMARY_BG
+                      : index == 0
+                      ? "orange.500"
+                      : Colors(colorMode === "dark").PRIMARY_BG
+                  }
+                  color={
+                    pageNumber
+                      ? pageNumber === index + 1
+                        ? "white"
+                        : Colors(colorMode === "dark").BORDER
+                      : index == 0
+                      ? "white"
+                      : Colors(colorMode === "dark").BORDER
+                  }
+                  onClick={() => pageNumClick(index + 1, limit)}
+                >
+                  {index + 1}
+                </Button>
+              ))
             : null}
         </HStack>
         <Spacer />

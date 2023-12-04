@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Accordion,
   AccordionButton,
   AccordionIcon,
   AccordionItem,
   AccordionPanel,
+  Alert,
+  AlertDescription,
+  AlertDialogContent,
+  AlertIcon,
+  AlertTitle,
   Box,
   Button,
   Collapse,
@@ -30,17 +35,17 @@ import {
   Text,
   Textarea,
   Tooltip,
+  VStack,
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
-import {
+import dynamic from "next/dynamic";
+import { Field, Form, Formik, FormikHelpers } from "formik";
+import helper, {
   createQuestionRules,
   writeAGoodQuestion,
   writeAGoodQuestionVie,
-} from "./rule.js";
-import dynamic from "next/dynamic";
-import { Field, Form, Formik, FormikHelpers } from "formik";
-import helper from "@/util/helper";
+} from "@/util/helper";
 import useStateWithCallback from "@/hooks/useStateWithCallback";
 import { useDispatch } from "react-redux";
 import actionCreateQuestion from "@/API/redux/actions/question/ActionCreateQuestion";
@@ -56,6 +61,7 @@ import actionCreateTag from "@/API/redux/actions/tags/ActionCreateTag";
 import actionUpdateQuestion from "@/API/redux/actions/question/ActionUpdateQuesiton";
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
+import TagQuestion from "@/components/TagQuestion";
 const MDEditor = dynamic(
   () => import("@uiw/react-md-editor").then((mod) => mod.default),
   { ssr: false }
@@ -103,6 +109,17 @@ function CreateQuestion() {
     title: false,
     bodyQuestion: false,
   });
+  const validateTags = (value?: Set<TagType>) => {
+    let error = undefined;
+    if (!value) {
+      error = "Tags is required";
+    } else if (value.size < 1) {
+      error = "Tags is required";
+    } else if (value.size >= 5) {
+      error = "Tags reach the number of tag can added";
+    }
+    return error;
+  };
   const { getTranslate, getCurrentLanguage } = LanguageHelper(Pages.HOME);
   const validateTitle = (value: string) => {
     let error;
@@ -135,9 +152,22 @@ function CreateQuestion() {
       );
     }
   };
-  const debouncedSearchTag = _.debounce((value) => {
-    searchTag(value);
-  }, 500);
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      searchTag(state.searchTagId);
+      if (state.searchTagId === "")
+        setState(
+          // @ts-ignore
+          (oldState) =>
+            helper.mappingState(oldState, {
+              resultsTagIds: new Set(),
+            })
+        );
+    }, 100);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [state.searchTagId]);
+
   const addTagHandle = (tag: TagType) => {
     setState(
       // @ts-ignore
@@ -169,9 +199,6 @@ function CreateQuestion() {
     setState((oldState) =>
       helper.mappingState(oldState, { searchTagId: value })
     );
-
-    // Use the debounced function
-    debouncedSearchTag(value);
   };
   const createTagHandle = () => {
     let form = {
@@ -291,7 +318,7 @@ function CreateQuestion() {
                         );
                       }}
                       id="title"
-                      placeholder="title"
+                      placeholder={getTranslate("QUESTION_TITLE_PLACEHOLDER")}
                       type="text"
                       required
                     />
@@ -326,44 +353,24 @@ function CreateQuestion() {
                     >
                       {state.selectedTags && state.selectedTags.size > 0
                         ? Array.from(state.selectedTags).map((tag) => (
-                            <Tag
-                              size={"md"}
-                              variant="solid"
-                              colorScheme="orange"
-                              cursor={"pointer"}
-                              display={"flex"}
-                              minW={"fit-content"}
-                            >
-                              <Text
-                                minW={"fit-content"}
-                                fontSize={"xs"}
-                                flex={"1"}
-                                noOfLines={1}
-                              >
-                                {tag?.name}
-                              </Text>
-                              <IconButton
-                                variant={"ghost"}
-                                colorScheme="orange"
-                                _hover={{
-                                  bg: "transparent",
-                                  color: "whiteAlpha.700",
-                                }}
-                                aria-label="delete"
-                                size="xs"
-                                onClick={() => {
-                                  removeTagHandle(tag);
-                                }}
-                                icon={<CloseIcon />}
-                              />
-                            </Tag>
+                            <TagQuestion
+                              type="minimals"
+                              tag={tag}
+                              key={tag.id}
+                              onCancelClick={() => removeTagHandle(tag)}
+                            />
                           ))
                         : null}
                       <Input
                         {...field}
                         variant={"unstyled"}
+                        isDisabled={
+                          state.selectedTags &&
+                          state.selectedTags?.size > 1 &&
+                          validateTags(state.selectedTags)
+                        }
                         id="resultsTagIds"
-                        placeholder="Search a tag"
+                        placeholder={validateTags(state.selectedTags)?? "Search tag"}
                         type="text"
                         value={state.searchTagId}
                         onChange={(e) => {
@@ -386,70 +393,65 @@ function CreateQuestion() {
                         borderRadius={"5px"}
                         p={"2"}
                       >
-                        {state.resultsTagIds && state.resultsTagIds.size > 0 ? (
-                          Array.from(state.resultsTagIds).map((tag) => (
-                            <Tooltip
-                              key={tag.id}
-                              label={
-                                tag.content ||
-                                "No content yet. Need update later"
-                              }
-                              hasArrow
-                              arrowPadding={5}
-                            >
-                              <Tag
-                                size={"md"}
-                                variant="solid"
-                                colorScheme="orange"
-                                cursor={"pointer"}
-                                onClick={() => {
-                                  !checkTagExist(tag) && addTagHandle(tag);
-                                }}
+                        <HStack flexWrap={"wrap"}>
+                          {state.resultsTagIds &&
+                          state.resultsTagIds.size > 0 ? (
+                            Array.from(state.resultsTagIds).map((tag) => (
+                              <TagQuestion
                                 style={{
                                   ...(checkTagExist(tag) && {
                                     opacity: "0.5",
                                     cursor: "not-allowed",
                                   }),
                                 }}
-                              >
-                                {typeof tag !== "string" ? tag.name : tag}{" "}
-                                {typeof tag !== "string" &&
-                                tag.state === "verified" ? (
-                                  <Tooltip
-                                    label={"This tag was verified"}
-                                    aria-label={"Verified"}
-                                  >
-                                    <CheckIcon color={"green"} ml={2} />
-                                  </Tooltip>
-                                ) : null}
-                              </Tag>
-                            </Tooltip>
-                          ))
-                        ) : (
-                          <Text fontSize={"sm"} color={"gray.500"}>
-                            {getTranslate("CANNOT_FIND_TAG").replace(
-                              "{tagname}",
-                              state.searchTagId
-                            )}
-                            <Button
-                              variant={"link"}
-                              colorScheme={"orange"}
-                              onClick={() => {
-                                setState(
-                                  // @ts-ignore
-                                  (oldState) =>
-                                    helper.mappingState(oldState, {
-                                      tagName: state.searchTagId,
-                                    }),
-                                  () => onOpen()
-                                );
-                              }}
-                            >
-                              {getTranslate("CREATE_NEW_TAG")}
-                            </Button>
-                          </Text>
-                        )}
+                                type="minimals"
+                                tag={tag}
+                                key={tag.id}
+                                onClick={() => {
+                                  !checkTagExist(tag) && addTagHandle(tag);
+                                }}
+                              />
+                            ))
+                          ) : (
+                            <></>
+                          )}
+                        </HStack>
+                        <Text fontSize={"sm"} color={"gray.500"}>
+                          {getTranslate("CANNOT_FIND_TAG").replace(
+                            "{tagname}",
+                            state.searchTagId
+                          )}
+                          <Button
+                            variant={"link"}
+                            colorScheme={"orange"}
+                            onClick={() => {
+                              setState(
+                                // @ts-ignore
+                                (oldState) =>
+                                  helper.mappingState(oldState, {
+                                    tagName: state.searchTagId,
+                                  }),
+                                () => onOpen()
+                              );
+                            }}
+                          >
+                            {getTranslate("CREATE_NEW_TAG")}
+                          </Button>
+                        </Text>
                       </Box>
+                      <Text
+                        style={{
+                          fontSize: "12px",
+                          color: "tomato",
+                          marginTop: "5px",
+                          textAlign: "left",
+                          fontWeight: "bold",
+                        }}
+                        opacity={validateTags(state.selectedTags) ? 1 : 0}
+                        transition={"all 0.2s ease-in-out"}
+                      >
+                        {validateTags(state.selectedTags)}
+                      </Text>
                     </Collapse>
                     <FormErrorMessage>
                       {form.errors.resultsTagIds}
@@ -529,7 +531,7 @@ function CreateQuestion() {
           backgroundColor: colorMode === "light" ? "#fff" : "#1a202c",
         }}
       >
-        <Accordion defaultIndex={[0]} allowMultiple>
+        <Accordion allowMultiple>
           <AccordionItem>
             <Text>
               <AccordionButton>
@@ -559,45 +561,49 @@ function CreateQuestion() {
       <Modal finalFocusRef={finalRef} isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Create a tag</ModalHeader>
+          <ModalHeader>{getTranslate("CREATE_TAG_TITLE")}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Text fontSize={"sm"} color={"gray.500"}>
-              Please enter a tag name.
-            </Text>
-            <Input
-              id="name-tag"
-              placeholder="Enter name"
-              type="text"
-              value={state.tagName}
-              onChange={(e) => {
-                // @ts-ignore
-                setState((oldState) =>
-                  helper.mappingState(oldState, { tagName: e.target.value })
-                );
-              }}
-              required
-            />
-            <Text fontSize={"sm"} color={"gray.500"}>
-              Please enter a tag description
-            </Text>
-            <Textarea
-              id="content-tag"
-              placeholder="Enter content"
-              value={state.tagContent}
-              onChange={(e) => {
-                // @ts-ignore
-                setState((oldState) =>
-                  helper.mappingState(oldState, { tagContent: e.target.value })
-                );
-              }}
-              required
-            />
+            <Alert status="info" mb={3}>
+              <AlertIcon />
+              <AlertDescription mr={2}>
+                {getTranslate("CREATE_TAG_DESCRIPTION")}
+              </AlertDescription>
+            </Alert>
+            <VStack>
+              <Input
+                id="name-tag"
+                placeholder={getTranslate("TAG_NAME_PLACEHOLDER")}
+                type="text"
+                value={state.tagName}
+                onChange={(e) => {
+                  // @ts-ignore
+                  setState((oldState) =>
+                    helper.mappingState(oldState, { tagName: e.target.value })
+                  );
+                }}
+                required
+              />
+              <Textarea
+                id="content-tag"
+                placeholder={getTranslate("TAG_CONTENT_PLACEHOLDER")}
+                value={state.tagContent}
+                onChange={(e) => {
+                  // @ts-ignore
+                  setState((oldState) =>
+                    helper.mappingState(oldState, {
+                      tagContent: e.target.value,
+                    })
+                  );
+                }}
+                required
+              />
+            </VStack>
           </ModalBody>
 
           <ModalFooter>
             <Button variant={"ghost"} mr={3} onClick={onClose}>
-              Close
+              {getTranslate("CLOSE")}
             </Button>
             <Button
               colorScheme="orange"
