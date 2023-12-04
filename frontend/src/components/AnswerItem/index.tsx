@@ -33,11 +33,14 @@ import CustomAlertDialog from "../AlertDialog";
 import useStateWithCallback from "@/hooks/useStateWithCallback";
 import { VOTE } from "@/API/constant/Vote.enum";
 import actionVoteAnswer from "@/API/redux/actions/answer/actionVoteAnswer";
-import actionCreateCommentAnswer from "@/API/redux/actions/answer/actionCreateCommentAnswer";
+import actionCreateCommentAnswer, {
+  actionDeleteComment,
+} from "@/API/redux/actions/answer/actionCreateCommentAnswer";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { CommentType } from "@/util/type/Comment.type";
 import dynamic from "next/dynamic";
+import { actionDeleteAnswer } from "@/API/redux/actions/answer/actionCreateAnswer";
 const EditerMarkdown = dynamic(
   () =>
     import("@uiw/react-md-editor").then((mod) => {
@@ -72,10 +75,13 @@ function AnswerItem({
     isApproved: boolean;
     isShowConfirm: boolean;
     isShowComment: boolean;
+    isShowDelete: boolean;
     comment: string;
     answer: AnswerType;
     isVoted: boolean;
     voteType: VOTE;
+    isShowCommentDelete: boolean;
+    selectedComment: CommentType | null;
   }>({
     // @ts-ignore
     count: answer.votes ?? 0,
@@ -83,6 +89,9 @@ function AnswerItem({
     isApproved: answer.isApproved,
     isShowConfirm: false,
     isShowComment: false,
+    isShowDelete: false,
+    isShowCommentDelete: false,
+    selectedComment: null,
     comment: "",
     answer: answer,
     isVoted: false,
@@ -101,6 +110,32 @@ function AnswerItem({
     );
     // setCommentArray(answer.comments);
   }, [answer]);
+  const deleteHandler = () => {
+    dispatch(
+      actionDeleteAnswer(
+        answer.id,
+        (res: any) => {
+          fecthAnswer();
+        },
+        (err: any) => {}
+      )
+    );
+  };
+  const deleteCommentHandler = () => {
+    state.selectedComment &&
+      dispatch(
+        actionDeleteComment(
+          state.selectedComment?.id,
+          (res: any) => {
+            fecthAnswer();
+          },
+          // @ts-ignore
+          (err: any) => {
+            console.log(err);
+          }
+        )
+      );
+  };
   const voteHandler = (type: VOTE) => {
     const form: FormVoteAnswer = {
       answer_id: answer.id,
@@ -302,7 +337,6 @@ function AnswerItem({
                 />
               </Box>
             )}
-
             <Link
               style={{
                 display: type === "normal" ? "none" : "block",
@@ -325,6 +359,33 @@ function AnswerItem({
               display={type === "minimals" ? "none" : "flex"}
               alignItems={"flex-start"}
             >
+              <Button
+                variant={"link"}
+                size={"xs"}
+                onClick={() => {
+                  router.push(`/question/edit/answer/${answer.id}`);
+                }}
+                colorScheme={"blue"}
+              >
+                {getTranslate("EDIT")}
+              </Button>
+              <Button
+                display={
+                  session.data?.user.id === answer.user.id ? "block" : "none"
+                }
+                variant={"link"}
+                size={"xs"}
+                onClick={() =>
+                  setState((oldState) =>
+                    helper.mappingState(oldState, {
+                      isShowDelete: true,
+                    })
+                  )
+                }
+                colorScheme={"blue"}
+              >
+                {getTranslate("DELETE")}
+              </Button>
               <Spacer />
               <Author
                 type="simple"
@@ -356,9 +417,9 @@ function AnswerItem({
             >
               {state.answer.comments?.length > 0 &&
                 state.answer.comments.map((comment) => (
-                  <HStack
-                    key={comment.id}
+                  <VStack
                     w={"full"}
+                    alignItems={"flex-start"}
                     borderBottom={"1px solid"}
                     borderColor={"gray.200"}
                     opacity={0.8}
@@ -366,38 +427,62 @@ function AnswerItem({
                       opacity: 1,
                     }}
                     py={2}
-                    flexWrap={"wrap"}
                   >
-                    <Text fontSize={"xs"}>
-                      {comment.content}{" "}
-                      <Text as="span" fontSize={"xs"}>
+                    <HStack key={comment.id} w={"full"} flexWrap={"wrap"}>
+                      <Text fontSize={"xs"}>
+                        {comment.content}{" "}
+                        <Text as="span" fontSize={"xs"}>
+                          -{" "}
+                          {helper.formatDate(
+                            comment.createdAt,
+                            false,
+                            "H:mm A - ddd, DD/MM/YYYY"
+                          )}{" "}
+                        </Text>{" "}
                         -{" "}
-                        {helper.formatDate(
-                          comment.createdAt,
-                          false,
-                          "H:mm A - ddd, DD/MM/YYYY"
-                        )}{" "}
-                      </Text>{" "}
-                      -{" "}
-                      <Button
-                        as="span"
-                        variant={"link"}
-                        colorScheme="facebook"
-                        onClick={() =>
-                          router.push(
-                            `/user/${comment.user.id ?? session.data?.user.id}`
-                          )
-                        }
-                        _hover={{
-                          textDecoration: "underline",
-                        }}
-                      >
-                        <Text fontSize={"xs"}>
-                          {comment.user.fullname ?? session.data?.user.fullname}
-                        </Text>
-                      </Button>
-                    </Text>
-                  </HStack>
+                        <Button
+                          as="span"
+                          variant={"link"}
+                          colorScheme="facebook"
+                          onClick={() =>
+                            router.push(
+                              `/user/${
+                                comment.user.id ?? session.data?.user.id
+                              }`
+                            )
+                          }
+                          _hover={{
+                            textDecoration: "underline",
+                          }}
+                        >
+                          <Text fontSize={"xs"}>
+                            {comment.user.fullname ??
+                              session.data?.user.fullname}
+                          </Text>
+                        </Button>
+                      </Text>
+                    </HStack>
+                    <Button
+                      variant={"link"}
+                      size={"xs"}
+                      display={
+                        session.data?.user.id === comment.user.id
+                          ? "block"
+                          : "none"
+                      }
+                      colorScheme="blue"
+                      onClick={() => {
+                        setState((oldState) =>
+                          helper.mappingState(oldState, {
+                            isShowCommentDelete: true,
+                            selectedComment: comment,
+                          })
+                        );
+                      }}
+                    >
+                      {getTranslate("DELETE")}
+                    </Button>
+                  </VStack>
                 ))}
             </VStack>
             <Collapse
@@ -497,6 +582,7 @@ function AnswerItem({
             isShowConfirm: false,
           }))
         }
+        type="approved"
         confirmButtonStyle={{
           variant: "solid",
           colorScheme: state.isApproved ? "red" : "green",
@@ -512,6 +598,65 @@ function AnswerItem({
         }
         cancelText={getTranslate("CANCEL")}
         confirmAction={approveHandler}
+      />
+      <CustomAlertDialog
+        content={getTranslate("DELETE_ANSWER_CONFIRM_TITLE")}
+        title={getTranslate("DELETE").concat("?")}
+        buttonStyle={{
+          display: "none",
+        }}
+        isOpen={state.isShowDelete}
+        onClose={() =>
+          setState((oldState) => ({
+            ...oldState,
+            isShowDelete: false,
+          }))
+        }
+        type="delete"
+        confirmButtonStyle={{
+          variant: "solid",
+          colorScheme: "red",
+        }}
+        cancelButtonStyle={{
+          variant: "ghost",
+          colorScheme: "gray",
+        }}
+        confirmText={getTranslate("DELETE_COMFIRM")}
+        cancelText={getTranslate("CANCEL")}
+        confirmAction={deleteHandler}
+      />
+      <CustomAlertDialog
+        content={
+          <VStack w={"full"} alignItems={"flex-start"}>
+            <Text>{getTranslate("DELETE_COMMENT_CONFIRM_TITLE")}</Text>
+            <Text>
+              {markdownToPlainText(state.selectedComment?.content as string)}
+            </Text>
+          </VStack>
+        }
+        title={getTranslate("DELETE_COMMENT").concat("?")}
+        buttonStyle={{
+          display: "none",
+        }}
+        isOpen={state.isShowCommentDelete}
+        onClose={() =>
+          setState((oldState) => ({
+            ...oldState,
+            isShowCommentDelete: false,
+          }))
+        }
+        type="delete"
+        confirmButtonStyle={{
+          variant: "solid",
+          colorScheme: "red",
+        }}
+        cancelButtonStyle={{
+          variant: "ghost",
+          colorScheme: "gray",
+        }}
+        confirmText={getTranslate("DELETE_COMMENT_COMFIRM")}
+        cancelText={getTranslate("CANCEL")}
+        confirmAction={deleteCommentHandler}
       />
     </>
   );

@@ -23,6 +23,7 @@ interface Props {
   confirmButtonStyle?: ButtonProps;
   cancelButtonStyle?: ButtonProps;
   title?: string;
+  type?: "approved" | "delete";
 }
 
 function CustomAlertDialog({
@@ -38,6 +39,7 @@ function CustomAlertDialog({
   confirmAction = () => {},
   confirmButtonStyle,
   cancelButtonStyle,
+  type = "approved",
 }: Props) {
   const cancelRef = React.useRef();
 
