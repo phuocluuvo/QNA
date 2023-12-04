@@ -53,6 +53,10 @@ __decorate([
     __metadata("design:type", Date)
 ], Question.prototype, "updatedAt", void 0);
 __decorate([
+    (0, typeorm_1.DeleteDateColumn)({ name: "deleted_at" }),
+    __metadata("design:type", Date)
+], Question.prototype, "deletedAt", void 0);
+__decorate([
     (0, typeorm_1.Column)({ type: "enum", enum: question_state_enum_1.QuestionState, default: question_state_enum_1.QuestionState.PENDING }),
     __metadata("design:type", String)
 ], Question.prototype, "state", void 0);

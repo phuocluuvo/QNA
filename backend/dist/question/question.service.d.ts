@@ -29,7 +29,7 @@ export declare class QuestionService {
     findOneById(id: string): Promise<Question>;
     create(questionDto: CreateQuestionDto, userId: string): Promise<Question>;
     update(id: string, questionDto: UpdateQuestionDto): Promise<Question>;
-    remove(question: Question): Promise<Question>;
+    remove(question: Question): Promise<import("typeorm").UpdateResult>;
     getQuestionAndIncreaseViewCount(questionId: string, userId: string, ip: string): Promise<Question>;
     updateVote(userId: string, questionVoteDto: VoteQuestionDto): Promise<Question>;
     private increaseViewCount;

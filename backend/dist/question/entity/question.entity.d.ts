@@ -16,6 +16,7 @@ export declare class Question {
     votes: number;
     createdAt: Date;
     updatedAt: Date;
+    deletedAt: Date;
     state: QuestionState;
     user: User;
     answers: Answer[];

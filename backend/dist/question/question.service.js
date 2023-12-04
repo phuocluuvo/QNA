@@ -106,7 +106,7 @@ let QuestionService = class QuestionService {
         return this.questionRepository.save(question);
     }
     async remove(question) {
-        return this.questionRepository.remove(question);
+        return this.questionRepository.softDelete(question.id);
     }
     async getQuestionAndIncreaseViewCount(questionId, userId, ip) {
         try {
@@ -193,11 +193,11 @@ let QuestionService = class QuestionService {
     }
     async removeWithActivity(question, userId) {
         const questionId = question.id;
-        const questionRemove = this.remove(question);
+        await this.remove(question);
         const activity = await this.activityService.create(reputation_enum_1.ReputationActivityTypeEnum.DELETE_QUESTION, reputation_enum_1.ObjectActivityTypeEnum.QUESTION, questionId, userId, question.user.id);
         await this.activityService.syncPointDelete(question.id, question.user.id);
         await this.notificationService.create(notification_constants_1.notificationText.QUESTION.DELETE, notification_constants_1.notificationTextDesc.QUESTION.DELETE, question.user.id, activity.id);
-        return questionRemove;
+        return question;
     }
     async related(query, tagNames) {
         const tags = tagNames ? tagNames.split(",") : [];
