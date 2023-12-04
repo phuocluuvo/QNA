@@ -218,5 +218,6 @@
   "ANSWER_CONTENT": "Answer Content",
   "FIX_ANSWER_TITLE": "Update your answer",
   "ANSWER_CONTENT_DESCRIPTION": "Your answer needs to be as detailed as possible for people to understand it correctly.",
-  "CREATED_AT": "Created at"
+  "CREATED_AT": "Created at",
+  "EDIT_QUESITON": "Edit question"
 }
