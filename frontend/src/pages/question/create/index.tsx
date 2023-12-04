@@ -116,7 +116,7 @@ function CreateQuestion() {
     } else if (value.size < 1) {
       error = "Tags is required";
     } else if (value.size >= 5) {
-      error = "Tags reach the number of tag can added";
+      error = "Tags reach the number of tag cannot add more";
     }
     return error;
   };
