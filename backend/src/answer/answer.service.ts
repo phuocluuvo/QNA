@@ -144,7 +144,7 @@ export class AnswerService {
    * @returns The removed answer.
    */
   async remove(answer: Answer) {
-    return this.answerRepository.remove(answer);
+    return this.answerRepository.softDelete(answer.id);
   }
 
   /**
@@ -269,7 +269,7 @@ export class AnswerService {
   @Transactional()
   async removeWithActivity(answer: Answer, userId: string) {
     const answerId = answer.id;
-    const answerRemove = await this.remove(answer);
+    await this.remove(answer);
 
     const activity = await this.activityService.create(
       ReputationActivityTypeEnum.DELETE_ANSWER,
@@ -286,7 +286,7 @@ export class AnswerService {
       answer.user.id,
       activity.id,
     );
-    return answerRemove;
+    return answer;
   }
 
   /**
