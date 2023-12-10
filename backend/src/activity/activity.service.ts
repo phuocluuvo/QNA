@@ -114,9 +114,9 @@ export class ActivityService {
 
     if (activity >= requiredActivity) {
       const user = await this.usersService.findById(userId);
-      const pointCheck = (activity + 1) * questionPointCheck;
+      const pointCheck = Math.pow(activity + 1, 2) * questionPointCheck;
 
-      return user.activityPoint > pointCheck;
+      return user.activityPoint >= pointCheck;
     }
     return true;
   }
@@ -138,6 +138,12 @@ export class ActivityService {
     return this.usersService.updateActivityPoint(userId, -pointChange);
   }
 
+  /**
+   *
+   * @param userId
+   * @param date
+   * @returns
+   */
   async getPointChange(userId: string, date: string) {
     const user = await this.usersService.find({
       id: userId,
@@ -173,6 +179,11 @@ export class ActivityService {
     return result;
   }
 
+  /**
+   * Get reputation point
+   * @param activityType
+   * @private
+   */
   private async transConfigToReputationConstant(
     activityType: ReputationActivityTypeEnum,
   ): Promise<number> {
@@ -220,12 +231,20 @@ export class ActivityService {
     }
   }
 
+  /**
+   * Check undelete question
+   * @param questionId
+   */
   async checkUndeleteQuestion(questionId: string): Promise<boolean> {
     const requiredActivity = 10;
     const activity = await this.countUnblockQuestion(questionId);
     return activity < requiredActivity;
   }
 
+  /**
+   * Count unblock question
+   * @param questionId
+   */
   async countUnblockQuestion(questionId: string): Promise<number> {
     const activityType = ReputationActivityTypeEnum.UN_BLOCK_QUESTION;
 
@@ -235,5 +254,53 @@ export class ActivityService {
         activityType: activityType,
       },
     });
+  }
+
+  /**
+   *  Count question balance
+   * @param userId
+   */
+  async countQuestionBalance(userId: string) {
+    const sysconfigUsing = await this.sysconfigService.getUsingSysconfig();
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    let requiredActivity = 3;
+    let questionPointCheck =
+      reputationActivityPoint[ReputationActivityTypeEnum.CREATE_QUESTION];
+
+    if (sysconfigUsing) {
+      requiredActivity = sysconfigUsing.createQuestionDaily;
+      questionPointCheck = sysconfigUsing.questionCreatePointCheck;
+    }
+    const activity = await this.activityRepository.count({
+      where: {
+        user: { id: userId },
+        activityType: ReputationActivityTypeEnum.CREATE_QUESTION,
+        createdAt: MoreThanOrEqual(todayStart),
+      },
+    });
+
+    const user = await this.usersService.findById(userId);
+
+    let balance = 0;
+    let flag = true;
+    let pointCheck = 0;
+    const count = activity >= requiredActivity ? activity : requiredActivity;
+    console.log("count::" + count);
+    while (flag) {
+      pointCheck = Math.pow(count + 1 + balance, 2) * questionPointCheck;
+
+      if (user.activityPoint >= pointCheck && balance < 100) {
+        balance++;
+      } else {
+        flag = false;
+      }
+      user.activityPoint += questionPointCheck;
+    }
+
+    return activity >= requiredActivity
+      ? balance
+      : balance + requiredActivity - activity;
   }
 }

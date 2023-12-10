@@ -44,7 +44,7 @@ export class ActivityController {
   /**
    * get activity history userId
    * @param query
-   * @param req
+   * @param id
    */
   @ApiOperation({
     summary: "get activity history userId",
