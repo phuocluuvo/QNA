@@ -313,6 +313,13 @@ export class QuestionService {
     }
   }
 
+  /**
+   * Update a question with activity.
+   * @param id
+   * @param questionDto
+   * @param oldQuestion
+   * @param userId
+   */
   @Transactional()
   async updateWithActivity(
     id: string,
@@ -389,6 +396,12 @@ export class QuestionService {
     );
   }
 
+  /**
+   * censoring question
+   * @param questionId
+   * @param userId
+   * @param state
+   */
   @Transactional()
   async censoring(questionId: string, userId: string, state: QuestionState) {
     let mess, repu, noti, notiDesc;
@@ -434,6 +447,10 @@ export class QuestionService {
     return result;
   }
 
+  /**
+   * get count question by time
+   * @param timeType
+   */
   async getCountQuestionByTime(timeType: QuestionTimeTypeEnum) {
     const currentDate = new Date();
     const currentDay = currentDate.getDate();
@@ -478,6 +495,9 @@ export class QuestionService {
     return await queryBuilder.getCount();
   }
 
+  /**
+   * get count question
+   */
   async getCountQuestion() {
     return {
       data: {
@@ -496,6 +516,9 @@ export class QuestionService {
     };
   }
 
+  /**
+   * get top 5 question by views
+   */
   getTop5ByViews() {
     const queryBuilder = this.questionRepository
       .createQueryBuilder("question")
@@ -504,6 +527,9 @@ export class QuestionService {
     return queryBuilder.getMany();
   }
 
+  /**
+   * get top 5 question by votes
+   */
   getTop5ByVotes() {
     const queryBuilder = this.questionRepository
       .createQueryBuilder("question")
@@ -512,6 +538,9 @@ export class QuestionService {
     return queryBuilder.getMany();
   }
 
+  /**
+   * get top 5 question by answers
+   */
   getTop5ByAnswers() {
     const queryBuilder = this.questionRepository
       .createQueryBuilder("question")
@@ -524,10 +553,20 @@ export class QuestionService {
     return queryBuilder.getMany();
   }
 
+  /**
+   * get question history
+   * @param query
+   * @param questionId
+   */
   async getQuestionHistory(query: PaginateQuery, questionId: string) {
     return this.historyService.getQuestionHistory(query, questionId);
   }
 
+  /**
+   * replace tag
+   * @param newTagId
+   * @param oldTagId
+   */
   @Transactional()
   async replaceTag(newTagId: string, oldTagId: string) {
     const tagToReplace = await this.tagService.findOne({ id: newTagId });
@@ -568,14 +607,26 @@ export class QuestionService {
     return tagToReplace;
   }
 
+  /**
+   * check report question
+   * @param questionId
+   */
   async checkReport(questionId: string) {
     return await this.activityService.checkUndeleteQuestion(questionId);
   }
 
+  /**
+   *  get count unblock question
+   * @param questionId
+   */
   async getCountReport(questionId: string) {
     return await this.activityService.countUnblockQuestion(questionId);
   }
 
+  /**
+   * get question balance
+   * @param userId
+   */
   async getQuestionBalance(userId: string) {
     return await this.activityService.countQuestionBalance(userId);
   }
