@@ -83,8 +83,8 @@ let ActivityService = class ActivityService {
         });
         if (activity >= requiredActivity) {
             const user = await this.usersService.findById(userId);
-            const pointCheck = (activity + 1) * questionPointCheck;
-            return user.activityPoint > pointCheck;
+            const pointCheck = Math.pow(activity + 1, 2) * questionPointCheck;
+            return user.activityPoint >= pointCheck;
         }
         return true;
     }
@@ -172,6 +172,47 @@ let ActivityService = class ActivityService {
                 activityType: activityType,
             },
         });
+    }
+    async countQuestionBalance(userId) {
+        const sysconfigUsing = await this.sysconfigService.getUsingSysconfig();
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        let requiredActivity = 3;
+        let questionPointCheck = reputation_constants_1.reputationActivityPoint[reputation_enum_1.ReputationActivityTypeEnum.CREATE_QUESTION];
+        if (sysconfigUsing) {
+            requiredActivity = sysconfigUsing.createQuestionDaily;
+            questionPointCheck = sysconfigUsing.questionCreatePointCheck;
+        }
+        const activity = await this.activityRepository.count({
+            where: {
+                user: { id: userId },
+                activityType: reputation_enum_1.ReputationActivityTypeEnum.CREATE_QUESTION,
+                createdAt: (0, typeorm_1.MoreThanOrEqual)(todayStart),
+            },
+        });
+        const user = await this.usersService.findById(userId);
+        let balance = 0;
+        let flag = true;
+        let pointCheck = 0;
+        const count = activity >= requiredActivity ? activity : requiredActivity;
+        console.log("count::" + count);
+        while (flag) {
+            pointCheck = Math.pow(count + 1 + balance, 2) * questionPointCheck;
+            console.log("poiuntcheck::" + pointCheck);
+            console.log("userP::" + user.activityPoint);
+            if (user.activityPoint >= pointCheck && balance < 100) {
+                console.log("user::" + user.activityPoint);
+                balance++;
+            }
+            else {
+                flag = false;
+            }
+            user.activityPoint += questionPointCheck;
+        }
+        console.log(balance);
+        return activity >= requiredActivity
+            ? balance
+            : balance + requiredActivity - activity;
     }
 };
 exports.ActivityService = ActivityService;

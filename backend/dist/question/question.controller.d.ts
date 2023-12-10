@@ -12,6 +12,7 @@ export declare class QuestionController {
     constructor(questionService: QuestionService, caslAbilityFactory: CaslAbilityFactory);
     find(query: PaginateQuery, tagNames: string, req: Request): Promise<import("nestjs-paginate").Paginated<Question>>;
     getRelated(query: PaginateQuery, tagNames: string): Promise<import("nestjs-paginate").Paginated<Question>>;
+    getQuestionBalance(req: Request): Promise<number>;
     findOneById(id: string, req: Request): Promise<Question>;
     findHistory(id: string, query: PaginateQuery): Promise<import("nestjs-paginate").Paginated<import("../history/entity/history.entity").History>>;
     create(questionDto: CreateQuestionDto, req: Request): Promise<Question>;

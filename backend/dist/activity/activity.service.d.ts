@@ -17,4 +17,5 @@ export declare class ActivityService {
     private transConfigToReputationConstant;
     checkUndeleteQuestion(questionId: string): Promise<boolean>;
     countUnblockQuestion(questionId: string): Promise<number>;
+    countQuestionBalance(userId: string): Promise<number>;
 }

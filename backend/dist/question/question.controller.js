@@ -43,6 +43,9 @@ let QuestionController = class QuestionController {
     async getRelated(query, tagNames) {
         return this.questionService.related(query, tagNames);
     }
+    async getQuestionBalance(req) {
+        return this.questionService.getQuestionBalance(req.user["sub"]);
+    }
     async findOneById(id, req) {
         const ability = this.caslAbilityFactory.createForUser(req.user);
         const question = await this.questionService.findOneById(id);
@@ -145,6 +148,17 @@ __decorate([
     __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
 ], QuestionController.prototype, "getRelated", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({
+        summary: "related question",
+    }),
+    (0, common_1.Get)("/questionBalance"),
+    (0, common_1.UseGuards)(accessToken_guard_1.AccessTokenGuard),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], QuestionController.prototype, "getQuestionBalance", null);
 __decorate([
     (0, swagger_1.ApiOperation)({
         summary: "get question",

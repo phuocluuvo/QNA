@@ -55,4 +55,5 @@ export declare class QuestionService {
     replaceTag(newTagId: string, oldTagId: string): Promise<import("../tag/entity/tag.entity").Tag>;
     checkReport(questionId: string): Promise<boolean>;
     getCountReport(questionId: string): Promise<number>;
+    getQuestionBalance(userId: string): Promise<number>;
 }

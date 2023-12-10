@@ -10,7 +10,6 @@ exports.SearchMiddleware = void 0;
 const common_1 = require("@nestjs/common");
 let SearchMiddleware = class SearchMiddleware {
     use(req, res, next) {
-        console.log(`Incoming request: ${req.method} ${req.originalUrl}`);
         if (req.query.search) {
             req.query.search = req.query.search
                 .toString()

@@ -351,6 +351,9 @@ let QuestionService = class QuestionService {
     async getCountReport(questionId) {
         return await this.activityService.countUnblockQuestion(questionId);
     }
+    async getQuestionBalance(userId) {
+        return await this.activityService.countQuestionBalance(userId);
+    }
 };
 exports.QuestionService = QuestionService;
 __decorate([
