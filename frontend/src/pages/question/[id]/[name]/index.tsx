@@ -36,6 +36,7 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Select,
   Spacer,
   Spinner,
   Stack,
@@ -69,6 +70,7 @@ import api from "@/API/api";
 import { GetServerSideProps } from "next";
 import { Tooltip } from "chart.js";
 import CommentModal from "@/components/CommentModal";
+import CustomAlertDialog from "@/components/AlertDialog";
 const EditerMarkdown = dynamic(
   () =>
     import("@uiw/react-md-editor").then((mod) => {
@@ -76,8 +78,38 @@ const EditerMarkdown = dynamic(
     }),
   { ssr: false }
 );
+const sortData = [
+  {
+    title: "Most Vote (Approved answer first)",
+    value: "isApproved:DESC",
+  },
+  {
+    title: "Newest",
+    value: "createdAt:DESC",
+  },
+  { title: "Most Vote", value: "votes:DESC" },
+  {
+    title: "Oldest",
+    value: "createdAt:ASC",
+  },
+];
+const sortDataVie = [
+  {
+    title: "Trả lời có đánh giá cao nhất (Trả lời được chấp nhận xếp trước)",
+    value: "isApproved:DESC",
+  },
+  {
+    title: "Mới nhất",
+    value: "createdAt:DESC",
+  },
+  { title: "Trả lời có đánh giá cao nhất", value: "votes:DESC" },
+  {
+    title: "Cũ nhất",
+    value: "createdAt:ASC",
+  },
+];
 function Question() {
-  const { getTranslate } = LanguageHelper(Pages.HOME);
+  const { getTranslate, getCurrentLanguage } = LanguageHelper(Pages.HOME);
   const { colorMode } = useColorMode();
   const { setQuestion } = useContext(LayoutContext);
   const router = useRouter();
@@ -85,7 +117,10 @@ function Question() {
   const [hydrated, setHydrated] = useState(false);
   const session = useSession();
   const dispatch = useDispatch();
+  const [isShowDelete, setShowDelete] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  let _sortData = getCurrentLanguage().code === "en" ? sortData : sortDataVie;
+  const [selectedSort, setSelectedSort] = useState(_sortData[0]);
   // @ts-ignore
   const questionsRequesting = useSelector(
     (state: { questionReducer: { type: ActionTypes } }) =>
@@ -130,6 +165,36 @@ function Question() {
     }, 10000);
     return () => clearInterval(interval);
   }, []);
+  const deleteHandler = () => {
+    api
+      .deleteQuesiton(id as string)
+      .then((res) => {
+        router.push("/");
+        toast({
+          title: "Success",
+          description: "Question deleted successfully",
+          status: "success",
+          duration: 3000,
+          position: "top-right",
+          isClosable: true,
+        });
+      })
+      .catch(
+        // @ts-ignore
+        (err) => {
+          toast({
+            title: "Error",
+            description: "Something went wrong",
+            status: "error",
+            icon: "error",
+            duration: 3000,
+            position: "top-right",
+            variant: "subtle",
+            isClosable: true,
+          });
+        }
+      );
+  };
   const voteQuestion = (voteType: VOTE) => {
     let form: FormVote = {
       question_id: id as string,
@@ -204,14 +269,19 @@ function Question() {
       )
     );
   };
+  useEffect(() => {
+    fecthAnswer();
+  }, [selectedSort.value]);
   const fecthAnswer = () => {
+    const form = {
+      question_id: id as string,
+      limit: 50,
+      page: 1,
+      sortBy: selectedSort.value,
+    };
     dispatch<any>(
       actionGetAnswer(
-        {
-          question_id: id as string,
-          limit: 20,
-          page: 1,
-        },
+        form,
         (res) => {
           // @ts-ignore
           setState((oldState) => {
@@ -399,6 +469,7 @@ function Question() {
       )
     );
   }
+
   return (
     <>
       {state.question ? (
@@ -583,7 +654,7 @@ function Question() {
                                 <TagQuestion key={tag.id} tag={tag} />
                               ))}
                             </HStack>
-                            <HStack w={"full"}>
+                            <HStack w={"full"} justifyContent={"space-between"}>
                               {/* modified times */}
                               <Text
                                 fontSize="xs"
@@ -603,7 +674,6 @@ function Question() {
                                   )
                                 )}
                               </Text>
-                              <Spacer />
                               <Author
                                 type="simple"
                                 user={state.question.user}
@@ -664,6 +734,17 @@ function Question() {
                             size={"sm"}
                             variant="link"
                             onClick={() => {
+                              setShowDelete(true);
+                            }}
+                            isDisabled={state.question.state === "blocked"}
+                          >
+                            {getTranslate("DELETE")}
+                          </Button>
+                          <Button
+                            colorScheme="orange"
+                            size={"sm"}
+                            variant="link"
+                            onClick={() => {
                               router.push(
                                 router.basePath +
                                   `/question/edit?questionId=${state.question.id}`
@@ -686,6 +767,78 @@ function Question() {
                     fecthAnswer();
                   }}
                 />
+                <HStack w={"full"}>
+                  <Text
+                    style={{
+                      fontSize: "lg",
+                      fontWeight: "bold",
+                      minWidth: "fit-content",
+                    }}
+                  >
+                    {getTranslate("ANSWER")} (
+                    {(state.answerList && state.answerList.meta?.totalItems) ||
+                      0}
+                    )
+                  </Text>
+                  <Spacer />
+                  <VStack
+                    justifyContent={"flex-end"}
+                    alignItems={"end"}
+                    spacing={0}
+                  >
+                    <Text
+                      fontSize={{
+                        base: "xs",
+                        md: "xs",
+                      }}
+                      style={{
+                        fontWeight: "bold",
+                        minWidth: "fit-content",
+                      }}
+                    >
+                      {getTranslate("SORT_BY")}
+                    </Text>
+                    <Button
+                      display={
+                        selectedSort.value === _sortData[0].value
+                          ? "none"
+                          : "flex"
+                      }
+                      colorScheme="blue"
+                      size={"xs"}
+                      variant={"link"}
+                      onClick={() => {
+                        setSelectedSort(_sortData[0]);
+                      }}
+                    >
+                      {getTranslate("RESET_TO_DEFAULT")}
+                    </Button>
+                  </VStack>
+                  <Select
+                    w={"fit-content"}
+                    defaultValue={selectedSort.value}
+                    onChange={
+                      // @ts-ignore
+                      (e) => {
+                        setSelectedSort(
+                          // @ts-ignore
+                          _sortData.find(
+                            (sort) => sort.value === e.target.value
+                          )
+                        );
+                      }
+                    }
+                  >
+                    {_sortData.map((sort) => (
+                      <option
+                        value={sort.value}
+                        selected={sort.value === selectedSort.value}
+                      >
+                        {sort.title}
+                      </option>
+                    ))}
+                  </Select>
+                </HStack>
                 <VStack divider={<Divider />}>
                   {state.answerList &&
                     state.answerList?.data?.map((answer) => (
@@ -820,6 +973,27 @@ function Question() {
           </Flex>
         </Box>
       )}
+      <CustomAlertDialog
+        content={getTranslate("DELETE_QUESTION_CONFIRM_TITLE")}
+        title={getTranslate("DELETE_QUESTION").concat("?")}
+        buttonStyle={{
+          display: "none",
+        }}
+        isOpen={isShowDelete}
+        onClose={() => setShowDelete(false)}
+        type="delete"
+        confirmButtonStyle={{
+          variant: "solid",
+          colorScheme: "red",
+        }}
+        cancelButtonStyle={{
+          variant: "ghost",
+          colorScheme: "gray",
+        }}
+        confirmText={getTranslate("DELETE_QUESTION_CONFIRM")}
+        cancelText={getTranslate("CANCEL")}
+        confirmAction={deleteHandler}
+      />
     </>
   );
 }

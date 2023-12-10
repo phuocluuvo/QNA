@@ -116,7 +116,7 @@ function CreateQuestion() {
     } else if (value.size < 1) {
       error = "Tags is required";
     } else if (value.size >= 5) {
-      error = "Tags reach the number of tag can added";
+      error = "Tags reach the number of tag cannot add more";
     }
     return error;
   };
@@ -278,6 +278,7 @@ function CreateQuestion() {
       w={"full"}
       minW={{ lg: "70%", base: "100%" }}
       gap={10}
+      minH={"30vh"}
       flexDirection={"column-reverse"}
     >
       <Formik
@@ -370,7 +371,9 @@ function CreateQuestion() {
                           validateTags(state.selectedTags)
                         }
                         id="resultsTagIds"
-                        placeholder={validateTags(state.selectedTags)?? "Search tag"}
+                        placeholder={
+                          validateTags(state.selectedTags) ?? "Search tag"
+                        }
                         type="text"
                         value={state.searchTagId}
                         onChange={(e) => {

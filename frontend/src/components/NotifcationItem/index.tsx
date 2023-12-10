@@ -22,7 +22,10 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { NotificationType } from "@/util/type/Notification.type";
-import helper, { markdownToPlainText } from "@/util/helper";
+import helper, {
+  markdownToPlainText,
+  removeVietnameseTones,
+} from "@/util/helper";
 import { BiPin } from "react-icons/bi";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -57,7 +60,7 @@ function NotificationItem({
   const [hydrated, setHydrated] = useState(false);
   const [item, setItem] = React.useState<NotificationType>(notification);
   const [isShowDetail, setIsShowDetail] = React.useState(false);
-  const { isOpen, onClose, onOpen } = useDisclosure();
+
   const { setBadgeNumber } = React.useContext(LayoutContext);
   const router = useRouter();
   const dispatch = useDispatch();
@@ -87,7 +90,12 @@ function NotificationItem({
                   cursor: "pointer",
                 }}
                 onClick={() => {
-                  router.push(`/question/${itemObject?.id}`);
+                  router.push(
+                    `/question/${itemObject?.id}/${removeVietnameseTones(
+                      // @ts-ignore
+                      itemObject?.title
+                    )}`
+                  );
                 }}
               >
                 {itemObject?.title}
@@ -187,7 +195,12 @@ function NotificationItem({
                 }}
                 onClick={() => {
                   router.push(
-                    `/question/${itemObject?.question.id}#${itemObject?.id}`,
+                    `/question/${
+                      itemObject?.question.id
+                    }/${removeVietnameseTones(
+                      // @ts-ignore
+                      itemObject?.question.title
+                    )}#${itemObject?.id}`,
                     undefined,
                     {
                       shallow: false,
@@ -226,7 +239,12 @@ function NotificationItem({
                   cursor: "pointer",
                 }}
                 onClick={() => {
-                  router.push(`/question/${question?.id}`);
+                  router.push(
+                    `/question/${question?.id}/${removeVietnameseTones(
+                      // @ts-ignore
+                      question?.title
+                    )}`
+                  );
                 }}
               >
                 {question?.title}
@@ -300,7 +318,12 @@ function NotificationItem({
                 cursor: "pointer",
               }}
               onClick={() => {
-                router.push(`/question/${itemObject?.id}`);
+                router.push(
+                  `/question/${itemObject?.id}/${removeVietnameseTones(
+                    // @ts-ignore
+                    itemObject?.title
+                  )}`
+                );
               }}
             >
               <Text maxW={"full"} textOverflow={"ellipsis"} noOfLines={1}>
@@ -359,9 +382,16 @@ function NotificationItem({
                   cursor: "pointer",
                 }}
                 onClick={() => {
-                  router.push(`/question/${itemObject?.id}`, undefined, {
-                    shallow: false,
-                  });
+                  router.push(
+                    `/question/${itemObject?.id}/${removeVietnameseTones(
+                      // @ts-ignore
+                      itemObject?.title
+                    )}`,
+                    undefined,
+                    {
+                      shallow: false,
+                    }
+                  );
                 }}
               >
                 show more
@@ -392,7 +422,12 @@ function NotificationItem({
                 cursor: "pointer",
               }}
               onClick={() => {
-                router.push(`/question/${itemObject?.question.id}`);
+                router.push(
+                  `/question/${itemObject?.question.id}/${removeVietnameseTones(
+                    // @ts-ignore
+                    itemObject?.question.title
+                  )}`
+                );
               }}
             >
               <Text maxW={"full"} textOverflow={"ellipsis"} noOfLines={1}>
@@ -489,6 +524,7 @@ function NotificationItem({
       )
     );
   }
+
   useEffect(() => {
     setHydrated(true);
   }, []);
@@ -545,13 +581,12 @@ function NotificationItem({
             border: "none",
           }),
         }}
+        onClick={(e) => {
+          setIsShowDetail(true);
+        }}
         opacity={!item.isRead ? 1 : 0.5}
       >
-        <Stack
-          direction={type === "normal" ? "row" : "column"}
-          w={"full"}
-          onClick={onOpen}
-        >
+        <Stack direction={type === "normal" ? "row" : "column"} w={"full"}>
           <Text fontSize={"sm"} display={"flex"}>
             {/* @ts-ignore */}
             <Image
@@ -643,33 +678,32 @@ function NotificationItem({
         </Text>
       </Button>
       <Modal
-        isOpen={isOpen}
+        isOpen={isShowDetail}
         onClose={() => {
-          onClose();
+          setIsShowDetail(false);
         }}
         size={"2xl"}
       >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Notification</ModalHeader>
+          <ModalHeader>{getTranslate("NOTIFICATIONS")}</ModalHeader>
           <ModalCloseButton
             onClick={() => {
-              onClose();
-              router.push({
-                pathname: "/user/notification",
-                query: {
-                  ...router.query,
-                  id: undefined,
-                },
-              });
+              setIsShowDetail(false);
+              // router.push({
+              //   pathname: "/user/notification",
+              //   query: {
+              //     ...router.query,
+              //     id: undefined,
+              //   },
+              // });
             }}
           />
           <ModalBody>
-            {/* @ts-ignore */}
-            {isOpen && item.activity && getContentBasedOnType()}
+            {isShowDetail && item.activity && getContentBasedOnType()}
           </ModalBody>
           <ModalFooter>
-            <Button mr={3} onClick={onClose}>
+            <Button mr={3} onClick={() => setIsShowDetail(false)}>
               {getTranslate("CLOSE")}
             </Button>
           </ModalFooter>
