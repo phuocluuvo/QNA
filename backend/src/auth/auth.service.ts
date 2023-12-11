@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ForbiddenException,
+  Inject,
   Injectable,
 } from "@nestjs/common";
 import { UsersService } from "../users/users.service";
@@ -15,6 +16,8 @@ import { message } from "../constants/message.constants";
 import { UserState } from "../enums/user-state.enum";
 import { v4 as uuidv4 } from "uuid";
 import { EmailService } from "src/email/email.service";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Cache } from "cache-manager";
 
 @Injectable()
 export class AuthService {
@@ -22,6 +25,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly emailService: EmailService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   /**
@@ -62,14 +66,55 @@ export class AuthService {
       ...createUserDto,
       password: hash,
     });
-    const tokens = await this.getTokens(
-      newUser.id,
-      newUser.username,
-      newUser.role,
-    );
-    await this.updateRefreshToken(newUser.id, tokens.refreshToken);
+    // const tokens = await this.getTokens(
+    //   newUser.id,
+    //   newUser.username,
+    //   newUser.role,
+    // );
+    // await this.updateRefreshToken(newUser.id, tokens.refreshToken);
     delete newUser.password;
-    return { ...newUser, ...tokens };
+    await this.sendEmailVefiry(newUser.id);
+    return { ...newUser };
+  }
+
+  async sendEmailVefiry(userId: string): Promise<any> {
+    const newUser: User = await this.usersService.find({ id: userId });
+
+    if (newUser) {
+      await this.cacheManager.del("verify::" + newUser.id);
+      const opt = Math.floor(100000 + Math.random() * 900000).toString();
+      await this.cacheManager.set("verify::" + newUser.id, opt, {
+        ttl: 5 * 60,
+      } as any);
+      return this.emailService.sendEmailVerify(newUser.email, opt);
+    } else {
+      throw new BadRequestException(message.NOT_EXITS_USER);
+    }
+  }
+
+  async confirmEmail(userId: string, otp: string): Promise<any> {
+    const newUser: User = await this.usersService.find({ id: userId });
+
+    if (newUser.state != UserState.VERIFYING) {
+      throw new BadRequestException(message.USER_IS_VERIFIED);
+    }
+
+    const otpCache = await this.cacheManager.get("verify::" + newUser.id);
+    if (otp && otp == otpCache) {
+      await this.usersService.updateUserForAdmin(newUser.id, {
+        state: UserState.ACTIVE,
+      });
+      const tokens = await this.getTokens(
+        newUser.id,
+        newUser.username,
+        newUser.role,
+      );
+      await this.updateRefreshToken(newUser.id, tokens.refreshToken);
+      delete newUser.password;
+      return { ...newUser, ...tokens };
+    } else {
+      throw new BadRequestException(message.OTP_IS_INCORRECT);
+    }
   }
 
   /**
@@ -90,8 +135,16 @@ export class AuthService {
       throw new BadRequestException(message.PASSWORD_IS_INCORRECT);
 
     const isBlock = user.state === UserState.BLOCKED;
-
     if (isBlock) throw new BadRequestException(message.USER_IS_BLOCK);
+
+    const isVerifing = user.state === UserState.VERIFYING;
+    if (isVerifing)
+      throw new BadRequestException({
+        message: message.USER_IS_NOT_VERIFY,
+        error: "Bad Request",
+        statusCode: 400,
+        ...user,
+      });
 
     const tokens = await this.getTokens(user.id, user.username, user.role);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
@@ -104,8 +157,8 @@ export class AuthService {
    * Sign in a user with Google.
    * If the user doesn't exist, create a new user.
    * If the user exists, update the refresh token.
-   * @param email Email of the user.
    * @returns Promise<any> Tokens for the signed-in user.
+   * @param user
    */
 
   async signInWithGoogle(user: any) {
@@ -291,7 +344,6 @@ export class AuthService {
   /**
    * Refresh tokens for a user.
    *
-   * @param userId ID of the user.
    * @param refreshToken Refresh token.
    * @returns Promise< accessToken: string; refreshToken: string > The refreshed tokens.
    * @throws ForbiddenException if the user or the refresh token is invalid.
@@ -401,10 +453,10 @@ export class AuthService {
 
   /**
    * Confirm password
-   * @param user
-   * @param passwordConfirm
    * @returns
    * @throws BadRequestException
+   * @param userId
+   * @param password
    */
 
   async confirmPassword(userId: string, password: string) {

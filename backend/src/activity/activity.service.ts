@@ -138,6 +138,12 @@ export class ActivityService {
     return this.usersService.updateActivityPoint(userId, -pointChange);
   }
 
+  /**
+   *
+   * @param userId
+   * @param date
+   * @returns
+   */
   async getPointChange(userId: string, date: string) {
     const user = await this.usersService.find({
       id: userId,
@@ -173,6 +179,11 @@ export class ActivityService {
     return result;
   }
 
+  /**
+   * Get reputation point
+   * @param activityType
+   * @private
+   */
   private async transConfigToReputationConstant(
     activityType: ReputationActivityTypeEnum,
   ): Promise<number> {
@@ -220,12 +231,20 @@ export class ActivityService {
     }
   }
 
+  /**
+   * Check undelete question
+   * @param questionId
+   */
   async checkUndeleteQuestion(questionId: string): Promise<boolean> {
     const requiredActivity = 10;
     const activity = await this.countUnblockQuestion(questionId);
     return activity < requiredActivity;
   }
 
+  /**
+   * Count unblock question
+   * @param questionId
+   */
   async countUnblockQuestion(questionId: string): Promise<number> {
     const activityType = ReputationActivityTypeEnum.UN_BLOCK_QUESTION;
 
@@ -237,6 +256,10 @@ export class ActivityService {
     });
   }
 
+  /**
+   *  Count question balance
+   * @param userId
+   */
   async countQuestionBalance(userId: string) {
     const sysconfigUsing = await this.sysconfigService.getUsingSysconfig();
     const todayStart = new Date();
@@ -264,22 +287,22 @@ export class ActivityService {
     let flag = true;
     let pointCheck = 0;
     const count = activity >= requiredActivity ? activity : requiredActivity;
-    console.log("count::" + count);
     while (flag) {
       pointCheck = Math.pow(count + 1 + balance, 2) * questionPointCheck;
-      console.log("poiuntcheck::" + pointCheck);
-      console.log("userP::" + user.activityPoint);
+
       if (user.activityPoint >= pointCheck && balance < 100) {
-        console.log("user::" + user.activityPoint);
         balance++;
       } else {
         flag = false;
       }
       user.activityPoint += questionPointCheck;
     }
-    console.log(balance);
-    return activity >= requiredActivity
-      ? balance
-      : balance + requiredActivity - activity;
+
+    const balanceQuestion =
+      activity >= requiredActivity
+        ? balance
+        : balance + requiredActivity - activity;
+
+    return { balance: balanceQuestion, pointCheckNextQuestion: pointCheck };
   }
 }
