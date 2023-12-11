@@ -2,11 +2,12 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
+  Query,
   Req,
   Res,
   UseGuards,
-  Query,
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { AuthService } from "./auth.service";
@@ -168,5 +169,18 @@ export class AuthController {
   ) {
     const userId = req.user["sub"];
     return this.authService.confirmPassword(userId, password);
+  }
+
+  @Get("/send-email-verify/:userId")
+  async sendEmailVerify(@Param("userId") userId: string) {
+    return this.authService.sendEmailVefiry(userId);
+  }
+
+  @Post("/confirm-email/:userId")
+  async confirmEmail(
+    @Body("otp") otp: string,
+    @Param("userId") userId: string,
+  ) {
+    return this.authService.confirmEmail(userId, otp);
   }
 }

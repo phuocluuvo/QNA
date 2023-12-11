@@ -287,7 +287,6 @@ export class ActivityService {
     let flag = true;
     let pointCheck = 0;
     const count = activity >= requiredActivity ? activity : requiredActivity;
-    console.log("count::" + count);
     while (flag) {
       pointCheck = Math.pow(count + 1 + balance, 2) * questionPointCheck;
 
@@ -299,8 +298,11 @@ export class ActivityService {
       user.activityPoint += questionPointCheck;
     }
 
-    return activity >= requiredActivity
-      ? balance
-      : balance + requiredActivity - activity;
+    const balanceQuestion =
+      activity >= requiredActivity
+        ? balance
+        : balance + requiredActivity - activity;
+
+    return { balance: balanceQuestion, pointCheckNextQuestion: pointCheck };
   }
 }
