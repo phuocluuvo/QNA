@@ -365,6 +365,9 @@ function AnswerItem({
                 onClick={() => {
                   router.push(`/question/edit/answer/${answer.id}`);
                 }}
+                display={
+                  session.data?.user.id === answer.user.id ? "block" : "none"
+                }
                 colorScheme={"blue"}
               >
                 {getTranslate("EDIT")}
