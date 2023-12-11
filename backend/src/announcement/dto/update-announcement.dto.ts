@@ -30,6 +30,12 @@ export class UpdateAnnouncementDto {
   expiration_date: Date;
 
   @ApiProperty()
+  @IsDateString()
+  @Expose()
+  @IsOptional()
+  publication_date: Date;
+
+  @ApiProperty()
   @IsBoolean()
   @Expose()
   is_published: boolean;

@@ -21,6 +21,11 @@ export class CreateAnnouncementDto {
   expiration_date: Date;
 
   @ApiProperty()
+  @IsDateString()
+  @Expose()
+  publication_date: Date;
+
+  @ApiProperty()
   @IsBoolean()
   @Expose()
   is_published: boolean;

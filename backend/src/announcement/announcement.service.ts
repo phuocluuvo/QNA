@@ -95,6 +95,9 @@ export class AnnouncementService {
       .createQueryBuilder("announcement")
       .where("announcement.expiration_date > :currentTime", {
         currentTime: new Date(),
+      })
+      .andWhere("announcement.publication_date < :currentTime", {
+        currentTime: new Date(),
       });
     if (findAnnouncementDto.is_published)
       queryBuilder.andWhere("announcement.is_published = :is_published", {
