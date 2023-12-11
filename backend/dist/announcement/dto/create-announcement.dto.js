@@ -38,6 +38,12 @@ __decorate([
 ], CreateAnnouncementDto.prototype, "expiration_date", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)(),
+    (0, class_validator_1.IsDateString)(),
+    (0, class_transformer_1.Expose)(),
+    __metadata("design:type", Date)
+], CreateAnnouncementDto.prototype, "publication_date", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
     (0, class_validator_1.IsBoolean)(),
     (0, class_transformer_1.Expose)(),
     __metadata("design:type", Boolean)

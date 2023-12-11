@@ -40,6 +40,10 @@ __decorate([
     __metadata("design:type", Date)
 ], Announcement.prototype, "expiration_date", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ type: "datetime", nullable: true }),
+    __metadata("design:type", Date)
+], Announcement.prototype, "publication_date", void 0);
+__decorate([
     (0, typeorm_1.Column)({ type: "tinyint", default: 0 }),
     __metadata("design:type", Boolean)
 ], Announcement.prototype, "is_published", void 0);

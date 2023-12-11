@@ -6,6 +6,7 @@ export declare class Announcement {
     createdAt: Date;
     updatedAt: Date;
     expiration_date: Date;
+    publication_date: Date;
     is_published: boolean;
     user: User;
 }
