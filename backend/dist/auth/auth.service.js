@@ -8,6 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
@@ -20,11 +23,13 @@ const message_constants_1 = require("../constants/message.constants");
 const user_state_enum_1 = require("../enums/user-state.enum");
 const uuid_1 = require("uuid");
 const email_service_1 = require("../email/email.service");
+const cache_manager_1 = require("@nestjs/cache-manager");
 let AuthService = class AuthService {
-    constructor(usersService, jwtService, emailService) {
+    constructor(usersService, jwtService, emailService, cacheManager) {
         this.usersService = usersService;
         this.jwtService = jwtService;
         this.emailService = emailService;
+        this.cacheManager = cacheManager;
     }
     async signUp(createUserDto) {
         const errExits = {};
@@ -48,10 +53,42 @@ let AuthService = class AuthService {
             ...createUserDto,
             password: hash,
         });
-        const tokens = await this.getTokens(newUser.id, newUser.username, newUser.role);
-        await this.updateRefreshToken(newUser.id, tokens.refreshToken);
         delete newUser.password;
-        return { ...newUser, ...tokens };
+        await this.sendEmailVefiry(newUser.id);
+        return { ...newUser };
+    }
+    async sendEmailVefiry(userId) {
+        const newUser = await this.usersService.find({ id: userId });
+        if (newUser) {
+            await this.cacheManager.del("verify::" + newUser.id);
+            const opt = Math.floor(100000 + Math.random() * 900000).toString();
+            await this.cacheManager.set("verify::" + newUser.id, opt, {
+                ttl: 5 * 60,
+            });
+            return this.emailService.sendEmailVerify(newUser.email, opt);
+        }
+        else {
+            throw new common_1.BadRequestException(message_constants_1.message.NOT_EXITS_USER);
+        }
+    }
+    async confirmEmail(userId, otp) {
+        const newUser = await this.usersService.find({ id: userId });
+        if (newUser.state != user_state_enum_1.UserState.VERIFYING) {
+            throw new common_1.BadRequestException(message_constants_1.message.USER_IS_VERIFIED);
+        }
+        const otpCache = await this.cacheManager.get("verify::" + newUser.id);
+        if (otp && otp == otpCache) {
+            await this.usersService.updateUserForAdmin(newUser.id, {
+                state: user_state_enum_1.UserState.ACTIVE,
+            });
+            const tokens = await this.getTokens(newUser.id, newUser.username, newUser.role);
+            await this.updateRefreshToken(newUser.id, tokens.refreshToken);
+            delete newUser.password;
+            return { ...newUser, ...tokens };
+        }
+        else {
+            throw new common_1.BadRequestException(message_constants_1.message.OTP_IS_INCORRECT);
+        }
     }
     async signIn(data) {
         const user = await this.usersService.findOne(data.username);
@@ -63,6 +100,14 @@ let AuthService = class AuthService {
         const isBlock = user.state === user_state_enum_1.UserState.BLOCKED;
         if (isBlock)
             throw new common_1.BadRequestException(message_constants_1.message.USER_IS_BLOCK);
+        const isVerifing = user.state === user_state_enum_1.UserState.VERIFYING;
+        if (isVerifing)
+            throw new common_1.BadRequestException({
+                message: message_constants_1.message.USER_IS_NOT_VERIFY,
+                error: "Bad Request",
+                statusCode: 400,
+                ...user,
+            });
         const tokens = await this.getTokens(user.id, user.username, user.role);
         await this.updateRefreshToken(user.id, tokens.refreshToken);
         delete user.password;
@@ -262,8 +307,9 @@ let AuthService = class AuthService {
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
+    __param(3, (0, common_1.Inject)(cache_manager_1.CACHE_MANAGER)),
     __metadata("design:paramtypes", [users_service_1.UsersService,
         jwt_1.JwtService,
-        email_service_1.EmailService])
+        email_service_1.EmailService, Object])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

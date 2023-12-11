@@ -16,4 +16,11 @@ export declare class EmailService {
             email: string;
         };
     }>;
+    sendEmailVerify(receiverEmail: string, opt: string): Promise<{
+        data: {
+            status: string;
+            message: string;
+            email: string;
+        };
+    }>;
 }

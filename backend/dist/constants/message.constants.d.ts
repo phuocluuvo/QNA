@@ -51,4 +51,7 @@ export declare const message: {
     PASSWORD_IS_EMPTY: string;
     EMAIL_IS_REQUIRED: string;
     CANNOT_DELETE_SYSCONFIG_USING: string;
+    OTP_IS_INCORRECT: string;
+    USER_IS_NOT_VERIFY: string;
+    USER_IS_VERIFIED: string;
 };

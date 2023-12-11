@@ -6,12 +6,16 @@ import { Role } from "../enums/role.enum";
 import { User } from "../users/entity/users.entity";
 import { UserState } from "../enums/user-state.enum";
 import { EmailService } from "src/email/email.service";
+import { Cache } from "cache-manager";
 export declare class AuthService {
     private readonly usersService;
     private readonly jwtService;
     private readonly emailService;
-    constructor(usersService: UsersService, jwtService: JwtService, emailService: EmailService);
+    private cacheManager;
+    constructor(usersService: UsersService, jwtService: JwtService, emailService: EmailService, cacheManager: Cache);
     signUp(createUserDto: CreateUserDto): Promise<any>;
+    sendEmailVefiry(userId: string): Promise<any>;
+    confirmEmail(userId: string, otp: string): Promise<any>;
     signIn(data: LoginUserDto): Promise<{
         accessToken: string;
         expires_in: Date;

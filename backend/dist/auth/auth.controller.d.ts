@@ -98,4 +98,6 @@ export declare class AuthController {
     confirmPassword(req: Request, password: string): Promise<{
         status: string;
     }>;
+    sendEmailVerify(userId: string): Promise<any>;
+    confirmEmail(otp: string, userId: string): Promise<any>;
 }

@@ -35,14 +35,12 @@ let UsersService = class UsersService {
     }
     async getAllUser(query, state, role) {
         const queryBuilder = await this.userRepository.createQueryBuilder("users");
-        console.log(query);
         if (state) {
             queryBuilder.andWhere({ state: state });
         }
         if (role) {
             queryBuilder.andWhere({ role: role });
         }
-        console.log(await this.transToArray(query));
         return (0, nestjs_paginate_1.paginate)(query, queryBuilder, {
             ...user_pagination_1.userPaginateConfig,
             ...(await this.transToArray(query)),

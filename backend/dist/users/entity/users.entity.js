@@ -98,7 +98,7 @@ __decorate([
     (0, typeorm_1.Column)({
         type: "enum",
         enum: user_state_enum_1.UserState,
-        default: user_state_enum_1.UserState.ACTIVE,
+        default: user_state_enum_1.UserState.VERIFYING,
     }),
     __metadata("design:type", String)
 ], User.prototype, "state", void 0);

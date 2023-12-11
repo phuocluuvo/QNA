@@ -5,5 +5,6 @@ var UserState;
 (function (UserState) {
     UserState["ACTIVE"] = "active";
     UserState["BLOCKED"] = "blocked";
+    UserState["VERIFYING"] = "verifying";
 })(UserState || (exports.UserState = UserState = {}));
 //# sourceMappingURL=user-state.enum.js.map

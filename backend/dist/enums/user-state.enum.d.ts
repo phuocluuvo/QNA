@@ -1,4 +1,5 @@
 export declare enum UserState {
     ACTIVE = "active",
-    BLOCKED = "blocked"
+    BLOCKED = "blocked",
+    VERIFYING = "verifying"
 }

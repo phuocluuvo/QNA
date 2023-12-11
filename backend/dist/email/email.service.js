@@ -80,6 +80,37 @@ let EmailService = class EmailService {
             console.error("Error sending email:", error);
         }
     }
+    async sendEmailVerify(receiverEmail, opt) {
+        console.log("Sending email...");
+        const mailOptions = {
+            to: receiverEmail,
+            subject: "Xác thực địa chỉ email",
+            text: "Verify of your email",
+            html: `
+      <h5> Chào bạn </h5>
+      <p> Bạn vừa yêu xác thực địa chỉ email tại website QNA </p>
+      <h1> ${opt} </h1>
+      <p> Mã này sẽ hết hạn sau 5 phút </p>
+      <p> Nếu bạn không yêu cầu, vui lòng bỏ qua email này </p>
+      <p>Trân trọng.</p>
+      <p>QNA</p>
+    `,
+        };
+        try {
+            await this.mailerService.sendMail(mailOptions);
+            console.log("Email sent successfully!");
+            return {
+                data: {
+                    status: "success",
+                    message: "Email sent successfully!",
+                    email: receiverEmail,
+                },
+            };
+        }
+        catch (error) {
+            console.error("Error sending email:", error);
+        }
+    }
 };
 exports.EmailService = EmailService;
 exports.EmailService = EmailService = __decorate([

@@ -86,6 +86,12 @@ let AuthController = class AuthController {
         const userId = req.user["sub"];
         return this.authService.confirmPassword(userId, password);
     }
+    async sendEmailVerify(userId) {
+        return this.authService.sendEmailVefiry(userId);
+    }
+    async confirmEmail(otp, userId) {
+        return this.authService.confirmEmail(userId, otp);
+    }
 };
 exports.AuthController = AuthController;
 __decorate([
@@ -206,6 +212,21 @@ __decorate([
     __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "confirmPassword", null);
+__decorate([
+    (0, common_1.Get)("/send-email-verify/:userId"),
+    __param(0, (0, common_1.Param)("userId")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "sendEmailVerify", null);
+__decorate([
+    (0, common_1.Post)("/confirm-email/:userId"),
+    __param(0, (0, common_1.Body)("otp")),
+    __param(1, (0, common_1.Param)("userId")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "confirmEmail", null);
 exports.AuthController = AuthController = __decorate([
     (0, swagger_1.ApiTags)("auth"),
     (0, common_1.Controller)("auth"),
