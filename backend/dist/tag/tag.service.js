@@ -40,6 +40,7 @@ let TagService = class TagService {
     async findOneByName(name) {
         const comment = await this.tagRepository.findOne({
             where: { name: name },
+            relations: ["user"],
         });
         if (!comment) {
             throw new common_1.NotFoundException(message_constants_1.message.NOT_FOUND.TAG);
