@@ -30,8 +30,6 @@ export class UsersService {
   async getAllUser(query: PaginateQuery, state: string, role: string) {
     const queryBuilder = await this.userRepository.createQueryBuilder("users");
 
-    console.log(query);
-
     if (state) {
       queryBuilder.andWhere({ state: state });
     }
@@ -39,8 +37,6 @@ export class UsersService {
     if (role) {
       queryBuilder.andWhere({ role: role });
     }
-
-    console.log(await this.transToArray(query));
 
     return paginate(query, queryBuilder, {
       ...userPaginateConfig,

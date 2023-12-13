@@ -78,7 +78,7 @@ export class User {
   @Column({
     type: "enum",
     enum: UserState,
-    default: UserState.ACTIVE,
+    default: UserState.VERIFYING,
   })
   state: UserState;
 

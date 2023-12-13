@@ -59,6 +59,7 @@ export class TagService {
   async findOneByName(name: string) {
     const comment = await this.tagRepository.findOne({
       where: { name: name },
+      relations: ["user"],
     });
 
     if (!comment) {
