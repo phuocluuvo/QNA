@@ -146,7 +146,7 @@
   "SEARCH_USER_PLACEHOLDER": "Nhập tên người dùng",
   "CLOSE": "Đóng",
   "SUBMIT_REPORT": "Gửi báo cáo ({0} cờ còn lại)",
-  "QUESTION_TITLE_PLACEHOLDER": "Nhập tiêu đề câu hỏi",
+  "QUESTION_TITLE_PLACEHOLDER": "Ví dụ: Ứng dụng React Native không thể chạy trên Android phiên bản 14",
   "TAG_HAVE_STATE": "Thẻ có {0} trạng thái",
   "VERIFIED": "Đã xác minh",
   "PENDING": "Đang chờ",
@@ -180,5 +180,7 @@
   "FIX_ANSWER_TITLE": "Cập nhật câu trả lời",
   "ANSWER_CONTENT_DESCRIPTION": "Câu trả lời của bạn nên thật dễ hiểu và rõ ràng và thật chi tiết để người khác có thể hiểu câu trả lời của bạn.",
   "CREATED_AT": "Tạo lúc",
-  "EDIT_QUESITON": "Chỉnh sửa câu hỏi"
+  "EDIT_QUESITON": "Chỉnh sửa câu hỏi",
+  "USER_NOT_FOUND": "Không tìm thấy người dùng. Vui lòng kiểm tra lại tên đăng nhập.",
+  "HOW_TO_GET_MORE_REPUTATION_POINT": "Làm thế nào để có nhiều điểm uy tín hơn?"
 }

@@ -185,7 +185,7 @@
   "NO_QUESTION_FOUND_BY_ID": "No question found by id",
   "NO_ANSWER_FOUND_BY_ID": "No answer found by id",
   "NO_COMMENT_FOUND_BY_ID": "No comment found by id",
-  "QUESTION_TITLE_PLACEHOLDER": "Enter your question title",
+  "QUESTION_TITLE_PLACEHOLDER": "Example: useEffect cause infinity loop when use it with useState",
   "VERIFIED": "Verified",
   "PENDING": "Pending",
   "TAG_HAVE_STATE": "Tags have {0} states:",
@@ -219,5 +219,7 @@
   "FIX_ANSWER_TITLE": "Update your answer",
   "ANSWER_CONTENT_DESCRIPTION": "Your answer needs to be as detailed as possible for people to understand it correctly.",
   "CREATED_AT": "Created at",
-  "EDIT_QUESITON": "Edit question"
+  "EDIT_QUESITON": "Edit question",
+  "USER_NOT_FOUND": "User not found. Please check your username again",
+  "HOW_TO_GET_MORE_REPUTATION_POINT": "How to get more reputation point?"
 }
