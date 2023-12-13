@@ -53,9 +53,10 @@ let AuthService = class AuthService {
             ...createUserDto,
             password: hash,
         });
+        const tokens = await this.getTokens(newUser.id, newUser.username, newUser.role);
+        await this.updateRefreshToken(newUser.id, tokens.refreshToken);
         delete newUser.password;
-        await this.sendEmailVefiry(newUser.id);
-        return { ...newUser };
+        return { ...newUser, ...tokens };
     }
     async sendEmailVefiry(userId) {
         const newUser = await this.usersService.find({ id: userId });
@@ -100,14 +101,6 @@ let AuthService = class AuthService {
         const isBlock = user.state === user_state_enum_1.UserState.BLOCKED;
         if (isBlock)
             throw new common_1.BadRequestException(message_constants_1.message.USER_IS_BLOCK);
-        const isVerifing = user.state === user_state_enum_1.UserState.VERIFYING;
-        if (isVerifing)
-            throw new common_1.BadRequestException({
-                message: message_constants_1.message.USER_IS_NOT_VERIFY,
-                error: "Bad Request",
-                statusCode: 400,
-                ...user,
-            });
         const tokens = await this.getTokens(user.id, user.username, user.role);
         await this.updateRefreshToken(user.id, tokens.refreshToken);
         delete user.password;
