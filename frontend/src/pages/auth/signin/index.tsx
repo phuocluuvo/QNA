@@ -219,40 +219,32 @@ export default function SignIn() {
     }
   }, [router.query.uuid]);
   function handleCheckExist(value: string) {
-    dispatch(
-      // @ts-ignore
-      actionCheckUserExisted(
-        value,
-        (res: UserType) => {
-          console.log(res);
-
-          if (res.username)
-            dispatch(
-              // @ts-ignore
-              actionForgetPassword(
-                res.username,
-                (res) => {
-                  toast({
-                    title: getTranslate("EMAIL_SENT"),
-                    status: "success",
-                  });
-                  console.log(res);
-                },
-                (err) => {}
-              )
-            );
-          onClose();
-        },
-        () => {
-          toast({
-            title: getTranslate("USER_NOT_FOUND"),
-            status: "error",
-          });
-          onClose();
-          // router.push(`/auth/reset-password?username=${value}`);
-        }
-      )
-    );
+    api
+      .checkUsernameExisted(value)
+      .then((res) => {
+        if (res.data.username)
+          dispatch(
+            // @ts-ignore
+            actionForgetPassword(
+              res.data.username,
+              (res) => {
+                toast({
+                  title: getTranslate("EMAIL_SENT"),
+                  status: "success",
+                });
+              },
+              (err) => {}
+            )
+          );
+        onClose();
+      })
+      .catch((err) => {
+        toast({
+          title: getTranslate("USER_NOT_FOUND"),
+          status: "error",
+        });
+        // router.push(`/auth/reset-password?username=${value}`);
+      });
   }
 
   return (
@@ -329,7 +321,7 @@ export default function SignIn() {
                     </FormControl>
                   )}
                 </Field>
-                <Field name="password" validate={validatePassword}>
+                <Field name="password">
                   {/* @ts-ignore */}
                   {({ field, form }) => (
                     <FormControl

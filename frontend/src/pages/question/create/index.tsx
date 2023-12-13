@@ -7,22 +7,18 @@ import {
   AccordionPanel,
   Alert,
   AlertDescription,
-  AlertDialogContent,
   AlertIcon,
-  AlertTitle,
   Box,
   Button,
   Collapse,
-  Container,
-  Divider,
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Grid,
   HStack,
-  IconButton,
   Input,
   InputGroup,
+  List,
+  ListItem,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -31,7 +27,6 @@ import {
   ModalHeader,
   ModalOverlay,
   Stack,
-  Tag,
   Text,
   Textarea,
   Tooltip,
@@ -53,7 +48,6 @@ import { useRouter } from "next/router";
 import { TagType } from "@/util/type/Tag.type";
 import actionSearchTags from "@/API/redux/actions/tags/ActionSearchTag";
 import _ from "lodash";
-import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import { LanguageHelper } from "@/util/Language/Language.util";
 import { Pages } from "@/assets/constant/Pages";
 import { FormCreateQuestion } from "@/API/type/Form.type";
@@ -62,6 +56,8 @@ import actionUpdateQuestion from "@/API/redux/actions/question/ActionUpdateQuesi
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
 import TagQuestion from "@/components/TagQuestion";
+import api from "@/API/api";
+import { useSession } from "next-auth/react";
 const MDEditor = dynamic(
   () => import("@uiw/react-md-editor").then((mod) => mod.default),
   { ssr: false }
@@ -81,6 +77,8 @@ type State = {
   selectedTags?: Set<TagType>;
   tagName?: string;
   tagContent?: string;
+  questionNumberLeft: number;
+  nextQuestionCost: number;
 };
 function CreateQuestion() {
   const [state, setState] = useStateWithCallback<State>({
@@ -91,6 +89,8 @@ function CreateQuestion() {
     selectedTags: new Set(),
     tagName: "",
     tagContent: "",
+    questionNumberLeft: 0,
+    nextQuestionCost: 0,
   });
 
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -98,6 +98,8 @@ function CreateQuestion() {
   const route = useRouter();
   const { colorMode } = useColorMode();
   const dispacth = useDispatch();
+  const session = useSession();
+  const helpModal = useDisclosure();
   const handleChangeBodyQuestion = (value: string) => {
     // @ts-ignore
     setState((oldState) =>
@@ -152,6 +154,19 @@ function CreateQuestion() {
       );
     }
   };
+  useEffect(() => {
+    api.getQuestionCondition().then((res) => {
+      if (res) {
+        console.log(res);
+        setState((oldState) =>
+          helper.mappingState(oldState, {
+            questionNumberLeft: res.data.balance ?? 0,
+            nextQuestionCost: res.data.pointCheckNextQuestion ?? 0,
+          })
+        );
+      }
+    });
+  }, []);
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       searchTag(state.searchTagId);
@@ -508,17 +523,51 @@ function CreateQuestion() {
                 )}
               </Field>
             </InputGroup>
-            <HStack justifyContent={"flex-end"} w={"full"}>
-              <Button
-                type="submit"
-                mt={"5"}
-                background={colorMode === "light" ? "gray.100" : "gray.700"}
-                border={"none"}
-                isLoading={props.isSubmitting}
+            <VStack w={"full"} alignItems={"flex-end"} mt={"5"}>
+              <Tooltip
+                label={
+                  (session.data?.user.activityPoint ?? 0) <
+                  state.nextQuestionCost
+                    ? "You don't have enough reputation point to create question"
+                    : ""
+                }
               >
-                {getTranslate("CREATE")}
-              </Button>
-            </HStack>
+                <Button
+                  type="submit"
+                  isDisabled={
+                    (session.data?.user.activityPoint ?? 0) <
+                    state.nextQuestionCost
+                  }
+                  background={colorMode === "light" ? "gray.100" : "gray.700"}
+                  border={"none"}
+                  isLoading={props.isSubmitting}
+                >
+                  {getTranslate("CREATE")}
+                </Button>
+              </Tooltip>{" "}
+              <Text
+                style={{
+                  fontSize: "12px",
+                  color: "gray",
+                  textAlign: "left",
+                }}
+              >
+                *You got {state.questionNumberLeft} free question(s) left{" "}
+                {state.questionNumberLeft <= 0
+                  ? `and next question will cost you ${state.nextQuestionCost} reputation points`
+                  : ""}
+              </Text>
+              <Text>
+                <Button
+                  variant={"link"}
+                  fontSize={"sm"}
+                  colorScheme={"blue"}
+                  onClick={helpModal.onOpen}
+                >
+                  {getTranslate("HOW_TO_GET_MORE_REPUTATION_POINT")}
+                </Button>
+              </Text>
+            </VStack>
           </Form>
         )}
       </Formik>
@@ -608,6 +657,7 @@ function CreateQuestion() {
             <Button variant={"ghost"} mr={3} onClick={onClose}>
               {getTranslate("CLOSE")}
             </Button>
+
             <Button
               colorScheme="orange"
               onClick={() => {
@@ -615,6 +665,36 @@ function CreateQuestion() {
               }}
             >
               {getTranslate("CREATE")}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <Modal isOpen={helpModal.isOpen} onClose={helpModal.onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>
+            {getTranslate("HOW_TO_GET_MORE_REPUTATION_POINT")}
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <List>
+              <ListItem>Answer a question</ListItem>
+              <ListItem>Your question got approved by author</ListItem>
+              <ListItem>Your question get upvote</ListItem>
+              <ListItem
+                style={{
+                  color: "tomato",
+                  fontStyle: "italic",
+                }}
+              >
+                *You get 3 question free each day
+              </ListItem>
+            </List>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={helpModal.onClose}>
+              {getTranslate("CLOSE")}
             </Button>
           </ModalFooter>
         </ModalContent>

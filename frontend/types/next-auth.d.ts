@@ -16,6 +16,7 @@ declare module "next-auth" {
       accessToken: string;
       refreshToken: string;
       expires_in: Date;
+      activityPoint: number;
     };
   }
 }
