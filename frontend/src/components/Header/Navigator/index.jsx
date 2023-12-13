@@ -11,6 +11,8 @@ import {
   MenuItem,
   useToast,
   cookieStorageManager,
+  Text,
+  Button,
 } from "@chakra-ui/react";
 import Cookies from "js-cookie";
 import React from "react";
@@ -113,18 +115,24 @@ function Navigator({ getTranslate, isMobile }) {
     </>
   ) : session?.user ? (
     <Menu>
-      <IconButton
-        w={"fit-content"}
-        as={MenuButton}
-        variant="ghost"
-        icon={
+      <Button w={"100px"} as={MenuButton} variant="ghost">
+        <HStack>
+          <Text
+            style={{
+              fontWeight: "bold",
+              fontSize: "12px",
+              color: Colors(colorMode).PRIMARY,
+            }}
+          >
+            {session.user?.activityPoint ?? 0}
+          </Text>
           <Avatar
             size={"xs"}
             name={session.user.fullname ? session.user.fullname : "Unknown"}
             src={session.user.avatar}
           />
-        }
-      />
+        </HStack>
+      </Button>
       <MenuList>
         <MenuItem onClick={DashboardHandle}>
           {getTranslate("DASHBOARD")}
