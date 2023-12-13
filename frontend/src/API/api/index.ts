@@ -391,6 +391,21 @@ const unBlockQuestion = (questionId: string) => {
 const getFlagNumber = (id: string) => {
   return AuthApi(REQUEST_METHOD.GET, url.COUNT_FAG.replace("{id}", id));
 };
+
+const getQuestionCondition = () => {
+  return AuthApi(REQUEST_METHOD.GET, url.QUESTION_CONDITIONS);
+};
+
+const requestOTP = (id: string) => {
+  return AuthApi(REQUEST_METHOD.GET, url.VERIFY_EMAIL.replace("{id}", id));
+};
+
+const sendOTP = (id: string, otp: string) => {
+  return AuthApi(REQUEST_METHOD.POST, url.CONFIRM_OTP.replace("{id}", id), {
+    otp,
+  });
+};
+
 export default {
   requestSignUp,
   getQuestion,
@@ -452,4 +467,7 @@ export default {
   deleteQuesiton,
   getAnswerById,
   updateAnswer,
+  getQuestionCondition,
+  sendOTP,
+  requestOTP,
 };

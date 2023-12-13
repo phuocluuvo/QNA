@@ -155,5 +155,8 @@ function getErrorMessageFromCodeString(
     if (isHaveLoggedIn) return "Your session is over. Please login again";
     else return "You are not logged in. Please login to continue";
   if (code === "PASSWORD_IS_NOT_CORRECT") return "Password is not correct";
+  if (code === "TAG_ALREADY_EXISTS")
+    return "Tag already exists, please check your tag";
+  if (code === "USER_NOT_FOUND") return "User not found. Please checkF again";
   return code;
 }

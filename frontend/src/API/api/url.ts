@@ -34,4 +34,7 @@ export const url = {
   ACTIVITY_DASHBOARD_USER: "/api/activity/activityPointChange/{id}",
   UNBLOCK_QUESTION: "/api/question/{id}/unblock",
   COUNT_FAG: "/api/question/{id}/getCountUnblock",
+  QUESTION_CONDITIONS: "/api/question/questionBalance",
+  VERIFY_EMAIL: "api/auth/send-email-verify/{id}",
+  CONFIRM_OTP: "api/auth/confirm-email/{id}",
 };
