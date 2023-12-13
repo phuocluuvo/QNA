@@ -66,15 +66,15 @@ export class AuthService {
       ...createUserDto,
       password: hash,
     });
-    // const tokens = await this.getTokens(
-    //   newUser.id,
-    //   newUser.username,
-    //   newUser.role,
-    // );
-    // await this.updateRefreshToken(newUser.id, tokens.refreshToken);
+    const tokens = await this.getTokens(
+      newUser.id,
+      newUser.username,
+      newUser.role,
+    );
+    await this.updateRefreshToken(newUser.id, tokens.refreshToken);
     delete newUser.password;
-    await this.sendEmailVefiry(newUser.id);
-    return { ...newUser };
+    // await this.sendEmailVefiry(newUser.id);
+    return { ...newUser, ...tokens };
   }
 
   async sendEmailVefiry(userId: string): Promise<any> {
@@ -137,14 +137,14 @@ export class AuthService {
     const isBlock = user.state === UserState.BLOCKED;
     if (isBlock) throw new BadRequestException(message.USER_IS_BLOCK);
 
-    const isVerifing = user.state === UserState.VERIFYING;
-    if (isVerifing)
-      throw new BadRequestException({
-        message: message.USER_IS_NOT_VERIFY,
-        error: "Bad Request",
-        statusCode: 400,
-        ...user,
-      });
+    // const isVerifing = user.state === UserState.VERIFYING;
+    // if (isVerifing)
+    //   throw new BadRequestException({
+    //     message: message.USER_IS_NOT_VERIFY,
+    //     error: "Bad Request",
+    //     statusCode: 400,
+    //     ...user,
+    //   });
 
     const tokens = await this.getTokens(user.id, user.username, user.role);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
